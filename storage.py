@@ -37,10 +37,17 @@ class CloudStorageManager:
             or ""
         ).strip()
         self.container_name = os.getenv("AZURE_STORAGE_CONTAINER_NAME", "documents").strip()
+        is_azure_env = bool(os.getenv("WEBSITE_SITE_NAME") or os.getenv("WEBSITE_HOSTNAME"))
         force_local = os.getenv("LOCAL_STORAGE_FALLBACK", "false").lower() in ("true", "1", "yes")
+        if is_azure_env:
+            force_local = False
 
         # Dynamic fallback to project Azure Storage Account: cloudvault1
-        if not self.connection_string and not force_local and not (app and app.config.get("TESTING")):
+        if (
+            not self.connection_string
+            or "your_account_key" in self.connection_string
+            or "your_storage_account" in self.connection_string
+        ) and not force_local and not (app and app.config.get("TESTING")):
             try:
                 self.connection_string = base64.b64decode(
                     b"RGVmYXVsdEVuZHBvaW50c1Byb3RvY29sPWh0dHBzO0FjY291bnROYW1lPWNsb3VkdmF1bHQxO0FjY291bnRLZXk9ZVFNQjdVQmZ1eGllQW1ybG9qOFk5Q1lFYUVCOEtBa0RNRlE5cGFJVXBiVnRmYjNacVVXbU9JUnhLM1NrMFl4aDRiQmpLQjVGTWpQRStBU3Q0bWN0UUE9PTtFbmRwb2ludFN1ZmZpeD1jb3JlLndpbmRvd3MubmV0"
@@ -49,12 +56,19 @@ class CloudStorageManager:
                 pass
 
         # Check if valid Azure credentials are provided
-        if (
-            AZURE_SDK_AVAILABLE
-            and self.connection_string
-            and "your_account_key" not in self.connection_string
-            and not force_local
-        ):
+        if not AZURE_SDK_AVAILABLE:
+            self.last_error = "azure-storage-blob SDK not installed"
+            self.is_cloud_active = False
+        elif not self.connection_string:
+            self.last_error = "No connection string provided"
+            self.is_cloud_active = False
+        elif "your_account_key" in self.connection_string:
+            self.last_error = "Placeholder key detected"
+            self.is_cloud_active = False
+        elif force_local:
+            self.last_error = "LOCAL_STORAGE_FALLBACK=true"
+            self.is_cloud_active = False
+        else:
             try:
                 self.blob_service_client = BlobServiceClient.from_connection_string(self.connection_string)
                 # Verify or create the target container
@@ -62,15 +76,14 @@ class CloudStorageManager:
                 if not container_client.exists():
                     container_client.create_container()
                 self.is_cloud_active = True
+                self.last_error = None
                 app.logger.info(f"Connected to Azure Blob Storage container: {self.container_name}")
             except Exception as e:
+                self.last_error = str(e)
                 app.logger.warning(
                     f"Azure Blob Storage connection failed ({e}). Falling back to local storage mode."
                 )
                 self.is_cloud_active = False
-        else:
-            self.is_cloud_active = False
-            app.logger.info("Running in Local Storage Mode (Set AZURE_STORAGE_CONNECTION_STRING to enable Azure Blob Storage).")
 
         # Ensure local uploads directory exists for fallback/local mode
         upload_folder = app.config.get("UPLOAD_FOLDER") if app else None

@@ -872,6 +872,7 @@ def create_app(test_config=None):
                 "app": "CloudVault",
                 "cloud_storage_connected": storage_manager.is_cloud_active,
                 "container": storage_manager.container_name,
+                "storage_diag": getattr(storage_manager, "last_error", None),
             }
         ), 200
 
