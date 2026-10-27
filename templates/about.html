@@ -194,7 +194,7 @@
     </div>
   </div>
 
-  <!-- SECTION 2: TECHNOLOGY STACK (Organized & Concise) -->
+  <!-- SECTION 2: TECHNOLOGY STACK (Organized & Concise with Logos) -->
   <div id="section-tech" class="about-section hidden space-y-4">
     <div class="flex items-center justify-between border-b border-white/[0.08] pb-2.5">
       <div>
@@ -209,15 +209,73 @@
       </span>
     </div>
 
+    <!-- Official Technology Logos Showcase Strip -->
+    <div class="quartz-surface rounded-xl p-3.5 border border-white/[0.08] flex items-center justify-between gap-3 overflow-x-auto text-xs font-mono">
+      <div class="flex items-center gap-2 shrink-0 text-slate-400 text-[11px] pr-2 border-r border-white/10">
+        <i class="fa-solid fa-microchip text-cyan-400"></i>
+        <span>Ecosystem:</span>
+      </div>
+      <div class="flex items-center gap-3 sm:gap-5 flex-nowrap">
+        <!-- Python Logo -->
+        <div class="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08]" title="Python 3.12">
+          <svg class="w-4 h-4" viewBox="0 0 128 128"><path d="M63.7 3C40.6 3 42 13 42 13l.03 10.3h22.1v3.1H33.3S18.8 24.8 18.8 48c0 23.2 12.6 22.4 12.6 22.4h7.5v-10.6s-.4-12.6 12.4-12.6h21.4s11.9.2 11.9-11.6V15S86.2 3 63.7 3z" fill="#387EB8"/><circle cx="34.8" cy="11.2" r="2.8" fill="#fff"/><path d="M64.3 125c23.1 0 21.7-10 21.7-10l-.03-10.3H63.9v-3.1h30.8s14.5 1.6 14.5-21.6c0-23.2-12.6-22.4-12.6-22.4h-7.5v10.6s.4 12.6-12.4 12.6H44.8s-11.9-.2-11.9 11.6V113s-1.6 12 21.4 12z" fill="#FFE052"/><circle cx="93.2" cy="116.8" r="2.8" fill="#fff"/></svg>
+          <span class="text-white font-bold text-[11px]">Python 3.12</span>
+        </div>
+        <!-- Flask Logo -->
+        <div class="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08]" title="Flask 3.0">
+          <i class="fa-solid fa-flask text-white text-xs"></i>
+          <span class="text-white font-bold text-[11px]">Flask</span>
+        </div>
+        <!-- Microsoft Azure Logo -->
+        <div class="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-sky-500/10 border border-sky-500/20" title="Microsoft Azure">
+          <svg class="w-4 h-4" viewBox="0 0 96 96" fill="none"><path d="M54.5 13L26.5 62.5L39.5 83L69 83L85 54L54.5 13Z" fill="#0089D6"/><path d="M11 70L24 83L69 83L54.5 62.5L29 62.5L11 70Z" fill="#0072C6"/><path d="M54.5 13L29 62.5L48 62.5L68 28.5L54.5 13Z" fill="#1490DF"/></svg>
+          <span class="text-sky-300 font-bold text-[11px]">Microsoft Azure</span>
+        </div>
+        <!-- Azure SQL Logo -->
+        <div class="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20" title="Azure SQL Database">
+          <i class="fa-solid fa-database text-amber-400 text-xs"></i>
+          <span class="text-amber-300 font-bold text-[11px]">Azure SQL</span>
+        </div>
+        <!-- Azure Blob Logo -->
+        <div class="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/20" title="Azure Blob Storage">
+          <i class="fa-solid fa-cloud text-rose-400 text-xs"></i>
+          <span class="text-rose-300 font-bold text-[11px]">Blob Storage</span>
+        </div>
+        <!-- Ubuntu Linux Logo -->
+        <div class="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-orange-500/10 border border-orange-500/20" title="Canonical Ubuntu Linux">
+          <i class="fa-brands fa-ubuntu text-[#E95420] text-xs"></i>
+          <span class="text-orange-300 font-bold text-[11px]">Ubuntu Linux</span>
+        </div>
+        <!-- HTML5 / CSS3 Logo -->
+        <div class="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20" title="HTML5 & CSS3">
+          <i class="fa-brands fa-html5 text-[#E34F26] text-xs"></i>
+          <i class="fa-brands fa-css3-alt text-[#1572B6] text-xs"></i>
+          <span class="text-violet-300 font-bold text-[11px]">HTML5 & CSS3</span>
+        </div>
+      </div>
+    </div>
+
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-      <!-- 1. Frontend -->
-      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+      <!-- 1. Frontend UI -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2.5 relative group overflow-hidden">
         <div class="flex items-center justify-between text-xs font-mono">
-          <span class="font-bold text-violet-300 flex items-center gap-1.5"><i class="fa-solid fa-code text-violet-400"></i> Frontend UI</span>
-          <span class="text-[10px] text-slate-500">HTML5 / CSS</span>
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600/30 to-indigo-600/30 border border-violet-500/40 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-code text-violet-300 text-xs"></i>
+            </div>
+            <div>
+              <span class="font-bold text-white block leading-tight">Frontend Architecture</span>
+              <span class="text-[10px] text-violet-300 font-mono">Modern UI & Client</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 text-sm">
+            <i class="fa-brands fa-html5 text-[#E34F26]" title="HTML5"></i>
+            <i class="fa-brands fa-css3-alt text-[#1572B6]" title="CSS3"></i>
+            <i class="fa-brands fa-js text-[#F7DF1E]" title="JavaScript ES6"></i>
+          </div>
         </div>
         <p class="text-xs text-slate-300 leading-relaxed">
-          Glassmorphism Quartz design system with Plus Jakarta Sans & JetBrains Mono, FontAwesome 6.5, and responsive mobile drawers.
+          Glassmorphism Quartz design system with Plus Jakarta Sans & JetBrains Mono, FontAwesome 6.5, async modal streams, and responsive drawers.
         </p>
         <div class="flex flex-wrap gap-1 text-[10px] font-mono text-slate-400">
           <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Vanilla CSS</span>
@@ -226,30 +284,49 @@
         </div>
       </div>
 
-      <!-- 2. Backend Framework -->
-      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+      <!-- 2. Backend Application Framework -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2.5 relative group overflow-hidden">
         <div class="flex items-center justify-between text-xs font-mono">
-          <span class="font-bold text-emerald-300 flex items-center gap-1.5"><i class="fa-brands fa-python text-emerald-400"></i> Backend Application</span>
-          <span class="text-[10px] text-slate-500">Python 3.12</span>
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-600/30 to-teal-600/30 border border-emerald-500/40 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4" viewBox="0 0 128 128"><path d="M63.7 3C40.6 3 42 13 42 13l.03 10.3h22.1v3.1H33.3S18.8 24.8 18.8 48c0 23.2 12.6 22.4 12.6 22.4h7.5v-10.6s-.4-12.6 12.4-12.6h21.4s11.9.2 11.9-11.6V15S86.2 3 63.7 3z" fill="#387EB8"/><circle cx="34.8" cy="11.2" r="2.8" fill="#fff"/><path d="M64.3 125c23.1 0 21.7-10 21.7-10l-.03-10.3H63.9v-3.1h30.8s14.5 1.6 14.5-21.6c0-23.2-12.6-22.4-12.6-22.4h-7.5v10.6s.4 12.6-12.4 12.6H44.8s-11.9-.2-11.9 11.6V113s-1.6 12 21.4 12z" fill="#FFE052"/><circle cx="93.2" cy="116.8" r="2.8" fill="#fff"/></svg>
+            </div>
+            <div>
+              <span class="font-bold text-white block leading-tight">Backend Framework</span>
+              <span class="text-[10px] text-emerald-300 font-mono">Python 3.12 / Flask 3.0</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 text-xs text-slate-400">
+            <i class="fa-solid fa-flask text-white" title="Flask Framework"></i>
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">WSGI</span>
+          </div>
         </div>
         <p class="text-xs text-slate-300 leading-relaxed">
-          Flask microframework running on Gunicorn WSGI server, with Flask-Login session management and Werkzeug secure streaming.
+          Flask microframework running on Gunicorn WSGI server, with Flask-Login session management, scrypt password hashing, and streaming.
         </p>
         <div class="flex flex-wrap gap-1 text-[10px] font-mono text-slate-400">
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Python 3.12</span>
           <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Flask 3.0</span>
           <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Gunicorn 21.2</span>
-          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">RESTful APIs</span>
         </div>
       </div>
 
       <!-- 3. Cloud PaaS Compute -->
-      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2.5 relative group overflow-hidden">
         <div class="flex items-center justify-between text-xs font-mono">
-          <span class="font-bold text-cyan-300 flex items-center gap-1.5"><i class="fa-solid fa-server text-cyan-400"></i> Cloud Hosting (PaaS)</span>
-          <span class="text-[10px] text-slate-500">Azure App Service</span>
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-600/30 to-blue-600/30 border border-sky-500/40 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4" viewBox="0 0 96 96" fill="none"><path d="M54.5 13L26.5 62.5L39.5 83L69 83L85 54L54.5 13Z" fill="#0089D6"/><path d="M11 70L24 83L69 83L54.5 62.5L29 62.5L11 70Z" fill="#0072C6"/><path d="M54.5 13L29 62.5L48 62.5L68 28.5L54.5 13Z" fill="#1490DF"/></svg>
+            </div>
+            <div>
+              <span class="font-bold text-white block leading-tight">Cloud Hosting (PaaS)</span>
+              <span class="text-[10px] text-sky-300 font-mono">Azure App Service</span>
+            </div>
+          </div>
+          <i class="fa-brands fa-microsoft text-[#00A4EF] text-sm" title="Microsoft Azure"></i>
         </div>
         <p class="text-xs text-slate-300 leading-relaxed">
-          Linux container hosting in Central India region with automatic TLS termination, system logging, and environment management.
+          Linux container hosting in Central India region with automatic TLS 1.3 termination, deployment logging, and GitHub Actions CI/CD pipeline.
         </p>
         <div class="flex flex-wrap gap-1 text-[10px] font-mono text-slate-400">
           <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Linux B1 Plan</span>
@@ -259,13 +336,21 @@
       </div>
 
       <!-- 4. Database DBaaS -->
-      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2.5 relative group overflow-hidden">
         <div class="flex items-center justify-between text-xs font-mono">
-          <span class="font-bold text-amber-300 flex items-center gap-1.5"><i class="fa-solid fa-database text-amber-400"></i> Relational DB (DBaaS)</span>
-          <span class="text-[10px] text-slate-500">Azure SQL</span>
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-600/30 to-orange-600/30 border border-amber-500/40 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-database text-amber-300 text-xs"></i>
+            </div>
+            <div>
+              <span class="font-bold text-white block leading-tight">Relational DB (DBaaS)</span>
+              <span class="text-[10px] text-amber-300 font-mono">Azure SQL Database</span>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">SQL</span>
         </div>
         <p class="text-xs text-slate-300 leading-relaxed">
-          Fully managed SQL database (cloudvaultdb) connected via PyMSSQL driver, featuring ACID transactions and automatic indexing.
+          Fully managed SQL database (cloudvaultdb) connected via PyMSSQL driver, featuring ACID transactions, foreign keys, and automatic indexing.
         </p>
         <div class="flex flex-wrap gap-1 text-[10px] font-mono text-slate-400">
           <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">SQLAlchemy 3.1</span>
@@ -275,13 +360,21 @@
       </div>
 
       <!-- 5. Object Storage SaaS -->
-      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2.5 relative group overflow-hidden">
         <div class="flex items-center justify-between text-xs font-mono">
-          <span class="font-bold text-rose-300 flex items-center gap-1.5"><i class="fa-solid fa-cloud text-rose-400"></i> Cloud Storage (SaaS)</span>
-          <span class="text-[10px] text-slate-500">Azure Blob</span>
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-600/30 to-pink-600/30 border border-rose-500/40 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-cloud text-rose-300 text-xs"></i>
+            </div>
+            <div>
+              <span class="font-bold text-white block leading-tight">Cloud Storage (SaaS)</span>
+              <span class="text-[10px] text-rose-300 font-mono">Azure Blob Storage</span>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold">5.0 GB</span>
         </div>
         <p class="text-xs text-slate-300 leading-relaxed">
-          High-durability blob container (documents) in storage account cloudvault1 with inline streaming and 5.0 GB per-user quota.
+          High-durability blob container (documents) in storage account cloudvault1 with inline streaming and 5.0 GB per-user quota allocation.
         </p>
         <div class="flex flex-wrap gap-1 text-[10px] font-mono text-slate-400">
           <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">azure-storage-blob</span>
@@ -291,10 +384,18 @@
       </div>
 
       <!-- 6. Threat Scanner & SECaaS -->
-      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2.5 relative group overflow-hidden">
         <div class="flex items-center justify-between text-xs font-mono">
-          <span class="font-bold text-indigo-300 flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-indigo-400"></i> Security & Scanner</span>
-          <span class="text-[10px] text-slate-500">SECaaS</span>
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600/30 to-violet-600/30 border border-indigo-500/40 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-shield-virus text-indigo-300 text-xs"></i>
+            </div>
+            <div>
+              <span class="font-bold text-white block leading-tight">Threat Scanner & SECaaS</span>
+              <span class="text-[10px] text-indigo-300 font-mono">Active Defense</span>
+            </div>
+          </div>
+          <i class="fa-solid fa-user-shield text-indigo-400 text-xs"></i>
         </div>
         <p class="text-xs text-slate-300 leading-relaxed">
           Deep byte header scanning engine, binary malware intercept (MZ/ELF), Scrypt password hashing, and immutable SQL audit telemetry.
@@ -303,6 +404,33 @@
           <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Magic Bytes</span>
           <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Scrypt KDF</span>
           <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Audit Trail</span>
+        </div>
+      </div>
+
+      <!-- 7. Infrastructure as a Service (IaaS) -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2.5 relative group overflow-hidden sm:col-span-2 lg:col-span-3">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-600/30 to-amber-600/30 border border-orange-500/40 flex items-center justify-center shrink-0">
+              <i class="fa-brands fa-ubuntu text-[#E95420] text-sm"></i>
+            </div>
+            <div>
+              <span class="font-bold text-white block leading-tight">Cloud Infrastructure (IaaS)</span>
+              <span class="text-[10px] text-orange-300 font-mono">Ubuntu Linux Virtual Machine</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 text-xs text-slate-400">
+            <i class="fa-brands fa-linux text-amber-300 text-sm" title="Linux"></i>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 font-bold">cloudvault1-vm</span>
+          </div>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Ubuntu Server 22.04 LTS VM deployed inside a dedicated Virtual Network (VNet: <code class="text-orange-300">vnet-centralindia-1</code>) with Network Security Group (NSG) firewall rules, serving as an external heartbeat sentinel.
+        </p>
+        <div class="flex flex-wrap gap-1 text-[10px] font-mono text-slate-400">
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Ubuntu 22.04 LTS</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Standard_B1s Compute</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Private VNet & NSG</span>
         </div>
       </div>
     </div>
