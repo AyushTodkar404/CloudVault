@@ -335,26 +335,56 @@
       </div>
     </div>
 
+    <!-- Offline Staging & Sync Alert Ribbon -->
+    <div id="offlineSyncBanner" class="hidden p-3.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-amber-600/10 to-orange-500/10 border border-amber-500/30 text-amber-200 text-xs shadow-lg backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
+      <div class="flex items-center gap-2.5">
+        <span class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-cloud-arrow-up text-sm animate-pulse"></i>
+        </span>
+        <div>
+          <div class="font-bold text-white flex items-center gap-2">
+            <span>Offline Upload Queue</span>
+            <span id="offlineQueueBadge" class="px-2 py-0.5 rounded-full bg-amber-500/30 text-amber-300 border border-amber-400/40 text-[10px] font-mono font-bold">0 Pending</span>
+          </div>
+          <p class="text-[11px] text-amber-300/80 font-mono">
+            Files stored temporarily in browser IndexedDB. You can preview, open, or delete them now. When internet reconnects, they sync automatically to Azure Cloud.
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+        <button 
+          type="button" 
+          onclick="window.OfflineVault && window.OfflineVault.syncAll()" 
+          id="offlineManualSyncBtn"
+          class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs font-mono flex items-center gap-1.5 shadow-md transition-all active:scale-95"
+        >
+          <i class="fa-solid fa-rotate text-[11px]"></i>
+          <span>Sync to Cloud Now</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Active Documents Registry -->
-    {% if documents or trash_documents %}
-      
-      <!-- 1. Table View Container -->
-      <div id="tableViewContainer" class="overflow-x-auto">
-        <table class="w-full text-left border-collapse" id="docTable">
-          <thead>
-            <tr class="border-b border-white/[0.08] text-[11px] font-semibold text-slate-400 font-mono uppercase tracking-wider">
-              <th class="py-2.5 px-3 w-8">
-                <input type="checkbox" id="selectAllHeader" onchange="selectAll(this.checked)" class="rounded bg-[#0a0c14] border-white/20 text-violet-600 focus:ring-0 cursor-pointer">
-              </th>
-              <th class="py-2.5 px-3">Student Name</th>
-              <th class="py-2.5 px-3">Credential Title</th>
-              <th class="py-2.5 px-3 hidden md:table-cell">Integrity Hash</th>
-              <th class="py-2.5 px-3 hidden sm:table-cell">File Details</th>
-              <th class="py-2.5 px-3 hidden lg:table-cell">Archived At</th>
-              <th class="py-2.5 px-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-white/[0.05] text-xs" id="tableBody">
+    <!-- 1. Table View Container -->
+    <div id="tableViewContainer" class="overflow-x-auto {% if not documents and not trash_documents %}hidden{% endif %}">
+      <table class="w-full text-left border-collapse" id="docTable">
+        <thead>
+          <tr class="border-b border-white/[0.08] text-[11px] font-semibold text-slate-400 font-mono uppercase tracking-wider">
+            <th class="py-2.5 px-3 w-8">
+              <input type="checkbox" id="selectAllHeader" onchange="selectAll(this.checked)" class="rounded bg-[#0a0c14] border-white/20 text-violet-600 focus:ring-0 cursor-pointer">
+            </th>
+            <th class="py-2.5 px-3">Student Name</th>
+            <th class="py-2.5 px-3">Credential Title</th>
+            <th class="py-2.5 px-3 hidden md:table-cell">Integrity Hash</th>
+            <th class="py-2.5 px-3 hidden sm:table-cell">File Details</th>
+            <th class="py-2.5 px-3 hidden lg:table-cell">Archived At</th>
+            <th class="py-2.5 px-3 text-right">Actions</th>
+          </tr>
+        </thead>
+        <!-- Offline Staged Documents (Pending Cloud Sync) -->
+        <tbody id="offlineTableBody" class="divide-y divide-amber-500/10 text-xs"></tbody>
+        <!-- Cloud Vault Persisted Documents -->
+        <tbody class="divide-y divide-white/[0.05] text-xs" id="tableBody">
             <!-- Active Documents -->
             {% for doc in documents %}
               <tr 
@@ -616,6 +646,8 @@
 
       <!-- 2. Grid View Container (Toggled via view switcher) -->
       <div id="gridViewContainer" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Offline Staged Cards -->
+        <div id="offlineGridContainer" class="contents"></div>
         <!-- Active Documents Grid -->
         {% for doc in documents %}
           <div 
@@ -762,32 +794,28 @@
         </button>
       </div>
 
-    {% else %}
-      
-      <!-- Empty Repository State -->
-      <div class="py-16 text-center space-y-4">
-        <div class="w-16 h-16 rounded-2xl bg-[#0f111a] border border-white/[0.08] flex items-center justify-center mx-auto text-violet-400/60 text-2xl shadow-lg">
-          <i class="fa-solid fa-vault"></i>
-        </div>
-        <div class="space-y-1">
-          <h3 class="text-sm font-bold text-white">No documents found</h3>
-          <p class="text-xs text-slate-400 max-w-sm mx-auto font-mono">
-            No certificates or digital documents have been registered to CloudVault yet.
-          </p>
-        </div>
-        <div>
-          <button 
-            type="button" 
-            onclick="openUploadModal()" 
-            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-violet-600/25 border border-violet-400/30 transition-all font-mono"
-          >
-            <i class="fa-solid fa-plus text-[11px]"></i>
-            <span>Register First Document</span>
-          </button>
-        </div>
+    <!-- Empty Repository State -->
+    <div id="emptyRepoState" class="py-16 text-center space-y-4 {% if documents or trash_documents %}hidden{% endif %}">
+      <div class="w-16 h-16 rounded-2xl bg-[#0f111a] border border-white/[0.08] flex items-center justify-center mx-auto text-violet-400/60 text-2xl shadow-lg">
+        <i class="fa-solid fa-vault"></i>
       </div>
-
-    {% endif %}
+      <div class="space-y-1">
+        <h3 class="text-sm font-bold text-white">No documents found</h3>
+        <p class="text-xs text-slate-400 max-w-sm mx-auto font-mono">
+          No certificates or digital documents have been registered to CloudVault yet.
+        </p>
+      </div>
+      <div>
+        <button 
+          type="button" 
+          onclick="openUploadModal()" 
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-violet-600/25 border border-violet-400/30 transition-all font-mono"
+        >
+          <i class="fa-solid fa-plus text-[11px]"></i>
+          <span>Register First Document</span>
+        </button>
+      </div>
+    </div>
 
   </div>
 
@@ -1088,6 +1116,210 @@
       const search = document.getElementById('instantSearch');
       if (search) search.focus();
     }
+  });
+
+  // Offline Document Staging & Cache Controller
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, function(m) {
+      return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[m];
+    });
+  }
+
+  function getReadableSize(bytes) {
+    if (typeof formatBytes === 'function') return formatBytes(bytes);
+    if (!bytes || bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  async function renderOfflineDocuments() {
+    if (!window.OfflineVault) return;
+    const items = await window.OfflineVault.getAll();
+    const banner = document.getElementById('offlineSyncBanner');
+    const badge = document.getElementById('offlineQueueBadge');
+    const offlineTableBody = document.getElementById('offlineTableBody');
+    const offlineGridContainer = document.getElementById('offlineGridContainer');
+    const emptyRepoState = document.getElementById('emptyRepoState');
+    const tableViewContainer = document.getElementById('tableViewContainer');
+    const gridViewContainer = document.getElementById('gridViewContainer');
+    const serverRowsCount = document.querySelectorAll('#tableBody .doc-row').length;
+
+    if (!items || items.length === 0) {
+      if (banner) banner.classList.add('hidden');
+      if (offlineTableBody) offlineTableBody.innerHTML = '';
+      if (offlineGridContainer) offlineGridContainer.innerHTML = '';
+      if (serverRowsCount === 0 && emptyRepoState) {
+        emptyRepoState.classList.remove('hidden');
+        if (tableViewContainer) tableViewContainer.classList.add('hidden');
+        if (gridViewContainer) gridViewContainer.classList.add('hidden');
+      }
+      return;
+    }
+
+    // Has offline items
+    if (banner) {
+      banner.classList.remove('hidden');
+      if (badge) badge.textContent = `${items.length} Pending`;
+    }
+    if (emptyRepoState) emptyRepoState.classList.add('hidden');
+    
+    // Ensure appropriate view container is visible
+    const isGridViewActive = gridViewContainer && !gridViewContainer.classList.contains('hidden');
+    if (!isGridViewActive && tableViewContainer) {
+      tableViewContainer.classList.remove('hidden');
+    }
+
+    // Render Table Rows
+    if (offlineTableBody) {
+      offlineTableBody.innerHTML = items.map(item => `
+        <tr class="offline-doc-row bg-amber-500/[0.04] hover:bg-amber-500/[0.08] transition-colors group border-b border-amber-500/10" id="offline-row-${item.id}">
+          <td class="py-3 px-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block animate-pulse" title="Pending Sync"></span>
+          </td>
+          <td class="py-3 px-3">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-300 flex items-center justify-center font-mono font-bold text-[10px]">
+                ${escapeHtml((item.studentName || 'U').substring(0, 2).toUpperCase())}
+              </div>
+              <span class="font-bold text-white">${escapeHtml(item.studentName || 'Student')}</span>
+            </div>
+          </td>
+          <td class="py-3 px-3">
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-white">${escapeHtml(item.documentTitle)}</span>
+              <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold inline-flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span> Pending Sync
+              </span>
+            </div>
+          </td>
+          <td class="py-3 px-3 hidden md:table-cell font-mono text-[11px] text-amber-300/80">
+            <span class="inline-flex items-center gap-1"><i class="fa-solid fa-hard-drive text-amber-400 text-[10px]"></i> Browser IndexedDB</span>
+          </td>
+          <td class="py-3 px-3 hidden sm:table-cell font-mono text-[11px] text-slate-300">
+            ${escapeHtml(item.fileName)} &bull; ${getReadableSize(item.fileSize)}
+          </td>
+          <td class="py-3 px-3 hidden lg:table-cell font-mono text-amber-400/90 text-[11px]">
+            Saved Offline
+          </td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <div class="flex items-center justify-end gap-1.5">
+              <button 
+                type="button" 
+                onclick="window.OfflineVault.preview('${item.id}')"
+                class="px-2.5 py-1 rounded-lg bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 text-violet-300 text-xs font-semibold font-mono transition-colors"
+                title="Preview offline file"
+              >
+                Preview
+              </button>
+              <button 
+                type="button" 
+                onclick="window.OfflineVault.download('${item.id}')"
+                class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] text-xs transition-colors"
+                title="Open / Download offline file"
+              >
+                <i class="fa-solid fa-arrow-down text-[11px]"></i>
+              </button>
+              <button 
+                type="button" 
+                onclick="deleteOfflineItem('${item.id}')"
+                class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 text-xs transition-colors"
+                title="Delete from offline queue"
+              >
+                <i class="fa-solid fa-trash-can text-[11px]"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Render Grid Cards
+    if (offlineGridContainer) {
+      offlineGridContainer.innerHTML = items.map(item => `
+        <div class="offline-doc-card quartz-surface rounded-xl p-4.5 border-amber-500/30 transition-all flex flex-col justify-between relative overflow-hidden group" id="offline-card-${item.id}">
+          <div>
+            <div class="flex items-center justify-between gap-2 pb-3 border-b border-amber-500/20">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-300 flex items-center justify-center font-mono font-bold text-xs">
+                  ${escapeHtml((item.studentName || 'U').substring(0, 2).toUpperCase())}
+                </div>
+                <div>
+                  <p class="font-bold text-xs text-white truncate max-w-[110px]">${escapeHtml(item.studentName || 'Student')}</p>
+                  <p class="text-[10px] text-amber-400/80 font-mono">Offline Staged</p>
+                </div>
+              </div>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                .${escapeHtml((item.fileExtension || 'FILE').toUpperCase())}
+              </span>
+            </div>
+
+            <div class="py-3.5 space-y-1.5">
+              <h4 class="font-bold text-sm text-slate-100 line-clamp-2">
+                ${escapeHtml(item.documentTitle)}
+              </h4>
+              <p class="text-[11px] text-slate-400 font-mono truncate">
+                ${escapeHtml(item.fileName)}
+              </p>
+              <div class="pt-1">
+                <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold inline-flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span> Pending Sync
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-amber-500/20 flex items-center justify-between text-xs font-mono text-slate-400">
+            <span>${getReadableSize(item.fileSize)}</span>
+            <div class="flex items-center gap-1">
+              <button 
+                type="button" 
+                onclick="window.OfflineVault.preview('${item.id}')"
+                class="px-2.5 py-1 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/30 text-violet-300 hover:text-white transition-colors text-[11px] font-semibold"
+              >
+                Preview
+              </button>
+              <button 
+                type="button" 
+                onclick="window.OfflineVault.download('${item.id}')"
+                class="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] text-xs"
+                title="Open / Download"
+              >
+                <i class="fa-solid fa-arrow-down"></i>
+              </button>
+              <button 
+                type="button" 
+                onclick="deleteOfflineItem('${item.id}')"
+                class="p-1 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 text-xs"
+                title="Delete"
+              >
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  async function deleteOfflineItem(id) {
+    if (!confirm('Remove this document from offline staging queue?')) return;
+    if (window.OfflineVault) {
+      await window.OfflineVault.delete(id);
+      if (typeof showToast === 'function') {
+        showToast('Document removed from offline queue.', 'info');
+      }
+      renderOfflineDocuments();
+    }
+  }
+
+  window.renderOfflineDocuments = renderOfflineDocuments;
+  window.deleteOfflineItem = deleteOfflineItem;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    renderOfflineDocuments();
   });
 </script>
 {% endblock %}

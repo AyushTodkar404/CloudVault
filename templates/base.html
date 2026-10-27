@@ -1057,7 +1057,13 @@
       previewModal.showModal();
     }
 
+    let currentPreviewObjectUrl = null;
+
     function closePreviewModal() {
+      if (currentPreviewObjectUrl) {
+        URL.revokeObjectURL(currentPreviewObjectUrl);
+        currentPreviewObjectUrl = null;
+      }
       if (previewModal) {
         const previewIframe = document.getElementById('previewIframe');
         const previewImage = document.getElementById('previewImage');
@@ -1284,6 +1290,20 @@
         return;
       }
 
+      // If browser is offline, store in IndexedDB offline queue immediately!
+      if (!navigator.onLine) {
+        Promise.all(files.map(f => {
+          const title = f.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
+          return OfflineVault.saveFile(f, '{{ current_user.username if current_user.is_authenticated else "User" }}', title);
+        })).then(() => {
+          showToast(`Offline mode: Saved ${files.length} file(s) locally. Will sync to cloud once connected.`, 'warning');
+          if (typeof renderOfflineDocuments === 'function') renderOfflineDocuments();
+        }).catch(err => {
+          alert('Failed to cache files offline: ' + err);
+        });
+        return;
+      }
+
       const progressToast = document.getElementById('uploadProgressToast');
       const progressBar = document.getElementById('uploadProgressBar');
       const progressLabel = document.getElementById('uploadProgressLabel');
@@ -1339,11 +1359,21 @@
       };
 
       xhr.onerror = () => {
-        if (progressLabel) progressLabel.textContent = `Network Error`;
-        if (progressDetails) progressDetails.textContent = `Could not connect to storage gateway`;
-        setTimeout(() => {
+        // Network failure mid-upload: gracefully save to OfflineVault
+        Promise.all(files.map(f => {
+          const title = f.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
+          return OfflineVault.saveFile(f, '{{ current_user.username if current_user.is_authenticated else "User" }}', title);
+        })).then(() => {
           if (progressToast) progressToast.classList.add('hidden');
-        }, 3500);
+          showToast(`Connection lost: saved ${files.length} file(s) offline. Will auto-sync when online.`, 'warning');
+          if (typeof renderOfflineDocuments === 'function') renderOfflineDocuments();
+        }).catch(() => {
+          if (progressLabel) progressLabel.textContent = `Network Error`;
+          if (progressDetails) progressDetails.textContent = `Could not connect to storage gateway`;
+          setTimeout(() => {
+            if (progressToast) progressToast.classList.add('hidden');
+          }, 3500);
+        });
       };
 
       xhr.send(formData);
@@ -1421,6 +1451,254 @@
       }, 3400);
     }
 
+    // Offline Storage & Synchronization Engine (IndexedDB)
+    const OfflineVault = {
+      dbName: 'CloudVaultOfflineDB',
+      dbVersion: 1,
+      storeName: 'pending_uploads',
+
+      async getDB() {
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(this.dbName, this.dbVersion);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(this.storeName)) {
+              db.createObjectStore(this.storeName, { keyPath: 'id' });
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      },
+
+      async saveFile(file, studentName, documentTitle) {
+        try {
+          const db = await this.getDB();
+          const id = 'offline_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+          const ext = file.name.includes('.') ? file.name.split('.').pop().toLowerCase() : '';
+
+          let category = 'other';
+          if (['pdf'].includes(ext)) category = 'pdf';
+          else if (['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'bmp'].includes(ext)) category = 'image';
+          else if (['mp4', 'webm', 'mov', 'mkv', 'avi'].includes(ext)) category = 'video';
+          else if (['mp3', 'wav', 'ogg', 'm4a'].includes(ext)) category = 'audio';
+          else if (['xls', 'xlsx', 'csv'].includes(ext)) category = 'spreadsheet';
+          else if (['doc', 'docx', 'odt'].includes(ext)) category = 'word';
+          else if (['zip', 'tar', 'gz', '7z', 'rar'].includes(ext)) category = 'archive';
+          else if (['py', 'js', 'html', 'css', 'json', 'sql', 'cpp', 'java'].includes(ext)) category = 'code';
+
+          const record = {
+            id: id,
+            fileName: file.name,
+            fileSize: file.size,
+            fileType: file.type || 'application/octet-stream',
+            fileExtension: ext,
+            category: category,
+            documentTitle: documentTitle || file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' '),
+            studentName: studentName || 'Student',
+            fileBlob: file,
+            createdAt: new Date().toISOString(),
+            status: 'pending_sync'
+          };
+
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(this.storeName, 'readwrite');
+            tx.objectStore(this.storeName).put(record);
+            tx.oncomplete = () => resolve(record);
+            tx.onerror = () => reject(tx.error);
+          });
+        } catch (e) {
+          console.error('Failed to save to OfflineVault:', e);
+          throw e;
+        }
+      },
+
+      async getAll() {
+        try {
+          const db = await this.getDB();
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(this.storeName, 'readonly');
+            const req = tx.objectStore(this.storeName).getAll();
+            req.onsuccess = () => resolve(req.result || []);
+            req.onerror = () => reject(req.error);
+          });
+        } catch (e) {
+          return [];
+        }
+      },
+
+      async get(id) {
+        try {
+          const db = await this.getDB();
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(this.storeName, 'readonly');
+            const req = tx.objectStore(this.storeName).get(id);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+          });
+        } catch (e) {
+          return null;
+        }
+      },
+
+      async delete(id) {
+        try {
+          const db = await this.getDB();
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(this.storeName, 'readwrite');
+            tx.objectStore(this.storeName).delete(id);
+            tx.oncomplete = () => resolve(true);
+            tx.onerror = () => reject(tx.error);
+          });
+        } catch (e) {
+          return false;
+        }
+      },
+
+      async preview(id) {
+        const item = await this.get(id);
+        if (!item || !item.fileBlob) {
+          alert('Could not retrieve offline document for preview.');
+          return;
+        }
+        if (currentPreviewObjectUrl) {
+          URL.revokeObjectURL(currentPreviewObjectUrl);
+        }
+        currentPreviewObjectUrl = URL.createObjectURL(item.fileBlob);
+        openPreviewModal(currentPreviewObjectUrl, item.documentTitle, item.studentName, item.fileExtension, item.category, item.id);
+      },
+
+      async download(id) {
+        const item = await this.get(id);
+        if (!item || !item.fileBlob) {
+          alert('Could not retrieve offline document.');
+          return;
+        }
+        const tempUrl = URL.createObjectURL(item.fileBlob);
+        const a = document.createElement('a');
+        a.href = tempUrl;
+        a.download = item.fileName;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(tempUrl);
+        }, 500);
+      },
+
+      async syncAll() {
+        if (!navigator.onLine) {
+          showToast('Cannot sync: Internet connection is offline.', 'warning');
+          return;
+        }
+        const pending = await this.getAll();
+        if (!pending || pending.length === 0) return;
+
+        showToast(`Syncing ${pending.length} pending offline file(s) to Azure Hot-Store...`, 'info');
+        let syncedCount = 0;
+
+        for (const item of pending) {
+          try {
+            const formData = new FormData();
+            formData.append('file', item.fileBlob, item.fileName);
+            formData.append('student_name', item.studentName);
+            formData.append('document_title', item.documentTitle);
+
+            const res = await fetch('/upload', {
+              method: 'POST',
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+              },
+              body: formData
+            });
+
+            if (res.ok) {
+              await this.delete(item.id);
+              syncedCount++;
+            }
+          } catch (err) {
+            console.warn('Sync interrupted by network error:', err);
+            break;
+          }
+        }
+
+        if (syncedCount > 0) {
+          showToast(`Successfully uploaded ${syncedCount} offline document(s) to cloud vault!`, 'success');
+          setTimeout(() => window.location.reload(), 900);
+        }
+      }
+    };
+    window.OfflineVault = OfflineVault;
+
+    // Modal Form Offline & AJAX Intercept
+    const modalUploadForm = document.getElementById('modalUploadForm');
+    if (modalUploadForm) {
+      modalUploadForm.addEventListener('submit', async (e) => {
+        const fileInput = document.getElementById('modalFileInput');
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) return;
+
+        // If offline, store immediately in OfflineVault
+        if (!navigator.onLine) {
+          e.preventDefault();
+          const studentName = document.getElementById('modal_student_name').value || 'Student';
+          const docTitle = document.getElementById('modal_document_title').value || '';
+          
+          for (let i = 0; i < fileInput.files.length; i++) {
+            const f = fileInput.files[i];
+            const title = fileInput.files.length === 1 && docTitle ? docTitle : f.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
+            await OfflineVault.saveFile(f, studentName, title);
+          }
+          closeUploadModal();
+          showToast(`Saved ${fileInput.files.length} document(s) offline. Will upload once online.`, 'warning');
+          if (typeof renderOfflineDocuments === 'function') renderOfflineDocuments();
+          return;
+        }
+
+        // When online, handle via AJAX to seamlessly catch network disconnection
+        e.preventDefault();
+        const submitBtn = document.getElementById('modalSubmitBtn');
+        const origHtml = submitBtn ? submitBtn.innerHTML : '';
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i><span>Committing to Cloud...</span>';
+        }
+
+        const formData = new FormData(modalUploadForm);
+        try {
+          const res = await fetch('/upload', {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+            body: formData
+          });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok && data.success) {
+            closeUploadModal();
+            showToast(`Successfully uploaded ${data.count || 1} document(s) to cloud vault!`, 'success');
+            setTimeout(() => window.location.reload(), 750);
+          } else {
+            alert(data.error || 'Upload error');
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = origHtml;
+            }
+          }
+        } catch (netErr) {
+          // Connection dropped during upload: gracefully fall back to OfflineVault
+          const studentName = document.getElementById('modal_student_name').value || 'Student';
+          const docTitle = document.getElementById('modal_document_title').value || '';
+          for (let i = 0; i < fileInput.files.length; i++) {
+            const f = fileInput.files[i];
+            const title = fileInput.files.length === 1 && docTitle ? docTitle : f.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
+            await OfflineVault.saveFile(f, studentName, title);
+          }
+          closeUploadModal();
+          showToast(`Connection interrupted! Document cached offline & queued for auto-sync.`, 'warning');
+          if (typeof renderOfflineDocuments === 'function') renderOfflineDocuments();
+        }
+      });
+    }
+
     // Cloud Connectivity Sentinel
     function checkNetworkConnectivity() {
       const ping = document.getElementById('clusterStatusPing');
@@ -1428,9 +1706,9 @@
       const text = document.getElementById('clusterStatusText');
       if (!navigator.onLine) {
         if (ping) ping.classList.add('hidden');
-        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-amber-400';
-        if (text) text.innerHTML = '<span class="text-amber-300 font-semibold">Offline (Local Cache)</span>';
-        showToast('Connection lost. Operating in offline cached mode.', 'warning');
+        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-amber-400 animate-pulse';
+        if (text) text.innerHTML = '<span class="text-amber-300 font-semibold">Offline Mode (Sync Queued)</span>';
+        showToast('Internet connection lost. Working in offline cached mode.', 'warning');
       } else {
         if (ping) ping.classList.remove('hidden');
         if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-emerald-500';
@@ -1440,7 +1718,15 @@
     window.addEventListener('offline', checkNetworkConnectivity);
     window.addEventListener('online', () => {
       checkNetworkConnectivity();
-      showToast('Reconnected to Azure Blob Hot-Store', 'success');
+      showToast('Reconnected to internet! Checking offline queue...', 'success');
+      OfflineVault.syncAll();
+    });
+
+    // Auto-sync on page load if online and offline items exist
+    document.addEventListener('DOMContentLoaded', () => {
+      if (navigator.onLine) {
+        setTimeout(() => OfflineVault.syncAll(), 1500);
+      }
     });
 
     // Keyboard Shortcuts (N for upload, Ctrl+K or / for search, Esc to close)

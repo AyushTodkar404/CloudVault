@@ -684,6 +684,23 @@ class CloudVaultProfessionalFeaturesTestCase(unittest.TestCase):
         self.assertIn("Prohibited script payload signature detected", data["error"])
 
 
+    def test_offline_vault_and_sync_elements_rendered(self):
+        """Ensure templates render offline vault UI elements and OfflineVault storage logic."""
+        self.register_and_login("offline_user", "offline@vault.edu")
+        resp = self.client.get("/")
+        self.assertEqual(resp.status_code, 200)
+        html = resp.get_data(as_text=True)
+
+        # Check offline banner and containers
+        self.assertIn('id="offlineSyncBanner"', html)
+        self.assertIn('id="offlineQueueBadge"', html)
+        self.assertIn('id="offlineTableBody"', html)
+        self.assertIn('id="offlineGridContainer"', html)
+        self.assertIn("OfflineVault", html)
+        self.assertIn("Pending Sync", html)
+        self.assertIn("renderOfflineDocuments", html)
+
+
 if __name__ == "__main__":
     unittest.main()
 
