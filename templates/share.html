@@ -109,7 +109,7 @@
             <span>Copy Link</span>
           </button>
           <!-- Direct Download -->
-          <a href="{{ doc.blob_url }}" download="{{ doc.file_name }}"
+          <a href="{{ url_for('download_shared_document', token=doc.share_token) }}" download="{{ doc.file_name }}"
             class="px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-md shadow-violet-600/30 border border-violet-400/30 flex items-center gap-1.5 font-mono">
             <i class="fa-solid fa-arrow-down text-xs"></i>
             <span>Download</span>
@@ -120,11 +120,11 @@
       <!-- Preview Canvas -->
       <div class="p-4 sm:p-6 min-h-[420px] flex items-center justify-center bg-[#090a0f]">
         {% if doc.is_pdf %}
-          <iframe src="{{ doc.blob_url }}" class="w-full h-[580px] rounded-xl border border-white/10 bg-white shadow-2xl"></iframe>
+          <iframe src="{{ url_for('view_shared_document', token=doc.share_token) }}" class="w-full h-[580px] rounded-xl border border-white/10 bg-white shadow-2xl"></iframe>
         {% elif doc.is_image %}
-          <img src="{{ doc.blob_url }}" alt="{{ doc.document_title }}" class="max-h-[540px] max-w-full rounded-xl object-contain shadow-2xl border border-white/10">
+          <img src="{{ url_for('view_shared_document', token=doc.share_token) }}" alt="{{ doc.document_title }}" class="max-h-[540px] max-w-full rounded-xl object-contain shadow-2xl border border-white/10">
         {% elif doc.is_video %}
-          <video src="{{ doc.blob_url }}" controls class="max-h-[500px] max-w-full rounded-xl shadow-2xl border border-white/10 bg-black"></video>
+          <video src="{{ url_for('view_shared_document', token=doc.share_token) }}" controls class="max-h-[500px] max-w-full rounded-xl shadow-2xl border border-white/10 bg-black"></video>
         {% elif doc.is_audio %}
           <div class="w-full max-w-md p-6 rounded-2xl bg-[#0f111a] border border-white/10 shadow-2xl text-center space-y-4">
             <div class="w-16 h-16 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center mx-auto text-2xl shadow-inner">
@@ -134,7 +134,7 @@
               <p class="font-bold text-white text-sm">{{ doc.file_name }}</p>
               <p class="text-xs text-slate-400 font-mono mt-1">{{ doc.formatted_size }}</p>
             </div>
-            <audio src="{{ doc.blob_url }}" controls class="w-full rounded-lg"></audio>
+            <audio src="{{ url_for('view_shared_document', token=doc.share_token) }}" controls class="w-full rounded-lg"></audio>
           </div>
         {% else %}
           <div class="text-center p-8 space-y-4 max-w-md">
@@ -146,7 +146,7 @@
               <p class="text-xs text-slate-400 font-mono mt-1">This document format can be downloaded and opened with its native application.</p>
             </div>
             <div>
-              <a href="{{ doc.blob_url }}" download="{{ doc.file_name }}"
+              <a href="{{ url_for('download_shared_document', token=doc.share_token) }}" download="{{ doc.file_name }}"
                 class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-violet-600/30 border border-violet-400/30 font-mono">
                 <i class="fa-solid fa-download text-xs"></i>
                 <span>Download {{ doc.file_extension|upper }} File ({{ doc.formatted_size }})</span>

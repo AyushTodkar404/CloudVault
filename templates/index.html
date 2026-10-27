@@ -458,7 +458,7 @@
                     <div class="overflow-hidden">
                       <button 
                         type="button" 
-                        onclick="openPreviewModal('{{ doc.blob_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}')"
+                        onclick="openPreviewModal('{{ doc.view_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}', '{{ doc.download_url }}')"
                         class="text-left font-semibold text-slate-100 hover:text-violet-300 transition-colors truncate max-w-[220px] block"
                       >
                         {{ doc.document_title }}
@@ -514,13 +514,23 @@
                     <!-- Preview In In-App Modal -->
                     <button 
                       type="button" 
-                      onclick="openPreviewModal('{{ doc.blob_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}')"
+                      onclick="openPreviewModal('{{ doc.view_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}', '{{ doc.download_url }}')"
                       class="px-2.5 py-1 rounded-lg bg-violet-500/15 hover:bg-violet-500/25 border border-violet-500/30 text-violet-300 hover:text-white text-xs font-semibold transition-all flex items-center gap-1 shadow-sm"
                       title="Inspect Document Preview"
                     >
                       <i class="fa-regular fa-eye text-[11px]"></i>
                       <span class="hidden sm:inline">Preview</span>
                     </button>
+
+                    <!-- Direct Download File -->
+                    <a 
+                      href="{{ doc.download_url }}" 
+                      download="{{ doc.file_name }}"
+                      class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] text-xs transition-colors"
+                      title="Download {{ doc.file_name }}"
+                    >
+                      <i class="fa-solid fa-arrow-down text-[11px]"></i>
+                    </a>
 
                     <!-- Share Link -->
                     <button 
@@ -545,7 +555,7 @@
                     <!-- Info Inspector -->
                     <button 
                       type="button" 
-                      onclick="openInfoModal('{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_name|replace('\'', '\\\'') }}', '{{ doc.formatted_size }}', '{{ doc.content_type }}', '{{ doc.created_at.strftime('%Y-%m-%d %H:%M') }}', '{{ doc.blob_name }}', '{{ doc.blob_url }}', '{{ (doc.description or '')|replace('\'', '\\\'') }}')" 
+                      onclick="openInfoModal('{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_name|replace('\'', '\\\'') }}', '{{ doc.formatted_size }}', '{{ doc.content_type }}', '{{ doc.created_at.strftime('%Y-%m-%d %H:%M') }}', '{{ doc.blob_name }}', '{{ doc.download_url }}', '{{ (doc.description or '')|replace('\'', '\\\'') }}')" 
                       class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] text-xs transition-colors"
                       title="File Details & Info"
                     >
@@ -707,11 +717,19 @@
               <div class="flex items-center gap-1">
                 <button 
                   type="button" 
-                  onclick="openPreviewModal('{{ doc.blob_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}')"
+                  onclick="openPreviewModal('{{ doc.view_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}', '{{ doc.download_url }}')"
                   class="px-2.5 py-1 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/30 text-violet-300 hover:text-white transition-colors text-[11px] font-semibold"
                 >
                   Preview
                 </button>
+                <a 
+                  href="{{ doc.download_url }}" 
+                  download="{{ doc.file_name }}"
+                  class="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] text-xs"
+                  title="Download {{ doc.file_name }}"
+                >
+                  <i class="fa-solid fa-arrow-down"></i>
+                </a>
                 <button 
                   type="button" 
                   onclick="openShareModal('{{ doc.id }}', '{{ doc.document_title|replace('\'', '\\\'') }}')" 

@@ -701,6 +701,63 @@ class CloudVaultProfessionalFeaturesTestCase(unittest.TestCase):
         self.assertIn("renderOfflineDocuments", html)
 
 
+    def test_authenticated_document_view_and_download(self):
+        """Ensure authenticated users can view/preview and download their documents without PublicAccessNotPermitted."""
+        self.register_and_login("preview_user", "preview@vault.edu")
+
+        # Upload a valid PDF file
+        pdf_bytes = b"%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF"
+        upload_resp = self.client.post(
+            "/upload",
+            data={
+                "file": (io.BytesIO(pdf_bytes), "Resume.pdf"),
+                "document_title": "My Official Resume",
+            },
+            follow_redirects=True,
+        )
+        self.assertEqual(upload_resp.status_code, 200)
+
+        with self.app.app_context():
+            doc = Document.query.filter_by(document_title="My Official Resume").first()
+            self.assertIsNotNone(doc)
+            doc_id = doc.id
+            share_token = "secure_test_share_123"
+            doc.share_token = share_token
+            from models import db
+            db.session.commit()
+
+        # 1. Authenticated Preview (view inline)
+        view_resp = self.client.get(f"/document/{doc_id}/view")
+        self.assertEqual(view_resp.status_code, 200)
+        self.assertEqual(view_resp.data, pdf_bytes)
+        self.assertIn("inline", view_resp.headers.get("Content-Disposition", ""))
+
+        # 2. Authenticated Download (attachment)
+        down_resp = self.client.get(f"/document/{doc_id}/download")
+        self.assertEqual(down_resp.status_code, 200)
+        self.assertEqual(down_resp.data, pdf_bytes)
+        self.assertIn("attachment", down_resp.headers.get("Content-Disposition", ""))
+        self.assertIn("Resume.pdf", down_resp.headers.get("Content-Disposition", ""))
+
+        # 3. Public Share Preview and Download (unauthenticated)
+        self.client.get("/logout", follow_redirects=True)
+        
+        # Unauthenticated direct access to /document/<id>/view redirects to login
+        unauth_resp = self.client.get(f"/document/{doc_id}/view")
+        self.assertEqual(unauth_resp.status_code, 302)
+        self.assertIn("/login", unauth_resp.headers.get("Location", ""))
+
+        # Public share link allows preview & download without login
+        share_view_resp = self.client.get(f"/share/{share_token}/view")
+        self.assertEqual(share_view_resp.status_code, 200)
+        self.assertEqual(share_view_resp.data, pdf_bytes)
+
+        share_down_resp = self.client.get(f"/share/{share_token}/download")
+        self.assertEqual(share_down_resp.status_code, 200)
+        self.assertEqual(share_down_resp.data, pdf_bytes)
+        self.assertIn("attachment", share_down_resp.headers.get("Content-Disposition", ""))
+
+
 if __name__ == "__main__":
     unittest.main()
 

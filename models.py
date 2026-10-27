@@ -112,6 +112,16 @@ class Document(db.Model):
         return f"{size:.1f} TB"
 
     @property
+    def view_url(self):
+        """Authenticated route to stream/preview the document inline."""
+        return f"/document/{self.id}/view"
+
+    @property
+    def download_url(self):
+        """Authenticated route to download the document as an attachment."""
+        return f"/document/{self.id}/download"
+
+    @property
     def file_extension(self):
         if "." in self.file_name:
             return self.file_name.rsplit(".", 1)[1].lower()
@@ -184,6 +194,8 @@ class Document(db.Model):
             "document_title": self.document_title,
             "file_name": self.file_name,
             "blob_url": self.blob_url,
+            "view_url": self.view_url,
+            "download_url": self.download_url,
             "blob_name": self.blob_name,
             "file_size": self.formatted_size,
             "file_extension": self.file_extension,

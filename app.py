@@ -17,6 +17,7 @@ from flask import (
     jsonify,
     send_file,
     session,
+    abort,
 )
 from flask_login import (
     LoginManager,
@@ -769,6 +770,77 @@ def create_app(test_config=None):
         """Publicly accessible view for shared documents without requiring authentication."""
         doc = Document.query.filter_by(share_token=token, is_deleted=False).first_or_404()
         return render_template("share.html", doc=doc)
+
+    @app.route("/document/<int:doc_id>/view")
+    @login_required
+    def view_document(doc_id):
+        """Streams document inline for authenticated in-app preview."""
+        doc = db.session.get(Document, doc_id)
+        if not doc or doc.is_deleted:
+            abort(404)
+        if doc.user_id and doc.user_id != current_user.id and current_user.role != "admin":
+            abort(403)
+
+        file_bytes = storage_manager.get_file_bytes(doc.blob_name)
+        if not file_bytes:
+            abort(404)
+
+        return send_file(
+            io.BytesIO(file_bytes),
+            mimetype=doc.content_type or "application/octet-stream",
+            as_attachment=False,
+            download_name=doc.file_name,
+        )
+
+    @app.route("/document/<int:doc_id>/download")
+    @login_required
+    def download_document(doc_id):
+        """Streams document as an attachment for authenticated user download."""
+        doc = db.session.get(Document, doc_id)
+        if not doc or doc.is_deleted:
+            abort(404)
+        if doc.user_id and doc.user_id != current_user.id and current_user.role != "admin":
+            abort(403)
+
+        file_bytes = storage_manager.get_file_bytes(doc.blob_name)
+        if not file_bytes:
+            abort(404)
+
+        log_activity(current_user.id, "DOWNLOAD", f"Downloaded '{doc.document_title}'")
+        return send_file(
+            io.BytesIO(file_bytes),
+            mimetype=doc.content_type or "application/octet-stream",
+            as_attachment=True,
+            download_name=doc.file_name,
+        )
+
+    @app.route("/share/<string:token>/view")
+    def view_shared_document(token):
+        """Streams shared document inline for recipient in-browser preview."""
+        doc = Document.query.filter_by(share_token=token, is_deleted=False).first_or_404()
+        file_bytes = storage_manager.get_file_bytes(doc.blob_name)
+        if not file_bytes:
+            abort(404)
+        return send_file(
+            io.BytesIO(file_bytes),
+            mimetype=doc.content_type or "application/octet-stream",
+            as_attachment=False,
+            download_name=doc.file_name,
+        )
+
+    @app.route("/share/<string:token>/download")
+    def download_shared_document(token):
+        """Streams shared document as an attachment for recipient download."""
+        doc = Document.query.filter_by(share_token=token, is_deleted=False).first_or_404()
+        file_bytes = storage_manager.get_file_bytes(doc.blob_name)
+        if not file_bytes:
+            abort(404)
+        return send_file(
+            io.BytesIO(file_bytes),
+            mimetype=doc.content_type or "application/octet-stream",
+            as_attachment=True,
+            download_name=doc.file_name,
+        )
 
     @app.route("/batch", methods=["POST"])
     @login_required

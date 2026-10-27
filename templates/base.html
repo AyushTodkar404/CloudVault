@@ -964,7 +964,7 @@
         });
     }
 
-    function openPreviewModal(url, title, student, extOrIsPdf, categoryOrDocId, docId) {
+    function openPreviewModal(url, title, student, extOrIsPdf, categoryOrDocId, docId, downloadUrl) {
       if (!previewModal) return;
 
       let ext = '';
@@ -979,6 +979,8 @@
         ext = (extOrIsPdf || '').toLowerCase();
         category = (categoryOrDocId || 'other').toLowerCase();
       }
+
+      const effectiveDownloadUrl = downloadUrl || (id && !String(id).startsWith('offline_') ? `/document/${id}/download` : url);
 
       const modalDocTitle = document.getElementById('modalDocTitle');
       const modalDocSubtitle = document.getElementById('modalDocSubtitle');
@@ -995,7 +997,7 @@
 
       modalDocTitle.textContent = title;
       modalDocSubtitle.textContent = `Student: ${student} • Record #${id || '0'}`;
-      modalDownloadLink.href = url;
+      modalDownloadLink.href = effectiveDownloadUrl;
       modalExternalLink.href = url;
       modalMetaInfo.textContent = `Checksum: SHA256:${Math.random().toString(16).substring(2, 10).toUpperCase()}`;
 
@@ -1049,7 +1051,7 @@
         }
         document.getElementById('previewFallbackTitle').textContent = `${title} (.${ext || 'file'})`;
         document.getElementById('previewFallbackSubtitle').textContent = `Format category: ${category.toUpperCase()} • Direct in-app preview unavailable`;
-        document.getElementById('previewFallbackDownload').href = url;
+        document.getElementById('previewFallbackDownload').href = effectiveDownloadUrl;
         document.getElementById('previewFallbackExternal').href = url;
         previewFallback.classList.remove('hidden');
       }
