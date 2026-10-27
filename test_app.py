@@ -168,12 +168,18 @@ class CloudVaultAuthTestCase(unittest.TestCase):
         """Test uploading diverse file extensions: docx, xlsx, mp3, mp4, zip."""
         self.register_user("multi_student", "multi@vault.edu", "pass123")
 
+        import zipfile
+        valid_zip_buf = io.BytesIO()
+        with zipfile.ZipFile(valid_zip_buf, "w", zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("test.txt", "valid archive entry")
+        valid_zip_bytes = valid_zip_buf.getvalue()
+
         files_to_test = [
-            ("Research Paper.docx", b"PK\x03\x04 fake docx content", "word"),
-            ("Budget Analysis.xlsx", b"PK\x03\x04 fake xlsx content", "spreadsheet"),
+            ("Research Paper.docx", valid_zip_bytes, "word"),
+            ("Budget Analysis.xlsx", valid_zip_bytes, "spreadsheet"),
             ("Lecture Audio.mp3", b"ID3 fake mp3 content", "audio"),
             ("Lab Demo.mp4", b"\x00\x00\x00\x18ftypmp42 fake mp4", "video"),
-            ("Project Archive.zip", b"PK\x03\x04 fake zip content", "archive"),
+            ("Project Archive.zip", valid_zip_bytes, "archive"),
         ]
 
         for filename, content, expected_category in files_to_test:
@@ -206,7 +212,7 @@ class CloudVaultAuthTestCase(unittest.TestCase):
             data={
                 "student_name": "Cloud User",
                 "document_title": "Project Specification",
-                "file": (io.BytesIO(b"Cloud spec content"), "spec.pdf"),
+                "file": (io.BytesIO(b"%PDF-1.4 Cloud spec content"), "spec.pdf"),
             },
             follow_redirects=True,
         )
@@ -612,6 +618,70 @@ class CloudVaultProfessionalFeaturesTestCase(unittest.TestCase):
         self.assertIn("Azure SQL", content)
         self.assertIn("Azure Blob Storage", content)
         self.assertIn("IaaS", content)
+
+        # Verify Technology Stack
+        self.assertIn("Production Technology Stack", content)
+        self.assertIn("Flask", content)
+        self.assertIn("Gunicorn", content)
+        self.assertIn("PyMSSQL", content)
+
+    def test_deep_security_scanner_rejects_disguised_executable(self):
+        """Ensure malware disguised under a harmless .pdf extension is detected and blocked."""
+        self.register_and_login("scanner_student", "scanner@vault.edu")
+
+        # Disguised Windows MZ binary with .pdf extension
+        fake_pdf_mz = b"M" + b"Z\x90\x00\x03\x00\x00\x00\x04\x00\x00\x00\xff\xff\x00\x00"
+        resp = self.client.post(
+            "/upload",
+            data={
+                "file": (io.BytesIO(fake_pdf_mz), "document.pdf"),
+                "document_title": "Fake PDF Trojan",
+            },
+            headers={"X-Requested-With": "XMLHttpRequest"},
+        )
+        self.assertEqual(resp.status_code, 400)
+        data = resp.get_json()
+        self.assertFalse(data["success"])
+        self.assertIn("Infected/prohibited executable signature detected", data["error"])
+
+    def test_deep_security_scanner_rejects_corrupted_archive(self):
+        """Ensure damaged or truncated zip files are identified and rejected."""
+        self.register_and_login("archive_student", "archive@vault.edu")
+
+        # Broken/truncated PK header
+        damaged_zip = b"PK\x03\x04truncated_and_corrupted"
+        resp = self.client.post(
+            "/upload",
+            data={
+                "file": (io.BytesIO(damaged_zip), "project.zip"),
+                "document_title": "Corrupt Project Archive",
+            },
+            headers={"X-Requested-With": "XMLHttpRequest"},
+        )
+        self.assertEqual(resp.status_code, 400)
+        data = resp.get_json()
+        self.assertFalse(data["success"])
+        self.assertIn("Damaged or invalid archive container", data["error"])
+
+    def test_deep_security_scanner_rejects_webshell_payload(self):
+        """Ensure non-code files with embedded script payloads are blocked."""
+        self.register_and_login("webshell_student", "webshell@vault.edu")
+
+        # Safely assembled payload avoiding raw malware signature on disk
+        payload_script = b"<" + b"?php" + b" eval(" + b"base64_decode('...'));"
+        injected_file = b"%PDF-1.4 genuine header\n" + payload_script + b"\n%%EOF"
+        resp = self.client.post(
+            "/upload",
+            data={
+                "file": (io.BytesIO(injected_file), "injected_paper.pdf"),
+                "document_title": "Paper with Hidden Shell",
+            },
+            headers={"X-Requested-With": "XMLHttpRequest"},
+        )
+        self.assertEqual(resp.status_code, 400)
+        data = resp.get_json()
+        self.assertFalse(data["success"])
+        self.assertIn("Prohibited script payload signature detected", data["error"])
 
 
 if __name__ == "__main__":

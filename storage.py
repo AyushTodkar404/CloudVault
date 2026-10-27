@@ -117,6 +117,12 @@ class CloudStorageManager:
         if file_size == 0:
             raise ValueError("Empty (0-byte) files cannot be uploaded.")
 
+        # Deep Security, Integrity & Malware Inspection
+        from scanner import scanner
+        scan_result = scanner.scan_file(file_bytes, original_filename)
+        if not scan_result.is_clean:
+            raise ValueError(f"Security & Integrity Alert: {scan_result.reason}")
+
         if self.is_cloud_active and self.blob_service_client:
             # Upload to Azure Blob Storage
             blob_client = self.blob_service_client.get_blob_client(

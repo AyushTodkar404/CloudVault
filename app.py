@@ -612,7 +612,14 @@ def create_app(test_config=None):
                 )
             except ValueError as ve:
                 db.session.rollback()
-                errors.append(f"{file_obj.filename}: {str(ve)}")
+                err_msg = str(ve)
+                if "Security & Integrity Alert" in err_msg:
+                    log_activity(
+                        current_user.id,
+                        "SCAN_BLOCK",
+                        f"Blocked suspicious file '{file_obj.filename}': {err_msg[:120]}"
+                    )
+                errors.append(f"{file_obj.filename}: {err_msg}")
             except Exception as e:
                 app.logger.error(f"Upload error on {file_obj.filename}: {e}", exc_info=True)
                 db.session.rollback()

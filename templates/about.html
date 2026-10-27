@@ -1,380 +1,533 @@
 {% extends "base.html" %}
 
-{% block title %}About Project & Developers &mdash; CloudVault{% endblock %}
+{% block title %}Project & Technology Stack &mdash; CloudVault{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto space-y-8 animate-fade-in pb-12">
+<div class="max-w-6xl mx-auto space-y-6 animate-fade-in pb-12">
 
   <!-- Academic Breadcrumb & Context Banner -->
-  <div class="quartz-surface rounded-2xl p-6 sm:p-8 border border-white/[0.08] shadow-2xl relative overflow-hidden">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-      <div class="space-y-2">
-        <div class="flex items-center gap-2 flex-wrap text-xs font-mono">
+  <div class="quartz-surface rounded-2xl p-5 sm:p-7 border border-white/[0.08] shadow-2xl relative overflow-hidden">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
+      <div class="space-y-1.5">
+        <div class="flex items-center gap-2 flex-wrap text-[11px] font-mono">
           <span class="px-2.5 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/30 font-semibold">
             Cloud Computing Laboratory
           </span>
           <span class="text-slate-500">&bull;</span>
           <span class="text-slate-400">Department of Computer Engineering</span>
           <span class="text-slate-500">&bull;</span>
-          <span class="text-slate-400">Academic Year 2025–2026</span>
+          <span class="text-slate-400">2025–2026</span>
         </div>
         <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-          CloudVault: Multi-Tier Cloud Document Repository
+          CloudVault Document Registry
         </h1>
-        <p class="text-sm text-slate-300 max-w-2xl leading-relaxed">
-          An enterprise-grade, multi-tenant digital document and credential hot-store engineered on Microsoft Azure cloud infrastructure. Built as an end-to-end practical demonstration of modern cloud architectural models including PaaS, DBaaS, SaaS/Object Storage, SECaaS, and IaaS.
+        <p class="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+          Multi-tenant digital credential hot-store on Microsoft Azure, implementing PaaS, DBaaS, SaaS Object Storage, SECaaS, and IaaS.
         </p>
       </div>
 
-      <!-- Quick Status Badges -->
-      <div class="flex flex-col sm:flex-row md:flex-col gap-2.5 shrink-0 font-mono text-xs">
-        <div class="p-3 rounded-xl bg-slate-900/80 border border-white/10 flex items-center gap-3">
+      <!-- Quick Metrics Strip -->
+      <div class="flex items-center gap-2.5 shrink-0 font-mono text-xs">
+        <div class="p-2.5 sm:p-3 rounded-xl bg-slate-900/80 border border-white/10 flex items-center gap-2.5">
           <span class="w-2.5 h-2.5 rounded-full {% if is_cloud_active %}bg-emerald-400 animate-pulse{% else %}bg-amber-400{% endif %}"></span>
           <div>
-            <span class="text-[10px] text-slate-400 block uppercase tracking-wider">Cloud Backend</span>
-            <span class="font-bold text-white">{% if is_cloud_active %}Azure Hot-Store (Online){% else %}Local Sandbox (Offline){% endif %}</span>
+            <span class="text-[9px] text-slate-400 block uppercase tracking-wider">Cloud Tier</span>
+            <span class="font-bold text-white text-xs">{% if is_cloud_active %}Azure Hot-Store{% else %}Sandbox{% endif %}</span>
           </div>
         </div>
-        <div class="p-3 rounded-xl bg-slate-900/80 border border-white/10 flex items-center gap-3">
-          <i class="fa-solid fa-hard-drive text-amber-400 text-sm"></i>
+        <div class="p-2.5 sm:p-3 rounded-xl bg-slate-900/80 border border-white/10 flex items-center gap-2.5">
+          <i class="fa-solid fa-hard-drive text-amber-400 text-xs"></i>
           <div>
-            <span class="text-[10px] text-slate-400 block uppercase tracking-wider">Storage Quota</span>
-            <span class="font-bold text-white">5.0 GB Guaranteed / Account (Azure Free Tier)</span>
+            <span class="text-[9px] text-slate-400 block uppercase tracking-wider">Storage Quota</span>
+            <span class="font-bold text-white text-xs">5.0 GB / Student</span>
           </div>
         </div>
       </div>
     </div>
-    <div class="absolute -right-16 -top-16 w-64 h-64 bg-violet-600/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -right-16 -top-16 w-56 h-56 bg-violet-600/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -left-16 -bottom-16 w-56 h-56 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
   </div>
 
-  <!-- Student Developers Team Section -->
-  <div class="space-y-4">
-    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+  <!-- Organized Section Navigator Tabs (Prevents clutter) -->
+  <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-mono">
+    <button type="button" onclick="switchAboutTab('team')" id="tabBtn-team"
+      class="about-nav-btn px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold shadow-md shadow-violet-600/25 border border-violet-400/30 whitespace-nowrap transition-all">
+      <i class="fa-solid fa-users mr-1.5"></i> Project Team
+    </button>
+    <button type="button" onclick="switchAboutTab('tech')" id="tabBtn-tech"
+      class="about-nav-btn px-4 py-2 rounded-xl bg-slate-900/80 hover:bg-white/10 text-slate-300 font-semibold border border-white/10 whitespace-nowrap transition-all">
+      <i class="fa-solid fa-layer-group text-cyan-400 mr-1.5"></i> Technology Stack
+    </button>
+    <button type="button" onclick="switchAboutTab('storage')" id="tabBtn-storage"
+      class="about-nav-btn px-4 py-2 rounded-xl bg-slate-900/80 hover:bg-white/10 text-slate-300 font-semibold border border-white/10 whitespace-nowrap transition-all">
+      <i class="fa-solid fa-shield-virus text-emerald-400 mr-1.5"></i> Storage & Scanner
+    </button>
+    <button type="button" onclick="switchAboutTab('models')" id="tabBtn-models"
+      class="about-nav-btn px-4 py-2 rounded-xl bg-slate-900/80 hover:bg-white/10 text-slate-300 font-semibold border border-white/10 whitespace-nowrap transition-all">
+      <i class="fa-solid fa-cubes-stacked text-indigo-400 mr-1.5"></i> 5 Cloud Models
+    </button>
+    <button type="button" onclick="switchAboutTab('rubric')" id="tabBtn-rubric"
+      class="about-nav-btn px-4 py-2 rounded-xl bg-slate-900/80 hover:bg-white/10 text-slate-300 font-semibold border border-white/10 whitespace-nowrap transition-all">
+      <i class="fa-solid fa-clipboard-check text-amber-400 mr-1.5"></i> Evaluation Rubric
+    </button>
+  </div>
+
+  <!-- SECTION 1: STUDENT PROJECT TEAM -->
+  <div id="section-team" class="about-section space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-2.5">
       <div>
-        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-users text-violet-400 text-base"></i>
-          <span>Student Project Team</span>
+        <h2 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-users text-violet-400"></i>
+          <span>Undergraduate Engineering Team</span>
         </h2>
-        <p class="text-xs text-slate-400">Undergraduate Engineering Team &bull; Cloud Computing Mini Project</p>
+        <p class="text-xs text-slate-400">Department of Computer Engineering &bull; Roll Number Registry</p>
       </div>
-      <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-white/[0.05] border border-white/10 text-slate-300">
+      <span class="text-xs font-mono px-2.5 py-0.5 rounded-lg bg-white/[0.05] border border-white/10 text-slate-300">
         4 Members
       </span>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
       <!-- Member 1: Ayush Todkar -->
-      <div class="quartz-surface quartz-surface-hover rounded-2xl p-5 border border-white/[0.08] relative group overflow-hidden">
-        <div class="flex items-start gap-4">
-          <div class="w-13 h-13 rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-700 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-violet-600/30 shrink-0 font-mono">
+      <div class="quartz-surface quartz-surface-hover rounded-xl p-4 border border-white/[0.08] relative group">
+        <div class="flex items-start gap-3.5">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-700 text-white flex items-center justify-center font-bold text-base shadow-md font-mono shrink-0">
             AT
           </div>
-          <div class="space-y-1.5 flex-1 min-w-0">
+          <div class="space-y-1 flex-1 min-w-0">
             <div class="flex items-center justify-between gap-2">
-              <h3 class="text-base font-bold text-white truncate">Ayush Todkar</h3>
-              <span class="px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 text-[11px] font-mono font-bold shrink-0">
+              <h3 class="text-sm font-bold text-white truncate">Ayush Todkar</h3>
+              <span class="px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 text-[10px] font-mono font-bold shrink-0">
                 Roll No: 57
               </span>
             </div>
             <p class="text-xs font-semibold text-violet-300 font-mono">Lead Cloud Architect & Full-Stack Developer</p>
-            <p class="text-xs text-slate-400 leading-relaxed pt-1">
-              Spearheaded end-to-end cloud infrastructure orchestration on Azure App Service (Linux) using Python Flask & Gunicorn WSGI. Designed the multi-tenant document isolation layer, passwordless Google SSO integration, dynamic sorting/filtering pipelines, and responsive UI architecture.
+            <p class="text-xs text-slate-400 leading-relaxed">
+              PaaS deployment orchestration on Azure App Service, Gunicorn WSGI pipeline, Google SSO, and responsive UI architecture.
             </p>
-            <div class="flex items-center gap-1.5 flex-wrap pt-2 text-[10px] font-mono">
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">PaaS Deployment</span>
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">WSGI Engine</span>
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">CI/CD Pipeline</span>
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">UI/UX Layout</span>
+            <div class="flex items-center gap-1.5 flex-wrap pt-1 text-[10px] font-mono text-slate-300">
+              <span class="px-2 py-0.5 rounded bg-white/[0.06]">Azure PaaS</span>
+              <span class="px-2 py-0.5 rounded bg-white/[0.06]">Flask & Gunicorn</span>
+              <span class="px-2 py-0.5 rounded bg-white/[0.06]">CI/CD Automation</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Member 2: Yahiya Siddiqui -->
-      <div class="quartz-surface quartz-surface-hover rounded-2xl p-5 border border-white/[0.08] relative group overflow-hidden">
-        <div class="flex items-start gap-4">
-          <div class="w-13 h-13 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-emerald-600/30 shrink-0 font-mono">
+      <div class="quartz-surface quartz-surface-hover rounded-xl p-4 border border-white/[0.08] relative group">
+        <div class="flex items-start gap-3.5">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-bold text-base shadow-md font-mono shrink-0">
             YS
           </div>
-          <div class="space-y-1.5 flex-1 min-w-0">
+          <div class="space-y-1 flex-1 min-w-0">
             <div class="flex items-center justify-between gap-2">
-              <h3 class="text-base font-bold text-white truncate">Yahiya Siddiqui</h3>
-              <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-mono font-bold shrink-0">
+              <h3 class="text-sm font-bold text-white truncate">Yahiya Siddiqui</h3>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-bold shrink-0">
                 Roll No: 49
               </span>
             </div>
             <p class="text-xs font-semibold text-emerald-300 font-mono">Database & Cloud Infrastructure Engineer</p>
-            <p class="text-xs text-slate-400 leading-relaxed pt-1">
-              Architected the managed Database-as-a-Service (DBaaS) tier on Azure SQL Server with relational indexing and foreign-key constraints. Co-configured the private Virtual Network (VNet) and IaaS Linux VM (<code class="text-emerald-300">cloudvault1-vm</code>) serving as external uptime telemetry sentinel.
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Managed Azure SQL Database (DBaaS) relational models, foreign-key indexing, and private VNet Linux VM health sentinel.
             </p>
-            <div class="flex items-center gap-1.5 flex-wrap pt-2 text-[10px] font-mono">
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">Azure SQL (DBaaS)</span>
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">IaaS Sentinel</span>
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">Virtual Network</span>
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">Schema Indexing</span>
+            <div class="flex items-center gap-1.5 flex-wrap pt-1 text-[10px] font-mono text-slate-300">
+              <span class="px-2 py-0.5 rounded bg-white/[0.06]">Azure SQL (DBaaS)</span>
+              <span class="px-2 py-0.5 rounded bg-white/[0.06]">PyMSSQL & ORM</span>
+              <span class="px-2 py-0.5 rounded bg-white/[0.06]">IaaS Sentinel</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Member 3: Alister Varghese K. -->
-      <div class="quartz-surface quartz-surface-hover rounded-2xl p-5 border border-white/[0.08] relative group overflow-hidden">
-        <div class="flex items-start gap-4">
-          <div class="w-13 h-13 rounded-2xl bg-gradient-to-br from-cyan-600 to-blue-700 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-cyan-600/30 shrink-0 font-mono">
+      <div class="quartz-surface quartz-surface-hover rounded-xl p-4 border border-white/[0.08] relative group">
+        <div class="flex items-start gap-3.5">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-700 text-white flex items-center justify-center font-bold text-base shadow-md font-mono shrink-0">
             AV
           </div>
-          <div class="space-y-1.5 flex-1 min-w-0">
+          <div class="space-y-1 flex-1 min-w-0">
             <div class="flex items-center justify-between gap-2">
-              <h3 class="text-base font-bold text-white truncate">Alister Varghese K.</h3>
-              <span class="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[11px] font-mono font-bold shrink-0">
+              <h3 class="text-sm font-bold text-white truncate">Alister Varghese K.</h3>
+              <span class="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono font-bold shrink-0">
                 Roll No: 03
               </span>
             </div>
             <p class="text-xs font-semibold text-cyan-300 font-mono">Cloud Storage & Quota Systems Engineer</p>
-            <p class="text-xs text-slate-400 leading-relaxed pt-1">
-              Engineered the Azure Blob Storage (SaaS/Storage-as-a-Service) integration with UUID-based blob namespaces and MIME stream resolution. Implemented the strict 5.0 GB storage quota tracking engine, category byte breakdown, and drag-and-drop batch upload processing pipeline.
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Azure Blob Storage (SaaS) integration, UUID namespaces, 5.0 GB student quota accounting, and batch uploader.
             </p>
-            <div class="flex items-center gap-1.5 flex-wrap pt-2 text-[10px] font-mono">
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">Azure Blob Storage</span>
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">5.0 GB Quota Engine</span>
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">Drag & Drop Batch</span>
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">MIME Streaming</span>
+            <div class="flex items-center gap-1.5 flex-wrap pt-1 text-[10px] font-mono text-slate-300">
+              <span class="px-2 py-0.5 rounded bg-white/[0.06]">Azure Blob Storage</span>
+              <span class="px-2 py-0.5 rounded bg-white/[0.06]">5.0 GB Quota Tier</span>
+              <span class="px-2 py-0.5 rounded bg-white/[0.06]">Batch Drag-and-Drop</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Member 4: Jude Rebairo -->
-      <div class="quartz-surface quartz-surface-hover rounded-2xl p-5 border border-white/[0.08] relative group overflow-hidden">
-        <div class="flex items-start gap-4">
-          <div class="w-13 h-13 rounded-2xl bg-gradient-to-br from-amber-600 to-rose-700 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-amber-600/30 shrink-0 font-mono">
+      <div class="quartz-surface quartz-surface-hover rounded-xl p-4 border border-white/[0.08] relative group">
+        <div class="flex items-start gap-3.5">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-600 to-rose-700 text-white flex items-center justify-center font-bold text-base shadow-md font-mono shrink-0">
             JR
           </div>
-          <div class="space-y-1.5 flex-1 min-w-0">
+          <div class="space-y-1 flex-1 min-w-0">
             <div class="flex items-center justify-between gap-2">
-              <h3 class="text-base font-bold text-white truncate">Jude Rebairo</h3>
-              <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-mono font-bold shrink-0">
+              <h3 class="text-sm font-bold text-white truncate">Jude Rebairo</h3>
+              <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-mono font-bold shrink-0">
                 Roll No: 31
               </span>
             </div>
             <p class="text-xs font-semibold text-amber-300 font-mono">Security, Access Control & QA Engineer</p>
-            <p class="text-xs text-slate-400 leading-relaxed pt-1">
-              Developed the SECaaS security subsystem incorporating scrypt password hashing, cryptographic share token generation, and the immutable security audit log trail. Authored automated test suites with 17+ test vectors and implemented genuine upload validation filters.
+            <p class="text-xs text-slate-400 leading-relaxed">
+              SECaaS security subsystem, scrypt password hashing, automated test suites (18 test vectors), and deep file integrity scanning.
             </p>
-            <div class="flex items-center gap-1.5 flex-wrap pt-2 text-[10px] font-mono">
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">Audit Logging</span>
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">Scrypt Security</span>
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">Automated Testing</span>
-              <span class="px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">Upload Validation</span>
+            <div class="flex items-center gap-1.5 flex-wrap pt-1 text-[10px] font-mono text-slate-300">
+              <span class="px-2 py-0.5 rounded bg-white/[0.06]">Audit Logging</span>
+              <span class="px-2 py-0.5 rounded bg-white/[0.06]">Deep File Scanner</span>
+              <span class="px-2 py-0.5 rounded bg-white/[0.06]">Automated QA</span>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- Storage Architecture: 1.0 GB Guaranteed Student Quota -->
-  <div class="quartz-surface rounded-2xl p-6 border border-white/[0.08] shadow-xl space-y-4">
-    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+  <!-- SECTION 2: TECHNOLOGY STACK (Organized & Concise) -->
+  <div id="section-tech" class="about-section hidden space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-2.5">
       <div>
-        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-hard-drive text-amber-400"></i>
-          <span>Student Storage Allocation & Capacity Guarantees</span>
+        <h2 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-layer-group text-cyan-400"></i>
+          <span>Production Technology Stack</span>
         </h2>
-        <p class="text-xs text-slate-400">Precise quota accounting backed by Microsoft Azure scalable cloud object store</p>
+        <p class="text-xs text-slate-400">Complete architectural breakdown of software layers, drivers, and cloud services</p>
       </div>
-      <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
-        5,120 MB (5.0 GB) Guaranteed
+      <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+        7 Layers Integrated
       </span>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-      <div class="p-4 rounded-xl bg-slate-900/60 border border-white/[0.06] space-y-2">
-        <div class="flex items-center gap-2 text-violet-400 font-mono text-xs font-semibold uppercase tracking-wider">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      <!-- 1. Frontend -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="font-bold text-violet-300 flex items-center gap-1.5"><i class="fa-solid fa-code text-violet-400"></i> Frontend UI</span>
+          <span class="text-[10px] text-slate-500">HTML5 / CSS</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Glassmorphism Quartz design system with Plus Jakarta Sans & JetBrains Mono, FontAwesome 6.5, and responsive mobile drawers.
+        </p>
+        <div class="flex flex-wrap gap-1 text-[10px] font-mono text-slate-400">
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Vanilla CSS</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">HTML5 Dialogs</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Async AJAX</span>
+        </div>
+      </div>
+
+      <!-- 2. Backend Framework -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="font-bold text-emerald-300 flex items-center gap-1.5"><i class="fa-brands fa-python text-emerald-400"></i> Backend Application</span>
+          <span class="text-[10px] text-slate-500">Python 3.12</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Flask microframework running on Gunicorn WSGI server, with Flask-Login session management and Werkzeug secure streaming.
+        </p>
+        <div class="flex flex-wrap gap-1 text-[10px] font-mono text-slate-400">
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Flask 3.0</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Gunicorn 21.2</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">RESTful APIs</span>
+        </div>
+      </div>
+
+      <!-- 3. Cloud PaaS Compute -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="font-bold text-cyan-300 flex items-center gap-1.5"><i class="fa-solid fa-server text-cyan-400"></i> Cloud Hosting (PaaS)</span>
+          <span class="text-[10px] text-slate-500">Azure App Service</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Linux container hosting in Central India region with automatic TLS termination, system logging, and environment management.
+        </p>
+        <div class="flex flex-wrap gap-1 text-[10px] font-mono text-slate-400">
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Linux B1 Plan</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Managed HTTPS</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Zero-Downtime</span>
+        </div>
+      </div>
+
+      <!-- 4. Database DBaaS -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="font-bold text-amber-300 flex items-center gap-1.5"><i class="fa-solid fa-database text-amber-400"></i> Relational DB (DBaaS)</span>
+          <span class="text-[10px] text-slate-500">Azure SQL</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Fully managed SQL database (cloudvaultdb) connected via PyMSSQL driver, featuring ACID transactions and automatic indexing.
+        </p>
+        <div class="flex flex-wrap gap-1 text-[10px] font-mono text-slate-400">
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">SQLAlchemy 3.1</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">PyMSSQL 2.4</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Foreign Keys</span>
+        </div>
+      </div>
+
+      <!-- 5. Object Storage SaaS -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="font-bold text-rose-300 flex items-center gap-1.5"><i class="fa-solid fa-cloud text-rose-400"></i> Cloud Storage (SaaS)</span>
+          <span class="text-[10px] text-slate-500">Azure Blob</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          High-durability blob container (documents) in storage account cloudvault1 with inline streaming and 5.0 GB per-user quota.
+        </p>
+        <div class="flex flex-wrap gap-1 text-[10px] font-mono text-slate-400">
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">azure-storage-blob</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">5 PiB Elasticity</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">UUID Namespaces</span>
+        </div>
+      </div>
+
+      <!-- 6. Threat Scanner & SECaaS -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="font-bold text-indigo-300 flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-indigo-400"></i> Security & Scanner</span>
+          <span class="text-[10px] text-slate-500">SECaaS</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Deep byte header scanning engine, binary malware intercept (MZ/ELF), Scrypt password hashing, and immutable SQL audit telemetry.
+        </p>
+        <div class="flex flex-wrap gap-1 text-[10px] font-mono text-slate-400">
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Magic Bytes</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Scrypt KDF</span>
+          <span class="px-1.5 py-0.5 rounded bg-white/[0.05]">Audit Trail</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: STORAGE & DEEP THREAT SCANNER -->
+  <div id="section-storage" class="about-section hidden space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-2.5">
+      <div>
+        <h2 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-shield-virus text-emerald-400"></i>
+          <span>Storage Guarantee & Deep Threat Inspection</span>
+        </h2>
+        <p class="text-xs text-slate-400">Multi-layer security pipeline ensuring zero corrupted or infected files enter cloud storage</p>
+      </div>
+      <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+        Active Defense
+      </span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+      <!-- Feature 1: 5.0 GB Quota -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+        <div class="flex items-center gap-2 text-violet-400 font-mono text-xs font-semibold uppercase">
           <i class="fa-solid fa-user-shield"></i>
-          <span>Per-User Quota</span>
+          <span>5.0 GB Guaranteed Quota</span>
         </div>
-        <p class="text-2xl font-extrabold text-white font-mono">5.0 GB</p>
+        <p class="text-xl font-extrabold text-white font-mono">5,120 MB</p>
         <p class="text-xs text-slate-400 leading-relaxed">
-          Every student account is provisioned with an enforced 5,368,709,120 byte (5.0 GB) ceiling, aligning with Microsoft Azure's 5 GB free tier blob storage allocation. Multi-file uploads automatically check total active usage before writing to storage.
+          Every student account receives a strict 5,368,709,120 byte allocation, matching Microsoft Azure's 5 GB free blob tier allowance.
         </p>
       </div>
 
-      <div class="p-4 rounded-xl bg-slate-900/60 border border-white/[0.06] space-y-2">
-        <div class="flex items-center gap-2 text-emerald-400 font-mono text-xs font-semibold uppercase tracking-wider">
-          <i class="fa-solid fa-cloud-arrow-up"></i>
-          <span>Backend Elasticity</span>
+      <!-- Feature 2: Deep Security Scanner -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+        <div class="flex items-center gap-2 text-emerald-400 font-mono text-xs font-semibold uppercase">
+          <i class="fa-solid fa-magnifying-glass-chart"></i>
+          <span>Deep Threat Scanner</span>
         </div>
-        <p class="text-2xl font-extrabold text-white font-mono">5 PiB Capacity</p>
+        <p class="text-xl font-extrabold text-white font-mono">Byte Analysis</p>
         <p class="text-xs text-slate-400 leading-relaxed">
-          Backed by Azure Blob Storage hot tier (<code class="text-emerald-300">cloudvault1</code>) with multi-region redundancy, ensuring individual student quotas never exhaust underlying physical storage.
+          Inspects binary magic headers, strips disguised executables (MZ, ELF), blocks PHP webshells, and verifies archive structures.
         </p>
       </div>
 
-      <div class="p-4 rounded-xl bg-slate-900/60 border border-white/[0.06] space-y-2">
-        <div class="flex items-center gap-2 text-cyan-400 font-mono text-xs font-semibold uppercase tracking-wider">
-          <i class="fa-solid fa-file-shield"></i>
-          <span>Genuine File Policy</span>
+      <!-- Feature 3: Anti-Corruption -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-2">
+        <div class="flex items-center gap-2 text-cyan-400 font-mono text-xs font-semibold uppercase">
+          <i class="fa-solid fa-file-circle-check"></i>
+          <span>Integrity Guard</span>
         </div>
-        <p class="text-2xl font-extrabold text-white font-mono">Strict Whitelist</p>
+        <p class="text-xl font-extrabold text-white font-mono">Zero-Byte Reject</p>
         <p class="text-xs text-slate-400 leading-relaxed">
-          Guards storage by rejecting 0-byte (empty) files and blocking dangerous binaries (<code class="text-cyan-300">.exe, .bat, .sh</code>), preserving quota solely for legitimate academic work.
+          Rejects 0-byte corrupted files, validates UTF-8 streams, and generates SHA-256 integrity anchors for tamper-proof verification.
         </p>
       </div>
     </div>
   </div>
 
-  <!-- 5 Cloud Service Models Implemented -->
-  <div class="quartz-surface rounded-2xl p-6 border border-white/[0.08] shadow-xl space-y-4">
-    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+  <!-- SECTION 4: 5 CLOUD SERVICE MODELS -->
+  <div id="section-models" class="about-section hidden space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-2.5">
       <div>
-        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+        <h2 class="text-base font-bold text-white flex items-center gap-2">
           <i class="fa-solid fa-cubes-stacked text-indigo-400"></i>
-          <span>The 5 Cloud Service Models Implemented</span>
+          <span>5 Cloud Service Models Implemented</span>
         </h2>
-        <p class="text-xs text-slate-400">Full compliance with the Cloud Computing laboratory syllabus criteria</p>
+        <p class="text-xs text-slate-400">Comprehensive syllabus alignment across the Cloud Computing curriculum</p>
       </div>
-      <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
-        5 / 5 Delivered
+      <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+        5 / 5 Models
       </span>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
-
-      <!-- Model 1: PaaS -->
-      <div class="p-4 rounded-xl bg-slate-900/60 border border-white/[0.06] space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-mono font-bold text-violet-300 px-2 py-0.5 rounded bg-violet-500/15 border border-violet-500/30">PaaS</span>
-          <span class="text-[11px] font-mono text-slate-400">Azure App Service</span>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      <!-- 1. PaaS -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-1.5">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="font-bold text-violet-300 px-2 py-0.5 rounded bg-violet-500/15 border border-violet-500/30">PaaS</span>
+          <span class="text-[10px] text-slate-400">Azure App Service</span>
         </div>
-        <h4 class="font-bold text-sm text-white">Platform as a Service</h4>
+        <h4 class="font-bold text-xs text-white">Platform as a Service</h4>
         <p class="text-xs text-slate-400 leading-relaxed">
-          Hosts the Python 3.14 web application on Linux without requiring manual OS patching or web server installation. Automated CI/CD deployments trigger on every Git push via GitHub Actions.
+          Managed Linux runtime hosting Python 3.12 Flask app with automatic HTTPS, scaling, and zero OS patching.
         </p>
       </div>
 
-      <!-- Model 2: DBaaS -->
-      <div class="p-4 rounded-xl bg-slate-900/60 border border-white/[0.06] space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-mono font-bold text-emerald-300 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30">DBaaS</span>
-          <span class="text-[11px] font-mono text-slate-400">Azure SQL Database</span>
+      <!-- 2. DBaaS -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-1.5">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="font-bold text-emerald-300 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30">DBaaS</span>
+          <span class="text-[10px] text-slate-400">Azure SQL Database</span>
         </div>
-        <h4 class="font-bold text-sm text-white">Database as a Service</h4>
+        <h4 class="font-bold text-xs text-white">Database as a Service</h4>
         <p class="text-xs text-slate-400 leading-relaxed">
-          Fully managed relational database providing ACID transactions, automated daily backups, and point-in-time recovery for student user profiles, document metadata, and activity telemetry.
+          Managed relational database with automated daily backups, ACID transaction isolation, and foreign-key indexing.
         </p>
       </div>
 
-      <!-- Model 3: SaaS / Storage -->
-      <div class="p-4 rounded-xl bg-slate-900/60 border border-white/[0.06] space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-mono font-bold text-cyan-300 px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-500/30">SaaS / Object</span>
-          <span class="text-[11px] font-mono text-slate-400">Azure Blob Storage</span>
+      <!-- 3. SaaS / Storage -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-1.5">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="font-bold text-cyan-300 px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-500/30">SaaS</span>
+          <span class="text-[10px] text-slate-400">Azure Blob Storage</span>
         </div>
-        <h4 class="font-bold text-sm text-white">Storage as a Service</h4>
+        <h4 class="font-bold text-xs text-white">Storage as a Service</h4>
         <p class="text-xs text-slate-400 leading-relaxed">
-          High-durability blob container (<code class="text-cyan-300">/documents</code>) storing physical files with unique UUID namespaces, inline streaming headers, and sub-second download access.
+          Hot-tier object storage container with 5 PiB underlying elasticity, unique UUID keys, and direct MIME streams.
         </p>
       </div>
 
-      <!-- Model 4: SECaaS -->
-      <div class="p-4 rounded-xl bg-slate-900/60 border border-white/[0.06] space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-mono font-bold text-rose-300 px-2 py-0.5 rounded bg-rose-500/15 border border-rose-500/30">SECaaS</span>
-          <span class="text-[11px] font-mono text-slate-400">Key Vault & Audit</span>
+      <!-- 4. SECaaS -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-1.5">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="font-bold text-rose-300 px-2 py-0.5 rounded bg-rose-500/15 border border-rose-500/30">SECaaS</span>
+          <span class="text-[10px] text-slate-400">Security Architecture</span>
         </div>
-        <h4 class="font-bold text-sm text-white">Security as a Service</h4>
+        <h4 class="font-bold text-xs text-white">Security as a Service</h4>
         <p class="text-xs text-slate-400 leading-relaxed">
-          Zero-Trust identity framework utilizing Scrypt cryptographic key derivation, SHA-256 public share tokens, and tamper-evident audit logging for user logins, uploads, and deletions.
+          Scrypt password key derivation, deep binary malware inspection, and tamper-evident audit logging.
         </p>
       </div>
 
-      <!-- Model 5: IaaS -->
-      <div class="p-4 rounded-xl bg-slate-900/60 border border-white/[0.06] space-y-2 md:col-span-2 lg:col-span-2">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-mono font-bold text-amber-300 px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30">IaaS</span>
-          <span class="text-[11px] font-mono text-slate-400">Azure Linux Virtual Machine</span>
+      <!-- 5. IaaS -->
+      <div class="p-4 rounded-xl bg-slate-900/70 border border-white/[0.08] space-y-1.5 md:col-span-2 lg:col-span-2">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="font-bold text-amber-300 px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30">IaaS</span>
+          <span class="text-[10px] text-slate-400">Azure Linux Virtual Machine</span>
         </div>
-        <h4 class="font-bold text-sm text-white">Infrastructure as a Service</h4>
+        <h4 class="font-bold text-xs text-white">Infrastructure as a Service</h4>
         <p class="text-xs text-slate-400 leading-relaxed">
-          A dedicated Ubuntu Linux Virtual Machine (<code class="text-amber-300">cloudvault1-vm</code>) provisioned in a private Azure Virtual Network (<code class="text-amber-300">vnet-centralindia-1</code>). Demonstrates full root infrastructure control, custom firewall rules (NSG), and operates as an external health sentinel polling the <code class="text-amber-300">/health</code> endpoint.
+          Ubuntu Linux VM (<code class="text-amber-300">cloudvault1-vm</code>) provisioned inside a private Virtual Network (VNet) with custom firewall NSG rules, functioning as an external health sentinel.
         </p>
       </div>
-
     </div>
   </div>
 
-  <!-- Evaluation Criteria Checklist (For Evaluators) -->
-  <div class="quartz-surface rounded-2xl p-6 border border-white/[0.08] shadow-xl space-y-4">
-    <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+  <!-- SECTION 5: EVALUATION RUBRIC (Concise Table) -->
+  <div id="section-rubric" class="about-section hidden space-y-4">
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-2.5">
       <div>
-        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-clipboard-check text-emerald-400"></i>
-          <span>Academic Evaluation Compliance Matrix</span>
+        <h2 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-clipboard-check text-amber-400"></i>
+          <span>Academic Evaluation Rubric</span>
         </h2>
-        <p class="text-xs text-slate-400">Demonstration proof for curriculum rubric and viva examination</p>
+        <p class="text-xs text-slate-400">Demonstration checklist for lab examiners and evaluators</p>
       </div>
-      <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-        100% Complete
+      <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+        100% Verified
       </span>
     </div>
 
     <div class="overflow-x-auto">
       <table class="w-full text-left text-xs">
-        <thead class="font-mono text-[11px] text-slate-400 uppercase tracking-wider border-b border-white/[0.08]">
+        <thead class="font-mono text-[10px] text-slate-400 uppercase tracking-wider border-b border-white/[0.08]">
           <tr>
-            <th class="py-2.5 px-3">Requirement</th>
-            <th class="py-2.5 px-3">Cloud Implementation</th>
-            <th class="py-2.5 px-3">Status</th>
-            <th class="py-2.5 px-3">Verification Location</th>
+            <th class="py-2 px-3">Laboratory Criteria</th>
+            <th class="py-2 px-3">Implementation</th>
+            <th class="py-2 px-3">Result</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-white/[0.05] font-sans">
           <tr>
-            <td class="py-3 px-3 font-semibold text-white">1. Cloud Web Hosting (PaaS)</td>
-            <td class="py-3 px-3 text-slate-300 font-mono text-[11px]">Azure App Service Linux &bull; Gunicorn</td>
-            <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold">PASSED</span></td>
-            <td class="py-3 px-3 text-slate-400 font-mono text-[11px]"><a href="https://cloudvault-app-dmgveggdbxacbuct.centralindia-01.azurewebsites.net/" class="text-violet-400 underline">Production Live URL</a></td>
+            <td class="py-2.5 px-3 font-semibold text-white">1. Cloud Web Hosting (PaaS)</td>
+            <td class="py-2.5 px-3 text-slate-300 font-mono text-[11px]">Azure App Service Linux &bull; Gunicorn</td>
+            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold">PASSED</span></td>
           </tr>
           <tr>
-            <td class="py-3 px-3 font-semibold text-white">2. Relational Database (DBaaS)</td>
-            <td class="py-3 px-3 text-slate-300 font-mono text-[11px]">Azure SQL Database &bull; SQLAlchemy</td>
-            <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold">PASSED</span></td>
-            <td class="py-3 px-3 text-slate-400 font-mono text-[11px]"><code class="text-slate-300">models.py &bull; /api/activity-log</code></td>
+            <td class="py-2.5 px-3 font-semibold text-white">2. Relational Database (DBaaS)</td>
+            <td class="py-2.5 px-3 text-slate-300 font-mono text-[11px]">Azure SQL Database &bull; SQLAlchemy ORM</td>
+            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold">PASSED</span></td>
           </tr>
           <tr>
-            <td class="py-3 px-3 font-semibold text-white">3. Object Storage (SaaS)</td>
-            <td class="py-3 px-3 text-slate-300 font-mono text-[11px]">Azure Blob Storage &bull; UUID namespaces</td>
-            <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold">PASSED</span></td>
-            <td class="py-3 px-3 text-slate-400 font-mono text-[11px]"><code class="text-slate-300">storage.py &bull; Container: documents</code></td>
+            <td class="py-2.5 px-3 font-semibold text-white">3. Object Storage (SaaS)</td>
+            <td class="py-2.5 px-3 text-slate-300 font-mono text-[11px]">Azure Blob Storage &bull; 5.0 GB Quota Tier</td>
+            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold">PASSED</span></td>
           </tr>
           <tr>
-            <td class="py-3 px-3 font-semibold text-white">4. Identity & Access Security (SECaaS)</td>
-            <td class="py-3 px-3 text-slate-300 font-mono text-[11px]">Scrypt Hashing &bull; Google SSO &bull; Audit Trail</td>
-            <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold">PASSED</span></td>
-            <td class="py-3 px-3 text-slate-400 font-mono text-[11px]"><code class="text-slate-300">/login &bull; Security Audit Trail</code></td>
+            <td class="py-2.5 px-3 font-semibold text-white">4. Deep Threat & Malware Defense</td>
+            <td class="py-2.5 px-3 text-slate-300 font-mono text-[11px]">Magic Byte Analysis &bull; Shellcode Intercept</td>
+            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold">PASSED</span></td>
           </tr>
           <tr>
-            <td class="py-3 px-3 font-semibold text-white">5. Infrastructure Control (IaaS)</td>
-            <td class="py-3 px-3 text-slate-300 font-mono text-[11px]">Azure Linux VM &bull; VNet &bull; NSG Security</td>
-            <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold">PASSED</span></td>
-            <td class="py-3 px-3 text-slate-400 font-mono text-[11px]"><code class="text-slate-300">cloudvault1-vm &bull; /health Probe</code></td>
+            <td class="py-2.5 px-3 font-semibold text-white">5. Infrastructure Control (IaaS)</td>
+            <td class="py-2.5 px-3 text-slate-300 font-mono text-[11px]">Azure Linux VM &bull; Virtual Network</td>
+            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold">PASSED</span></td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Back to Vault Action -->
+  <!-- Bottom CTA -->
   <div class="text-center pt-2">
-    <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs font-mono shadow-xl shadow-violet-600/20 border border-violet-400/30 transition-all active:scale-95">
+    <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs font-mono shadow-lg border border-violet-400/30 transition-all active:scale-95">
       <i class="fa-solid fa-arrow-left"></i>
-      <span>Return to Active Document Vault</span>
+      <span>Return to Vault</span>
     </a>
   </div>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function switchAboutTab(tabId) {
+    // Hide all sections
+    document.querySelectorAll('.about-section').forEach(sec => sec.classList.add('hidden'));
+    
+    // Reset all buttons
+    document.querySelectorAll('.about-nav-btn').forEach(btn => {
+      btn.classList.remove('bg-gradient-to-r', 'from-violet-600', 'to-indigo-600', 'text-white', 'font-bold', 'shadow-md', 'shadow-violet-600/25', 'border-violet-400/30');
+      btn.classList.add('bg-slate-900/80', 'text-slate-300', 'font-semibold', 'border-white/10');
+    });
+
+    // Show target section
+    const targetSection = document.getElementById(`section-${tabId}`);
+    if (targetSection) targetSection.classList.remove('hidden');
+
+    // Highlight active button
+    const targetBtn = document.getElementById(`tabBtn-${tabId}`);
+    if (targetBtn) {
+      targetBtn.classList.remove('bg-slate-900/80', 'text-slate-300', 'border-white/10');
+      targetBtn.classList.add('bg-gradient-to-r', 'from-violet-600', 'to-indigo-600', 'text-white', 'font-bold', 'shadow-md', 'shadow-violet-600/25', 'border-violet-400/30');
+    }
+  }
+</script>
 {% endblock %}

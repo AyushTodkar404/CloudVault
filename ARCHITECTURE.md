@@ -29,7 +29,7 @@ The application is architected from the ground up to utilize all five primary cl
 | **Ayush Todkar** | **57** | **Lead Cloud Architect & Full-Stack Developer** &bull; PaaS deployment orchestration, WSGI pipeline, multi-tenant document isolation, Google SSO, and UI/UX design. |
 | **Yahiya Siddiqui** | **49** | **Database & Cloud Infrastructure Engineer** &bull; Azure SQL Database (DBaaS) relational schema, indexing, foreign keys, and IaaS VM uptime sentinel. |
 | **Alister Varghese K.** | **03** | **Cloud Storage & Quota Systems Engineer** &bull; Azure Blob Storage integration, UUID namespaces, 5.0 GB student quota tracking (matching Azure Free Tier), and batch drag-and-drop. |
-| **Jude Rebairo** | **31** | **Security, Access Control & QA Engineer** &bull; SECaaS security subsystem, scrypt password hashing, automated test suites (18 tests), and upload validation. |
+| **Jude Rebairo** | **31** | **Security, Access Control & QA Engineer** &bull; SECaaS security subsystem, scrypt password hashing, automated test suites (21 tests), and deep file integrity & threat scanner. |
 
 ---
 
@@ -162,6 +162,14 @@ The application is architected from the ground up to utilize all five primary cl
                                       ▼ POST /upload (multipart/form-data)
                             [ Flask Application Worker ]
                                       │
+                                      ▼
+                      [ Deep File Integrity & Threat Scanner ]
+                      - Magic binary header signature verification
+                      - Polyglot / disguised executable block (MZ, ELF)
+                      - Embedded script & webshell heuristic check
+                      - Archive structure test (zipfile.testzip)
+                      - Binary null flood check on text documents
+                                      │
                 ┌─────────────────────┴─────────────────────┐
                 ▼                                           ▼
       [ Stream to Azure Blob ]                    [ Save Metadata to SQL ]
@@ -190,6 +198,7 @@ C:\CC_MINI_PROJECT\
 ├── templates/
 │   ├── base.html                 # Titanium Obsidian core master template + navbar
 │   ├── index.html                # Main document registry dashboard & upload modal
+│   ├── about.html                # Team, Technology Stack, 5 Models & Rubric
 │   ├── login.html                # Secure sign-in portal with Google OAuth button
 │   ├── signup.html               # Institutional student registration screen
 │   ├── google_picker.html        # 1-Click Emergent Google Account Chooser
@@ -201,11 +210,12 @@ C:\CC_MINI_PROJECT\
 ├── .env.example                  # Template configuration environment file
 ├── .gitignore                    # Ensures secrets, DBs, and virtualenvs never commit
 ├── app.py                        # Core Flask application factory, routing & auth
-├── models.py                     # SQLAlchemy models (User, Document) & SQL Server indexing
+├── models.py                     # SQLAlchemy models (User, Document, ActivityLog)
 ├── requirements.txt              # Production Python package manifest
+├── scanner.py                    # Deep byte integrity & malware heuristic engine
 ├── startup.sh                    # Linux App Service production Gunicorn boot script
-├── storage.py                    # Azure Blob Storage SDK driver with local fallback
-├── test_app.py                   # Automated test suite (10 integration & unit tests)
+├── storage.py                    # Azure Blob Storage SDK driver with scanner intercept
+├── test_app.py                   # Automated test suite (21 integration & unit tests)
 └── ARCHITECTURE.md               # This system architecture and operations manual
 ```
 
