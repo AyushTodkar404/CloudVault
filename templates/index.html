@@ -1,0 +1,960 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- Executive Metric Highlights (Quartz Glassmorphism Panels) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    
+    <!-- Metric 1: Total Documents -->
+    <div class="quartz-surface quartz-surface-hover rounded-2xl p-4 relative overflow-hidden group">
+      <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+        <span class="font-mono uppercase tracking-wider text-[10px]">Active Records</span>
+        <span class="w-7 h-7 rounded-lg bg-violet-500/15 border border-violet-500/30 flex items-center justify-center text-violet-300">
+          <i class="fa-solid fa-file-shield text-xs"></i>
+        </span>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <span class="text-3xl font-extrabold font-mono text-white tracking-tight">{{ total_docs }}</span>
+        <span class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1 font-mono">
+          <i class="fa-solid fa-circle-check text-[10px]"></i> {{ starred_count }} Starred
+        </span>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-1 font-mono">Encrypted & versioned</p>
+      <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-violet-500/10 rounded-full blur-xl pointer-events-none group-hover:scale-150 transition-transform"></div>
+    </div>
+
+    <!-- Metric 2: Storage Quota & Capacity Meter -->
+    <div class="quartz-surface quartz-surface-hover rounded-2xl p-4 relative overflow-hidden group">
+      <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+        <span class="font-mono uppercase tracking-wider text-[10px]">Storage Used</span>
+        <span class="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-300">
+          <i class="fa-solid fa-hard-drive text-xs"></i>
+        </span>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <span class="text-2xl font-extrabold font-mono text-white tracking-tight">{{ storage_used }}</span>
+        <span class="text-[11px] text-slate-400 font-mono">/ {{ storage_quota }}</span>
+      </div>
+      <!-- Storage Capacity Progress Bar -->
+      <div class="w-full bg-white/[0.08] h-1.5 rounded-full mt-2.5 overflow-hidden">
+        <div class="bg-gradient-to-r from-amber-500 via-indigo-500 to-violet-500 h-full rounded-full transition-all duration-500" style="width: {{ storage_percent }}%"></div>
+      </div>
+      <p class="text-[10px] text-slate-500 mt-1 font-mono">{{ storage_percent }}% of cloud quota consumed</p>
+      <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-amber-500/10 rounded-full blur-xl pointer-events-none group-hover:scale-150 transition-transform"></div>
+    </div>
+
+    <!-- Metric 3: Storage Node Status -->
+    <div class="quartz-surface quartz-surface-hover rounded-2xl p-4 relative overflow-hidden group">
+      <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+        <span class="font-mono uppercase tracking-wider text-[10px]">Target Bucket</span>
+        <span class="w-7 h-7 rounded-lg {% if is_cloud_active %}bg-emerald-500/15 border-emerald-500/30 text-emerald-300{% else %}bg-amber-500/15 border-amber-500/30 text-amber-300{% endif %} border flex items-center justify-center">
+          <i class="fa-solid fa-database text-xs"></i>
+        </span>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <span class="text-sm font-bold font-mono text-white truncate max-w-[140px]" title="{{ container_name }}">
+          /{{ container_name }}
+        </span>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full {% if is_cloud_active %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/40{% else %}bg-amber-500/20 text-amber-300 border border-amber-500/40{% endif %} font-bold">
+          {% if is_cloud_active %}ONLINE{% else %}SANDBOX{% endif %}
+        </span>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-1 font-mono">Encrypted Hot-Store</p>
+      <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl pointer-events-none group-hover:scale-150 transition-transform"></div>
+    </div>
+
+    <!-- Metric 4: Security Standard -->
+    <div class="quartz-surface quartz-surface-hover rounded-2xl p-4 relative overflow-hidden group">
+      <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+        <span class="font-mono uppercase tracking-wider text-[10px]">Encryption Tier</span>
+        <span class="w-7 h-7 rounded-lg bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-300">
+          <i class="fa-solid fa-fingerprint text-xs"></i>
+        </span>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <span class="text-base font-bold font-mono text-violet-300">AES-256-GCM</span>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-1 font-mono">SHA-256 Checksum Verified</p>
+      <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-xl pointer-events-none group-hover:scale-150 transition-transform"></div>
+    </div>
+
+  </div>
+
+  <!-- Main Repository Control Center -->
+  <div class="quartz-surface rounded-2xl p-5 sm:p-6 shadow-2xl space-y-5">
+    
+    <!-- Top Action & Filter Toolbar -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 pb-4 border-b border-white/[0.08]">
+      
+      <!-- Category Tabs (Sleek Frosted Capsule Buttons) -->
+      <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#0e1019]/90 border border-white/[0.08] text-xs self-start overflow-x-auto max-w-full">
+        <button 
+          type="button" 
+          onclick="filterCategory('all')" 
+          id="tab-all"
+          class="tab-btn px-3 py-1.5 rounded-lg font-semibold transition-all bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-600/25 whitespace-nowrap"
+        >
+          All ({{ documents|length }})
+        </button>
+        <button 
+          type="button" 
+          onclick="filterCategory('starred')" 
+          id="tab-starred"
+          class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-medium transition-all whitespace-nowrap"
+        >
+          <i class="fa-solid fa-star text-amber-400 mr-1 text-[11px]"></i> Starred ({{ starred_count }})
+        </button>
+        <button 
+          type="button" 
+          onclick="filterCategory('documents')" 
+          id="tab-documents"
+          class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-medium transition-all whitespace-nowrap"
+        >
+          <i class="fa-solid fa-file-lines text-rose-400 mr-1 text-[11px]"></i> Documents
+        </button>
+        <button 
+          type="button" 
+          onclick="filterCategory('media')" 
+          id="tab-media"
+          class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-medium transition-all whitespace-nowrap"
+        >
+          <i class="fa-solid fa-photo-film text-amber-400 mr-1 text-[11px]"></i> Audio / Video
+        </button>
+        <button 
+          type="button" 
+          onclick="filterCategory('spreadsheet')" 
+          id="tab-spreadsheet"
+          class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-medium transition-all whitespace-nowrap"
+        >
+          <i class="fa-solid fa-file-excel text-emerald-400 mr-1 text-[11px]"></i> Spreadsheets
+        </button>
+        <button 
+          type="button" 
+          onclick="filterCategory('image')" 
+          id="tab-image"
+          class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-medium transition-all whitespace-nowrap"
+        >
+          <i class="fa-solid fa-file-image text-cyan-400 mr-1 text-[11px]"></i> Images
+        </button>
+        <button 
+          type="button" 
+          onclick="filterCategory('trash')" 
+          id="tab-trash"
+          class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-medium transition-all whitespace-nowrap"
+        >
+          <i class="fa-solid fa-trash-can text-rose-400 mr-1 text-[11px]"></i> Trash ({{ trash_count }})
+        </button>
+      </div>
+
+      <!-- Right Toolbar: Search, Sort, View Switcher, Upload Button -->
+      <div class="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+        
+        <!-- Live Instant Search Bar -->
+        <div class="relative w-full sm:w-56">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+          </span>
+          <input 
+            type="text" 
+            id="instantSearch" 
+            oninput="handleInstantSearch(this.value)"
+            placeholder="Search files..." 
+            class="quartz-input w-full pl-8 pr-8 py-1.5 rounded-lg text-xs placeholder-slate-500"
+          >
+          <span class="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none text-[10px] font-mono text-slate-500">
+            /
+          </span>
+        </div>
+
+        <!-- Sort Select -->
+        <select id="sortSelect" onchange="handleSortChange(this.value)" class="quartz-input py-1.5 px-2 rounded-lg text-xs font-mono bg-[#0e1019]/90 border border-white/[0.08] text-slate-300">
+          <option value="date-desc">Newest</option>
+          <option value="date-asc">Oldest</option>
+          <option value="name-asc">Name (A-Z)</option>
+          <option value="name-desc">Name (Z-A)</option>
+          <option value="size-desc">Largest</option>
+          <option value="size-asc">Smallest</option>
+        </select>
+
+        <!-- View Switcher (Table vs Grid) -->
+        <div class="flex items-center p-1 rounded-lg bg-[#0e1019]/90 border border-white/[0.08] text-xs">
+          <button 
+            type="button" 
+            onclick="switchView('table')" 
+            id="viewTableBtn"
+            class="p-1.5 rounded bg-violet-600/20 text-violet-300 border border-violet-500/30 transition-colors" 
+            title="List Table View"
+          >
+            <i class="fa-solid fa-list text-xs"></i>
+          </button>
+          <button 
+            type="button" 
+            onclick="switchView('grid')" 
+            id="viewGridBtn"
+            class="p-1.5 rounded text-slate-400 hover:text-white transition-colors" 
+            title="Card Grid View"
+          >
+            <i class="fa-solid fa-grip text-xs"></i>
+          </button>
+        </div>
+
+        <!-- Primary Upload Trigger CTA -->
+        <button 
+          type="button" 
+          onclick="openUploadModal()" 
+          class="px-3.5 py-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shadow-violet-600/25 border border-violet-400/30 whitespace-nowrap active:scale-95"
+        >
+          <i class="fa-solid fa-cloud-arrow-up text-[11px]"></i>
+          <span>Upload</span>
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- Multi-Select Batch Actions Bar (Floating Sticky Bar) -->
+    <div id="batchActionBar" class="hidden flex items-center justify-between p-3 rounded-xl bg-violet-950/80 border border-violet-500/40 text-xs shadow-2xl backdrop-blur-md animate-fade-in">
+      <div class="flex items-center gap-3">
+        <span id="selectedCountDisplay" class="font-bold text-white font-mono">0 files selected</span>
+        <button type="button" onclick="selectAll(true)" class="text-violet-300 hover:text-white underline text-[11px] font-mono">Select All</button>
+        <button type="button" onclick="selectAll(false)" class="text-slate-400 hover:text-white underline text-[11px] font-mono">Clear</button>
+      </div>
+      <div class="flex items-center gap-2">
+        <form id="batchForm" method="POST" action="{{ url_for('batch_action') }}" class="flex items-center gap-2">
+          <input type="hidden" name="action" id="batchActionInput" value="">
+          <input type="hidden" name="doc_ids_csv" id="batchDocIdsInput" value="">
+          
+          <button type="button" onclick="submitBatch('download_zip')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-mono font-semibold flex items-center gap-1.5 border border-white/10">
+            <i class="fa-solid fa-file-zipper text-xs text-amber-400"></i>
+            <span>Download ZIP</span>
+          </button>
+          
+          <button type="button" id="batchTrashBtn" onclick="submitBatch('trash')" class="px-3 py-1.5 rounded-lg bg-rose-950/60 hover:bg-rose-900/60 text-rose-200 font-mono font-semibold flex items-center gap-1.5 border border-rose-500/30">
+            <i class="fa-solid fa-trash-can text-xs text-rose-400"></i>
+            <span>Move to Trash</span>
+          </button>
+
+          <button type="button" id="batchRestoreBtn" onclick="submitBatch('restore')" class="hidden px-3 py-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-200 font-mono font-semibold flex items-center gap-1.5 border border-emerald-500/30">
+            <i class="fa-solid fa-rotate-left text-xs text-emerald-400"></i>
+            <span>Restore Selected</span>
+          </button>
+
+          <button type="button" id="batchPurgeBtn" onclick="submitBatch('delete_permanent')" class="hidden px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-mono font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-ban text-xs"></i>
+            <span>Purge Permanently</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Active Documents Registry -->
+    {% if documents or trash_documents %}
+      
+      <!-- 1. Table View Container -->
+      <div id="tableViewContainer" class="overflow-x-auto">
+        <table class="w-full text-left border-collapse" id="docTable">
+          <thead>
+            <tr class="border-b border-white/[0.08] text-[11px] font-semibold text-slate-400 font-mono uppercase tracking-wider">
+              <th class="py-2.5 px-3 w-8">
+                <input type="checkbox" id="selectAllHeader" onchange="selectAll(this.checked)" class="rounded bg-[#0a0c14] border-white/20 text-violet-600 focus:ring-0 cursor-pointer">
+              </th>
+              <th class="py-2.5 px-3">Student Name</th>
+              <th class="py-2.5 px-3">Credential Title</th>
+              <th class="py-2.5 px-3 hidden md:table-cell">Integrity Hash</th>
+              <th class="py-2.5 px-3 hidden sm:table-cell">File Details</th>
+              <th class="py-2.5 px-3 hidden lg:table-cell">Archived At</th>
+              <th class="py-2.5 px-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.05] text-xs" id="tableBody">
+            <!-- Active Documents -->
+            {% for doc in documents %}
+              <tr 
+                class="doc-row hover:bg-white/[0.03] transition-colors group"
+                data-type="{{ doc.category }}"
+                data-starred="{{ 'true' if doc.is_starred else 'false' }}"
+                data-ext="{{ doc.file_extension|lower }}"
+                data-name="{{ doc.document_title|lower }}"
+                data-date="{{ doc.created_at.timestamp() }}"
+                data-size="{{ doc.file_size or 0 }}"
+                data-id="{{ doc.id }}"
+                data-text="{{ doc.student_name|lower }} {{ doc.document_title|lower }} {{ doc.file_name|lower }} .{{ doc.file_extension|lower }} #{{ doc.id }}"
+              >
+                <!-- Checkbox -->
+                <td class="py-3 px-3">
+                  <input type="checkbox" value="{{ doc.id }}" onchange="handleSelectRow(this)" class="doc-checkbox rounded bg-[#0a0c14] border-white/20 text-violet-600 focus:ring-0 cursor-pointer">
+                </td>
+
+                <!-- Student Identity & Star -->
+                <td class="py-3 px-3">
+                  <div class="flex items-center gap-2">
+                    <button type="button" onclick="toggleStar('{{ doc.id }}', this)" class="text-xs p-1 text-slate-500 hover:text-amber-400 transition-colors" title="Toggle Star / Favorite">
+                      <i class="{{ 'fa-solid text-amber-400' if doc.is_starred else 'fa-regular' }} fa-star"></i>
+                    </button>
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600/30 via-indigo-600/30 to-purple-600/30 border border-violet-500/30 text-violet-300 flex items-center justify-center font-bold text-xs font-mono shrink-0 shadow-sm">
+                      {{ doc.student_name[:2]|upper }}
+                    </div>
+                    <div class="overflow-hidden">
+                      <p class="font-bold text-slate-200 group-hover:text-violet-300 truncate max-w-[130px]">{{ doc.student_name }}</p>
+                      <p class="text-[10px] text-slate-500 font-mono">UID: #{{ doc.id }}</p>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Document Title -->
+                <td class="py-3 px-3">
+                  <div class="flex items-center gap-2.5">
+                    {% if doc.is_pdf %}
+                      <span class="w-7 h-7 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center text-xs shrink-0" title="PDF Document">
+                        <i class="fa-solid fa-file-pdf"></i>
+                      </span>
+                    {% elif doc.is_image %}
+                      <span class="w-7 h-7 rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 flex items-center justify-center text-xs shrink-0" title="Image File">
+                        <i class="fa-solid fa-file-image"></i>
+                      </span>
+                    {% elif doc.is_video %}
+                      <span class="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 flex items-center justify-center text-xs shrink-0" title="Video File">
+                        <i class="fa-solid fa-file-video"></i>
+                      </span>
+                    {% elif doc.is_audio %}
+                      <span class="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-300 flex items-center justify-center text-xs shrink-0" title="Audio File">
+                        <i class="fa-solid fa-file-audio"></i>
+                      </span>
+                    {% elif doc.is_spreadsheet %}
+                      <span class="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 flex items-center justify-center text-xs shrink-0" title="Spreadsheet">
+                        <i class="fa-solid fa-file-excel"></i>
+                      </span>
+                    {% elif doc.is_word %}
+                      <span class="w-7 h-7 rounded-lg bg-blue-500/15 border border-blue-500/30 text-blue-300 flex items-center justify-center text-xs shrink-0" title="Word Document">
+                        <i class="fa-solid fa-file-word"></i>
+                      </span>
+                    {% elif doc.is_code %}
+                      <span class="w-7 h-7 rounded-lg bg-yellow-500/15 border border-yellow-500/30 text-yellow-300 flex items-center justify-center text-xs shrink-0" title="Code / Script">
+                        <i class="fa-solid fa-file-code"></i>
+                      </span>
+                    {% else %}
+                      <span class="w-7 h-7 rounded-lg bg-violet-500/15 border border-violet-500/30 text-violet-300 flex items-center justify-center text-xs shrink-0" title="Digital Document">
+                        <i class="fa-solid fa-file"></i>
+                      </span>
+                    {% endif %}
+                    <div class="overflow-hidden">
+                      <button 
+                        type="button" 
+                        onclick="openPreviewModal('{{ doc.blob_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}')"
+                        class="text-left font-semibold text-slate-100 hover:text-violet-300 transition-colors truncate max-w-[220px] block"
+                      >
+                        {{ doc.document_title }}
+                      </button>
+                      <p class="text-[10px] text-slate-500 font-mono truncate max-w-[200px] sm:hidden">
+                        {{ doc.formatted_size }} &bull; {{ doc.created_at.strftime('%Y-%m-%d') }}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Integrity Hash / Checksum (Desktop) -->
+                <td class="py-3 px-3 hidden md:table-cell font-mono">
+                  <span class="px-2.5 py-1 rounded-md bg-[#0a0c14] border border-white/[0.08] text-[10px] text-slate-400 inline-flex items-center gap-1.5 font-mono shadow-sm">
+                    <i class="fa-solid fa-shield text-[9px] text-violet-400"></i>
+                    <span>{{ doc.blob_name[:12] }}...</span>
+                  </span>
+                </td>
+
+                <!-- File Details (Desktop) -->
+                <td class="py-3 px-3 hidden sm:table-cell">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase
+                      {% if doc.is_pdf %}bg-rose-500/20 text-rose-300 border border-rose-500/30
+                      {% elif doc.is_spreadsheet %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30
+                      {% elif doc.is_audio %}bg-purple-500/20 text-purple-300 border border-purple-500/30
+                      {% elif doc.is_video %}bg-amber-500/20 text-amber-300 border border-amber-500/30
+                      {% elif doc.is_image %}bg-cyan-500/20 text-cyan-300 border border-cyan-500/30
+                      {% elif doc.is_word %}bg-blue-500/20 text-blue-300 border border-blue-500/30
+                      {% else %}bg-slate-700/40 text-slate-300 border border-white/10
+                      {% endif %}">
+                      .{{ doc.file_extension|upper }}
+                    </span>
+                    <p class="text-slate-300 font-mono text-[11px] truncate max-w-[130px]" title="{{ doc.file_name }}">
+                      {{ doc.file_name }}
+                    </p>
+                  </div>
+                  <p class="text-[10px] text-slate-500 font-mono mt-0.5">
+                    {{ doc.formatted_size }}
+                  </p>
+                </td>
+
+                <!-- Timestamp -->
+                <td class="py-3 px-3 hidden lg:table-cell font-mono text-slate-400 text-[11px] whitespace-nowrap">
+                  {{ doc.created_at.strftime('%Y-%m-%d %H:%M') }}
+                </td>
+
+                <!-- Actions -->
+                <td class="py-3 px-3 text-right whitespace-nowrap">
+                  <div class="flex items-center justify-end gap-1">
+                    
+                    <!-- Preview In In-App Modal -->
+                    <button 
+                      type="button" 
+                      onclick="openPreviewModal('{{ doc.blob_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}')"
+                      class="px-2.5 py-1 rounded-lg bg-violet-500/15 hover:bg-violet-500/25 border border-violet-500/30 text-violet-300 hover:text-white text-xs font-semibold transition-all flex items-center gap-1 shadow-sm"
+                      title="Inspect Document Preview"
+                    >
+                      <i class="fa-regular fa-eye text-[11px]"></i>
+                      <span class="hidden sm:inline">Preview</span>
+                    </button>
+
+                    <!-- Share Link -->
+                    <button 
+                      type="button" 
+                      onclick="openShareModal('{{ doc.id }}', '{{ doc.document_title|replace('\'', '\\\'') }}')" 
+                      class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] text-xs transition-colors"
+                      title="Share Public Link"
+                    >
+                      <i class="fa-solid fa-share-nodes text-[11px]"></i>
+                    </button>
+
+                    <!-- Edit Metadata -->
+                    <button 
+                      type="button" 
+                      onclick="openEditModal('{{ doc.id }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ (doc.description or '')|replace('\'', '\\\'') }}')" 
+                      class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] text-xs transition-colors"
+                      title="Rename / Edit"
+                    >
+                      <i class="fa-regular fa-pen-to-square text-[11px]"></i>
+                    </button>
+
+                    <!-- Info Inspector -->
+                    <button 
+                      type="button" 
+                      onclick="openInfoModal('{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_name|replace('\'', '\\\'') }}', '{{ doc.formatted_size }}', '{{ doc.content_type }}', '{{ doc.created_at.strftime('%Y-%m-%d %H:%M') }}', '{{ doc.blob_name }}', '{{ doc.blob_url }}', '{{ (doc.description or '')|replace('\'', '\\\'') }}')" 
+                      class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] text-xs transition-colors"
+                      title="File Details & Info"
+                    >
+                      <i class="fa-solid fa-circle-info text-[11px]"></i>
+                    </button>
+
+                    <!-- Move to Trash -->
+                    <form action="{{ url_for('trash_document', doc_id=doc.id) }}" method="POST" class="inline" onsubmit="return confirm('Move this document to Trash?')">
+                      <button 
+                        type="submit" 
+                        class="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 text-xs transition-colors"
+                        title="Move to Trash"
+                      >
+                        <i class="fa-regular fa-trash-can text-[11px]"></i>
+                      </button>
+                    </form>
+
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+
+            <!-- Trash Documents (Hidden unless Trash tab is selected) -->
+            {% for doc in trash_documents %}
+              <tr 
+                class="doc-row hover:bg-white/[0.03] transition-colors group hidden opacity-75"
+                data-type="trash"
+                data-starred="false"
+                data-ext="{{ doc.file_extension|lower }}"
+                data-name="{{ doc.document_title|lower }}"
+                data-date="{{ doc.created_at.timestamp() }}"
+                data-size="{{ doc.file_size or 0 }}"
+                data-id="{{ doc.id }}"
+                data-text="{{ doc.student_name|lower }} {{ doc.document_title|lower }} {{ doc.file_name|lower }} .{{ doc.file_extension|lower }} #{{ doc.id }}"
+              >
+                <!-- Checkbox -->
+                <td class="py-3 px-3">
+                  <input type="checkbox" value="{{ doc.id }}" onchange="handleSelectRow(this)" class="doc-checkbox rounded bg-[#0a0c14] border-white/20 text-violet-600 focus:ring-0 cursor-pointer">
+                </td>
+
+                <!-- Student Identity -->
+                <td class="py-3 px-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-rose-400 text-xs"><i class="fa-solid fa-trash-can"></i></span>
+                    <div class="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-500/30 text-rose-300 flex items-center justify-center font-bold text-xs font-mono shrink-0">
+                      {{ doc.student_name[:2]|upper }}
+                    </div>
+                    <div class="overflow-hidden">
+                      <p class="font-bold text-slate-300 line-through truncate max-w-[130px]">{{ doc.student_name }}</p>
+                      <p class="text-[10px] text-rose-400/80 font-mono">In Trash</p>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Document Title -->
+                <td class="py-3 px-3">
+                  <span class="font-semibold text-slate-300 line-through">{{ doc.document_title }}</span>
+                </td>
+
+                <!-- Integrity Hash -->
+                <td class="py-3 px-3 hidden md:table-cell font-mono text-[10px] text-slate-500">
+                  {{ doc.blob_name[:12] }}...
+                </td>
+
+                <!-- File Details -->
+                <td class="py-3 px-3 hidden sm:table-cell font-mono text-[11px] text-slate-400">
+                  {{ doc.file_name }} &bull; {{ doc.formatted_size }}
+                </td>
+
+                <!-- Timestamp -->
+                <td class="py-3 px-3 hidden lg:table-cell font-mono text-slate-500 text-[11px]">
+                  {{ doc.created_at.strftime('%Y-%m-%d') }}
+                </td>
+
+                <!-- Trash Actions: Restore & Permanent Purge -->
+                <td class="py-3 px-3 text-right whitespace-nowrap">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <!-- Restore -->
+                    <form action="{{ url_for('restore_document', doc_id=doc.id) }}" method="POST" class="inline">
+                      <button type="submit" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-1 font-mono transition-colors">
+                        <i class="fa-solid fa-rotate-left text-[10px]"></i>
+                        <span>Restore</span>
+                      </button>
+                    </form>
+                    <!-- Permanent Purge -->
+                    <form action="{{ url_for('delete_document', doc_id=doc.id) }}" method="POST" class="inline" onsubmit="return confirm('Permanently destroy this record? This cannot be recovered.')">
+                      <button type="submit" class="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 text-xs transition-colors" title="Purge permanently">
+                        <i class="fa-solid fa-ban text-[11px]"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 2. Grid View Container (Toggled via view switcher) -->
+      <div id="gridViewContainer" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Active Documents Grid -->
+        {% for doc in documents %}
+          <div 
+            class="doc-card quartz-surface quartz-surface-hover rounded-xl p-4.5 transition-all flex flex-col justify-between group relative overflow-hidden"
+            data-type="{{ doc.category }}"
+            data-starred="{{ 'true' if doc.is_starred else 'false' }}"
+            data-ext="{{ doc.file_extension|lower }}"
+            data-name="{{ doc.document_title|lower }}"
+            data-date="{{ doc.created_at.timestamp() }}"
+            data-size="{{ doc.file_size or 0 }}"
+            data-id="{{ doc.id }}"
+            data-text="{{ doc.student_name|lower }} {{ doc.document_title|lower }} {{ doc.file_name|lower }} .{{ doc.file_extension|lower }} #{{ doc.id }}"
+          >
+            <div>
+              <div class="flex items-center justify-between gap-2 pb-3 border-b border-white/[0.08]">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" value="{{ doc.id }}" onchange="handleSelectRow(this)" class="doc-checkbox rounded bg-[#0a0c14] border-white/20 text-violet-600 focus:ring-0 cursor-pointer">
+                  <button type="button" onclick="toggleStar('{{ doc.id }}', this)" class="text-xs p-1 text-slate-500 hover:text-amber-400 transition-colors">
+                    <i class="{{ 'fa-solid text-amber-400' if doc.is_starred else 'fa-regular' }} fa-star"></i>
+                  </button>
+                  <div class="w-7 h-7 rounded-lg bg-violet-500/20 border border-violet-500/30 text-violet-300 flex items-center justify-center font-mono font-bold text-xs">
+                    {{ doc.student_name[:2]|upper }}
+                  </div>
+                  <div>
+                    <p class="font-bold text-xs text-white truncate max-w-[110px]">{{ doc.student_name }}</p>
+                    <p class="text-[10px] text-slate-500 font-mono">UID #{{ doc.id }}</p>
+                  </div>
+                </div>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold uppercase
+                  {% if doc.is_pdf %}bg-rose-500/20 text-rose-300 border border-rose-500/30
+                  {% elif doc.is_spreadsheet %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30
+                  {% elif doc.is_audio %}bg-purple-500/20 text-purple-300 border border-purple-500/30
+                  {% elif doc.is_video %}bg-amber-500/20 text-amber-300 border border-amber-500/30
+                  {% elif doc.is_image %}bg-cyan-500/20 text-cyan-300 border border-cyan-500/30
+                  {% elif doc.is_word %}bg-blue-500/20 text-blue-300 border border-blue-500/30
+                  {% else %}bg-slate-700/40 text-slate-300 border border-white/10
+                  {% endif %}">
+                  .{{ doc.file_extension|upper }}
+                </span>
+              </div>
+
+              <div class="py-3.5">
+                <h4 class="font-bold text-sm text-slate-100 group-hover:text-violet-300 transition-colors line-clamp-2">
+                  {{ doc.document_title }}
+                </h4>
+                <p class="text-[11px] text-slate-400 font-mono truncate mt-1">
+                  {{ doc.file_name }}
+                </p>
+                {% if doc.description %}
+                  <p class="text-[10px] text-slate-500 italic mt-1.5 line-clamp-1">"{{ doc.description }}"</p>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs font-mono text-slate-400">
+              <span>{{ doc.formatted_size }}</span>
+              <div class="flex items-center gap-1">
+                <button 
+                  type="button" 
+                  onclick="openPreviewModal('{{ doc.blob_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}')"
+                  class="px-2.5 py-1 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/30 text-violet-300 hover:text-white transition-colors text-[11px] font-semibold"
+                >
+                  Preview
+                </button>
+                <button 
+                  type="button" 
+                  onclick="openShareModal('{{ doc.id }}', '{{ doc.document_title|replace('\'', '\\\'') }}')" 
+                  class="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] text-xs"
+                  title="Share link"
+                >
+                  <i class="fa-solid fa-share-nodes"></i>
+                </button>
+                <button 
+                  type="button" 
+                  onclick="openEditModal('{{ doc.id }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ (doc.description or '')|replace('\'', '\\\'') }}')" 
+                  class="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] text-xs"
+                  title="Edit title"
+                >
+                  <i class="fa-regular fa-pen-to-square"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+
+        <!-- Trash Documents Grid -->
+        {% for doc in trash_documents %}
+          <div 
+            class="doc-card quartz-surface rounded-xl p-4.5 transition-all flex flex-col justify-between group relative overflow-hidden hidden opacity-75 border-rose-500/30"
+            data-type="trash"
+            data-starred="false"
+            data-ext="{{ doc.file_extension|lower }}"
+            data-name="{{ doc.document_title|lower }}"
+            data-date="{{ doc.created_at.timestamp() }}"
+            data-size="{{ doc.file_size or 0 }}"
+            data-id="{{ doc.id }}"
+            data-text="{{ doc.student_name|lower }} {{ doc.document_title|lower }} {{ doc.file_name|lower }} .{{ doc.file_extension|lower }} #{{ doc.id }}"
+          >
+            <div>
+              <div class="flex items-center justify-between gap-2 pb-3 border-b border-white/[0.08]">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" value="{{ doc.id }}" onchange="handleSelectRow(this)" class="doc-checkbox rounded bg-[#0a0c14] border-white/20 text-violet-600 focus:ring-0 cursor-pointer">
+                  <span class="text-rose-400 text-xs"><i class="fa-solid fa-trash-can"></i></span>
+                  <p class="font-bold text-xs text-slate-300 truncate max-w-[120px]">{{ doc.student_name }}</p>
+                </div>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold">
+                  TRASH
+                </span>
+              </div>
+              <div class="py-3.5">
+                <h4 class="font-bold text-sm text-slate-300 line-through">
+                  {{ doc.document_title }}
+                </h4>
+                <p class="text-[11px] text-slate-500 font-mono truncate mt-1">
+                  {{ doc.file_name }} &bull; {{ doc.formatted_size }}
+                </p>
+              </div>
+            </div>
+            <div class="pt-3 border-t border-white/[0.08] flex items-center justify-between">
+              <form action="{{ url_for('restore_document', doc_id=doc.id) }}" method="POST" class="inline">
+                <button type="submit" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1 font-mono">
+                  <i class="fa-solid fa-rotate-left text-[10px]"></i>
+                  <span>Restore</span>
+                </button>
+              </form>
+              <form action="{{ url_for('delete_document', doc_id=doc.id) }}" method="POST" class="inline" onsubmit="return confirm('Purge permanently?')">
+                <button type="submit" class="p-1 rounded-lg text-slate-500 hover:text-rose-400 text-xs" title="Delete permanently">
+                  <i class="fa-solid fa-ban"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- No Matching Results Feedback during search/filter -->
+      <div id="noMatchMessage" class="hidden py-12 text-center space-y-3">
+        <div class="w-12 h-12 rounded-xl bg-slate-900 border border-white/[0.08] flex items-center justify-center mx-auto text-slate-500">
+          <i class="fa-solid fa-filter-circle-xmark text-lg"></i>
+        </div>
+        <p class="text-xs text-slate-400">No documents match the current filter or search criteria.</p>
+        <button type="button" onclick="resetFilters()" class="text-xs text-violet-400 hover:underline font-mono">
+          Reset Filter & Search
+        </button>
+      </div>
+
+    {% else %}
+      
+      <!-- Empty Repository State -->
+      <div class="py-16 text-center space-y-4">
+        <div class="w-16 h-16 rounded-2xl bg-[#0f111a] border border-white/[0.08] flex items-center justify-center mx-auto text-violet-400/60 text-2xl shadow-lg">
+          <i class="fa-solid fa-vault"></i>
+        </div>
+        <div class="space-y-1">
+          <h3 class="text-sm font-bold text-white">No documents found</h3>
+          <p class="text-xs text-slate-400 max-w-sm mx-auto font-mono">
+            No certificates or digital documents have been registered to CloudVault yet.
+          </p>
+        </div>
+        <div>
+          <button 
+            type="button" 
+            onclick="openUploadModal()" 
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-violet-600/25 border border-violet-400/30 transition-all font-mono"
+          >
+            <i class="fa-solid fa-plus text-[11px]"></i>
+            <span>Register First Document</span>
+          </button>
+        </div>
+      </div>
+
+    {% endif %}
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let currentCategory = 'all';
+  let currentSearchQuery = '';
+
+  // Tab Filtering
+  function filterCategory(category) {
+    currentCategory = category;
+    
+    // Update tab button styles
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('bg-gradient-to-r', 'from-violet-600', 'to-indigo-600', 'text-white', 'shadow-md', 'shadow-violet-600/25');
+      btn.classList.add('text-slate-400');
+    });
+    const activeTab = document.getElementById(`tab-${category}`);
+    if (activeTab) {
+      activeTab.classList.add('bg-gradient-to-r', 'from-violet-600', 'to-indigo-600', 'text-white', 'shadow-md', 'shadow-violet-600/25');
+      activeTab.classList.remove('text-slate-400');
+    }
+
+    // Toggle batch action buttons for trash vs active
+    const batchTrashBtn = document.getElementById('batchTrashBtn');
+    const batchRestoreBtn = document.getElementById('batchRestoreBtn');
+    const batchPurgeBtn = document.getElementById('batchPurgeBtn');
+    if (category === 'trash') {
+      if (batchTrashBtn) batchTrashBtn.classList.add('hidden');
+      if (batchRestoreBtn) batchRestoreBtn.classList.remove('hidden');
+      if (batchPurgeBtn) batchPurgeBtn.classList.remove('hidden');
+    } else {
+      if (batchTrashBtn) batchTrashBtn.classList.remove('hidden');
+      if (batchRestoreBtn) batchRestoreBtn.classList.add('hidden');
+      if (batchPurgeBtn) batchPurgeBtn.classList.add('hidden');
+    }
+
+    applyFilters();
+  }
+
+  // Instant Search Input
+  function handleInstantSearch(query) {
+    currentSearchQuery = query.toLowerCase().trim();
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const rows = document.querySelectorAll('.doc-row');
+    const cards = document.querySelectorAll('.doc-card');
+    let visibleCount = 0;
+
+    function checkItem(element) {
+      const type = element.getAttribute('data-type');
+      const text = element.getAttribute('data-text') || '';
+      const isStarred = element.getAttribute('data-starred') === 'true';
+
+      let matchesCategory = false;
+      if (currentCategory === 'trash') {
+        matchesCategory = (type === 'trash');
+      } else {
+        if (type === 'trash') {
+          matchesCategory = false;
+        } else if (currentCategory === 'all') {
+          matchesCategory = true;
+        } else if (currentCategory === 'starred') {
+          matchesCategory = isStarred;
+        } else if (currentCategory === 'documents') {
+          matchesCategory = (type === 'pdf' || type === 'word' || type === 'other');
+        } else if (currentCategory === 'media') {
+          matchesCategory = (type === 'audio' || type === 'video');
+        } else if (currentCategory === 'spreadsheet') {
+          matchesCategory = (type === 'spreadsheet');
+        } else if (currentCategory === 'image') {
+          matchesCategory = (type === 'image');
+        }
+      }
+
+      const matchesSearch = (!currentSearchQuery || text.includes(currentSearchQuery));
+
+      if (matchesCategory && matchesSearch) {
+        element.classList.remove('hidden');
+        return true;
+      } else {
+        element.classList.add('hidden');
+        return false;
+      }
+    }
+
+    rows.forEach(row => {
+      if (checkItem(row)) visibleCount++;
+    });
+    cards.forEach(card => {
+      checkItem(card);
+    });
+
+    const noMatchMessage = document.getElementById('noMatchMessage');
+    if (noMatchMessage) {
+      if (visibleCount === 0 && (rows.length > 0)) {
+        noMatchMessage.classList.remove('hidden');
+      } else {
+        noMatchMessage.classList.add('hidden');
+      }
+    }
+  }
+
+  function resetFilters() {
+    document.getElementById('instantSearch').value = '';
+    currentSearchQuery = '';
+    filterCategory('all');
+  }
+
+  // Dynamic Client-Side Sorting
+  function handleSortChange(criteria) {
+    const tableBody = document.getElementById('tableBody');
+    const gridContainer = document.getElementById('gridViewContainer');
+
+    const sortFn = (a, b) => {
+      if (criteria === 'date-desc') {
+        return parseFloat(b.dataset.date || 0) - parseFloat(a.dataset.date || 0);
+      } else if (criteria === 'date-asc') {
+        return parseFloat(a.dataset.date || 0) - parseFloat(b.dataset.date || 0);
+      } else if (criteria === 'name-asc') {
+        return (a.dataset.name || '').localeCompare(b.dataset.name || '');
+      } else if (criteria === 'name-desc') {
+        return (b.dataset.name || '').localeCompare(a.dataset.name || '');
+      } else if (criteria === 'size-desc') {
+        return parseFloat(b.dataset.size || 0) - parseFloat(a.dataset.size || 0);
+      } else if (criteria === 'size-asc') {
+        return parseFloat(a.dataset.size || 0) - parseFloat(b.dataset.size || 0);
+      }
+      return 0;
+    };
+
+    if (tableBody) {
+      const rows = Array.from(tableBody.querySelectorAll('.doc-row'));
+      rows.sort(sortFn);
+      rows.forEach(r => tableBody.appendChild(r));
+    }
+    if (gridContainer) {
+      const cards = Array.from(gridContainer.querySelectorAll('.doc-card'));
+      cards.sort(sortFn);
+      cards.forEach(c => gridContainer.appendChild(c));
+    }
+  }
+
+  // Multi-Select Batch Operations
+  function getSelectedIds() {
+    const checkboxes = document.querySelectorAll('.doc-checkbox:checked');
+    const ids = new Set();
+    checkboxes.forEach(cb => {
+      if (cb.value) ids.add(cb.value);
+    });
+    return Array.from(ids);
+  }
+
+  function updateBatchBar() {
+    const selectedIds = getSelectedIds();
+    const batchBar = document.getElementById('batchActionBar');
+    const countDisplay = document.getElementById('selectedCountDisplay');
+
+    if (selectedIds.length > 0) {
+      batchBar.classList.remove('hidden');
+      countDisplay.textContent = `${selectedIds.length} item(s) selected`;
+    } else {
+      batchBar.classList.add('hidden');
+    }
+  }
+
+  function handleSelectRow(cb) {
+    // Sync checkboxes for same item between table and grid
+    const id = cb.value;
+    document.querySelectorAll(`.doc-checkbox[value="${id}"]`).forEach(box => {
+      box.checked = cb.checked;
+    });
+    updateBatchBar();
+  }
+
+  function selectAll(checked) {
+    const visibleCheckboxes = document.querySelectorAll('.doc-row:not(.hidden) .doc-checkbox, .doc-card:not(.hidden) .doc-checkbox');
+    visibleCheckboxes.forEach(cb => {
+      cb.checked = checked;
+    });
+    const headerCb = document.getElementById('selectAllHeader');
+    if (headerCb) headerCb.checked = checked;
+    updateBatchBar();
+  }
+
+  function submitBatch(action) {
+    const selectedIds = getSelectedIds();
+    if (selectedIds.length === 0) {
+      alert('Please select at least one document.');
+      return;
+    }
+
+    if (action === 'delete_permanent') {
+      if (!confirm(`Permanently purge ${selectedIds.length} file(s)? This cannot be undone.`)) {
+        return;
+      }
+    } else if (action === 'trash') {
+      if (!confirm(`Move ${selectedIds.length} file(s) to Trash?`)) {
+        return;
+      }
+    }
+
+    document.getElementById('batchActionInput').value = action;
+    document.getElementById('batchDocIdsInput').value = selectedIds.join(',');
+    document.getElementById('batchForm').submit();
+  }
+
+  // View Switcher (Table vs Grid)
+  function switchView(view) {
+    const tableContainer = document.getElementById('tableViewContainer');
+    const gridContainer = document.getElementById('gridViewContainer');
+    const viewTableBtn = document.getElementById('viewTableBtn');
+    const viewGridBtn = document.getElementById('viewGridBtn');
+
+    if (view === 'table') {
+      tableContainer.classList.remove('hidden');
+      gridContainer.classList.add('hidden');
+      viewTableBtn.classList.add('bg-violet-600/20', 'text-violet-300', 'border', 'border-violet-500/30');
+      viewTableBtn.classList.remove('text-slate-400');
+      viewGridBtn.classList.remove('bg-violet-600/20', 'text-violet-300', 'border', 'border-violet-500/30');
+      viewGridBtn.classList.add('text-slate-400');
+    } else {
+      tableContainer.classList.add('hidden');
+      gridContainer.classList.remove('hidden');
+      viewGridBtn.classList.add('bg-violet-600/20', 'text-violet-300', 'border', 'border-violet-500/30');
+      viewGridBtn.classList.remove('text-slate-400');
+      viewTableBtn.classList.remove('bg-violet-600/20', 'text-violet-300', 'border', 'border-violet-500/30');
+      viewTableBtn.classList.add('text-slate-400');
+    }
+  }
+
+  // Copy Direct Link with visual feedback
+  function copyDirectUrl(url, button) {
+    const fullUrl = url.startsWith('http') ? url : window.location.origin + url;
+    navigator.clipboard.writeText(fullUrl).then(() => {
+      const originalHtml = button.innerHTML;
+      button.innerHTML = '<i class="fa-solid fa-check text-emerald-400 text-[11px]"></i>';
+      setTimeout(() => {
+        button.innerHTML = originalHtml;
+      }, 1500);
+    });
+  }
+
+  // Hotkey '/' to focus search input
+  window.addEventListener('keydown', (e) => {
+    if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+      e.preventDefault();
+      const search = document.getElementById('instantSearch');
+      if (search) search.focus();
+    }
+  });
+</script>
+{% endblock %}

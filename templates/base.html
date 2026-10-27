@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#0a0b10] text-slate-100 antialiased selection:bg-violet-600 selection:text-white">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}CloudVault &mdash; Digital Credential & Document Registry{% endblock %}</title>
+  <meta name="description"
+    content="Secure, high-aesthetic institutional portal for digital certificate and document verification with encrypted object storage.">
+
+  <!-- Modern Fonts: Plus Jakarta Sans for UI + JetBrains Mono for metadata -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            titanium: {
+              850: '#151722',
+              900: '#0f1118',
+              950: '#0a0b10',
+            },
+            iris: {
+              400: '#a78bfa',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+            },
+            amber: {
+              350: '#fcd34d',
+              450: '#f59e0b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    /* Aurora Obsidian Canvas with dual violet & amber ambient diffusion */
+    .aurora-canvas {
+      background-color: #0a0b10;
+      background-image:
+        radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 10%, rgba(245, 158, 11, 0.08) 0px, transparent 45%),
+        radial-gradient(at 50% 90%, rgba(99, 102, 241, 0.08) 0px, transparent 55%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+      background-attachment: fixed;
+    }
+
+    /* Quartz Glassmorphism Surface Token */
+    .quartz-surface {
+      background: rgba(17, 19, 29, 0.65);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.09);
+    }
+
+    .quartz-surface-hover {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .quartz-surface-hover:hover {
+      background: rgba(22, 25, 38, 0.75);
+      border-color: rgba(167, 139, 250, 0.3);
+      box-shadow: 0 20px 48px -10px rgba(124, 58, 237, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+      transform: translateY(-1.5px);
+    }
+
+    /* Quartz Inputs */
+    .quartz-input {
+      background: rgba(12, 14, 22, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #f8fafc;
+      transition: all 0.2s ease;
+    }
+
+    .quartz-input:focus {
+      border-color: #a78bfa;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+      background: rgba(15, 17, 27, 0.9);
+      outline: none;
+    }
+
+    /* Native Dialog Backdrop with Frosted Obsidian Diffusion */
+    dialog::backdrop {
+      background: rgba(5, 6, 10, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    dialog[open] {
+      animation: quartzModalEnter 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes quartzModalEnter {
+      from {
+        opacity: 0;
+        transform: scale(0.96) translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    /* Custom Violet & Quartz Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(167, 139, 250, 0.22);
+      border-radius: 9999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(167, 139, 250, 0.45);
+    }
+  </style>
+</head>
+
+<body class="h-full aurora-canvas font-sans text-slate-100 flex flex-col min-h-screen">
+
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-40 bg-[#0d0f17]/85 backdrop-blur-xl border-b border-white/[0.08]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 gap-4">
+
+        <!-- Logo & Institutional Identifier -->
+        <div class="flex items-center gap-3.5">
+          <a href="{{ url_for('index') }}" class="flex items-center gap-3 group">
+            <div
+              class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-amber-500/80 p-[1px] shadow-lg shadow-violet-600/20 group-hover:scale-105 transition-transform">
+              <div class="w-full h-full bg-[#0d0f17] rounded-[11px] flex items-center justify-center">
+                <i class="fa-solid fa-vault text-violet-400 text-sm"></i>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span
+                  class="font-extrabold text-base tracking-tight text-white group-hover:text-violet-300 transition-colors">
+                  CloudVault
+                </span>
+                <span
+                  class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/30 uppercase tracking-wider font-semibold">
+                  Registry v2.4
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-400 hidden sm:block">Digital Document & Certificate Portal</p>
+            </div>
+          </a>
+        </div>
+
+        <!-- System Status & Action Controls -->
+        <div class="flex items-center gap-3">
+
+          <!-- Storage Cluster Status Pill -->
+          <div
+            class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#12141f] border border-white/[0.08] text-xs font-mono shadow-sm">
+            {% if is_cloud_active %}
+            <span class="flex h-2 w-2 relative">
+              <span
+                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span class="text-emerald-400 font-medium">Cluster: Encrypted Hot-Store</span>
+            {% else %}
+            <span class="h-2 w-2 rounded-full bg-amber-400"></span>
+            <span class="text-amber-400 font-medium">Node: Standalone Sandbox</span>
+            {% endif %}
+          </div>
+
+          <!-- Upload Modal Action Button -->
+          <button type="button" onclick="openUploadModal()"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-500 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-violet-600/30 border border-violet-400/30 active:scale-95 transition-all"
+            title="Upload new document (Press N)">
+            <i class="fa-solid fa-plus text-xs"></i>
+            <span>Upload Document</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Notification Banners -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full" id="flashContainer">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="space-y-2">
+      {% for category, message in messages %}
+      <div
+        class="flex items-center justify-between p-3.5 rounded-xl {% if category == 'error' %}bg-rose-950/60 border border-rose-500/30 text-rose-200{% else %}bg-violet-950/60 border border-violet-500/30 text-violet-200{% endif %} text-xs font-medium shadow-xl backdrop-blur-md"
+        role="alert">
+        <div class="flex items-center gap-2.5">
+          {% if category == 'error' %}
+          <i class="fa-solid fa-triangle-exclamation text-rose-400 text-sm"></i>
+          {% else %}
+          <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+          {% endif %}
+          <span>{{ message }}</span>
+        </div>
+        <button type="button" onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white p-1"
+          aria-label="Close message">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Viewport -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Institutional Footer -->
+  <footer class="mt-auto border-t border-white/[0.06] bg-[#090a0f]/90 backdrop-blur-md py-5 text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-shield-halved text-violet-400"></i>
+        <span>CloudVault Platform &copy; 2026 &bull; Cloud Computing Laboratory</span>
+      </div>
+      <div class="flex items-center gap-5 font-mono text-[11px] text-slate-400">
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-emerald-400"></i>End-to-End
+          Encrypted</span>
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-database text-violet-400"></i>Relational
+          Metadata</span>
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-cube text-amber-400"></i>Encrypted Object
+          Store</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Universal In-App Document Preview Modal (<dialog>) -->
+  <dialog id="previewModal"
+    class="rounded-2xl quartz-surface text-slate-100 p-0 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+    <div class="flex flex-col h-full max-h-[90vh]">
+
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08] bg-[#0f111a]">
+        <div class="flex items-center gap-3 overflow-hidden">
+          <div id="modalTypeIcon"
+            class="w-8 h-8 rounded-lg bg-violet-500/15 border border-violet-500/30 text-violet-300 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-file text-sm"></i>
+          </div>
+          <div class="overflow-hidden">
+            <h3 id="modalDocTitle" class="text-sm font-bold text-white truncate max-w-md">Document Preview</h3>
+            <p id="modalDocSubtitle" class="text-[11px] text-slate-400 truncate font-mono"></p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Download Original -->
+          <a id="modalDownloadLink" href="#" download
+            class="px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-white/[0.1] text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-down text-[10px]"></i>
+            <span>Download</span>
+          </a>
+          <!-- Open in Full Window -->
+          <a id="modalExternalLink" href="#" target="_blank" rel="noopener noreferrer"
+            class="px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-white/[0.1] text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5">
+            <i class="fa-solid fa-up-right-from-square text-[10px]"></i>
+            <span>Full Tab</span>
+          </a>
+          <!-- Dismiss Modal -->
+          <button type="button" onclick="closePreviewModal()"
+            class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center text-sm ml-1"
+            aria-label="Close modal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Canvas Body -->
+      <div class="flex-1 bg-[#090a0f]/95 p-4 min-h-[460px] flex items-center justify-center relative overflow-auto"
+        id="modalPreviewBody">
+        <iframe id="previewIframe" src="about:blank"
+          class="w-full h-full min-h-[480px] rounded-lg border border-white/[0.08] hidden bg-white"></iframe>
+        <img id="previewImage" src="" alt="File Preview"
+          class="max-h-[500px] max-w-full rounded-lg object-contain hidden border border-white/[0.08] shadow-2xl">
+        <video id="previewVideo" controls
+          class="max-h-[500px] max-w-full rounded-lg object-contain hidden border border-white/[0.08] shadow-2xl bg-black"></video>
+        <audio id="previewAudio" controls
+          class="w-full max-w-md hidden my-8 p-3 rounded-xl bg-slate-900 border border-white/10 shadow-xl"></audio>
+        <div id="previewFallback" class="hidden flex flex-col items-center justify-center p-8 text-center space-y-3">
+          <div id="previewFallbackIcon"
+            class="w-16 h-16 rounded-2xl bg-violet-500/15 border border-violet-500/30 text-violet-300 flex items-center justify-center text-2xl shadow-lg mx-auto">
+            <i class="fa-solid fa-file"></i>
+          </div>
+          <div>
+            <h4 id="previewFallbackTitle" class="text-sm font-bold text-white">Document Stream Available</h4>
+            <p id="previewFallbackSubtitle" class="text-xs text-slate-400 font-mono mt-1">Direct in-app rendering not applicable for this file type.</p>
+          </div>
+          <div class="pt-2 flex items-center gap-2">
+            <a id="previewFallbackDownload" href="#" download
+              class="px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-md flex items-center gap-1.5 font-mono">
+              <i class="fa-solid fa-download text-xs"></i>
+              <span>Download File</span>
+            </a>
+            <a id="previewFallbackExternal" href="#" target="_blank" rel="noopener noreferrer"
+              class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white text-xs font-semibold flex items-center gap-1.5 font-mono">
+              <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+              <span>Open in New Tab</span>
+            </a>
+          </div>
+        </div>
+        <div id="previewLoading" class="flex flex-col items-center gap-2 text-violet-300 text-xs font-mono">
+          <i class="fa-solid fa-spinner animate-spin text-xl text-violet-400"></i>
+          <span>Retrieving encrypted document stream...</span>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div
+        class="px-5 py-2.5 bg-[#0f111a] border-t border-white/[0.08] flex items-center justify-between text-[11px] text-slate-400 font-mono">
+        <span id="modalMetaInfo">Checksum: SHA-256 Verified</span>
+        <button type="button" onclick="closePreviewModal()" class="text-xs text-slate-300 hover:text-white px-2 py-1">
+          Dismiss (Esc)
+        </button>
+      </div>
+
+    </div>
+  </dialog>
+
+  <!-- Upload Modal (<dialog>) -->
+  <dialog id="uploadModal"
+    class="rounded-2xl quartz-surface text-slate-100 p-0 shadow-2xl w-full max-w-lg overflow-hidden">
+    <div class="p-6">
+      <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-violet-600/15 border border-violet-500/30 text-violet-300 flex items-center justify-center shadow-inner">
+            <i class="fa-solid fa-arrow-up-from-bracket text-base"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-base text-white">Upload Credential</h2>
+            <p class="text-xs text-slate-400">Register document to encrypted storage</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeUploadModal()"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center text-sm"
+          aria-label="Close dialog">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form action="{{ url_for('upload_document') }}" method="POST" enctype="multipart/form-data" class="mt-5 space-y-4"
+        id="modalUploadForm">
+
+        <div>
+          <label for="modal_student_name"
+            class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider font-mono">
+            Student Full Name <span class="text-violet-400">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+              <i class="fa-regular fa-user text-xs"></i>
+            </span>
+            <input type="text" name="student_name" id="modal_student_name" required placeholder="e.g. Ayush Todkar"
+              class="quartz-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm placeholder-slate-500">
+          </div>
+        </div>
+
+        <div>
+          <label for="modal_document_title"
+            class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider font-mono">
+            Document Title <span class="text-violet-400">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+              <i class="fa-solid fa-award text-xs"></i>
+            </span>
+            <input type="text" name="document_title" id="modal_document_title" required
+              placeholder="e.g. Distributed Cloud Architecture Certificate"
+              class="quartz-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm placeholder-slate-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider font-mono">
+            Certificate File <span class="text-violet-400">*</span>
+          </label>
+
+          <div id="modalDropzone"
+            class="border-2 border-dashed border-white/[0.12] hover:border-violet-500/70 rounded-xl p-5 text-center cursor-pointer transition-all bg-[#0e1019]/60 relative group"
+            onclick="document.getElementById('modalFileInput').click()">
+            <input type="file" name="file" id="modalFileInput" required
+              class="hidden" onchange="handleModalFileSelected(this)">
+
+            <div id="modalDropzonePrompt" class="space-y-1.5">
+              <div
+                class="w-10 h-10 rounded-full bg-violet-950/60 text-violet-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform border border-violet-500/30">
+                <i class="fa-solid fa-cloud-arrow-up text-base"></i>
+              </div>
+              <p class="text-xs font-medium text-slate-200">
+                <span class="text-violet-400 font-semibold underline decoration-violet-400/40">Browse file</span> or
+                drag & drop here
+              </p>
+              <p class="text-[11px] text-slate-500 font-mono">Any File Format Supported &bull; Max 100 MB</p>
+            </div>
+
+            <div id="modalFilePreview" class="hidden text-left">
+              <div class="flex items-center gap-2 p-2.5 rounded-lg bg-violet-500/15 border border-violet-500/30">
+                <i class="fa-solid fa-file-circle-check text-violet-400 text-lg"></i>
+                <div class="overflow-hidden flex-1">
+                  <p id="modalFileNameDisplay" class="text-xs font-semibold text-white truncate"></p>
+                  <p id="modalFileSizeDisplay" class="text-[10px] text-violet-300 font-mono"></p>
+                </div>
+                <button type="button" onclick="clearModalFileSelection(event)"
+                  class="text-slate-400 hover:text-rose-400 p-1">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" id="modalSubmitBtn"
+            class="w-full py-3 px-4 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-500 hover:from-violet-500 hover:to-indigo-500 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-600/30 border border-violet-400/30 font-mono">
+            <i class="fa-solid fa-lock text-xs"></i>
+            <span>Commit to Encrypted Storage</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Edit File Metadata Modal (<dialog>) -->
+  <dialog id="editModal" class="rounded-2xl quartz-surface text-slate-100 p-0 shadow-2xl w-full max-w-md overflow-hidden">
+    <div class="p-6">
+      <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-violet-600/15 border border-violet-500/30 text-violet-300 flex items-center justify-center">
+            <i class="fa-solid fa-pen-to-square text-base"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-base text-white">Edit Document</h2>
+            <p class="text-xs text-slate-400">Rename title or update description notes</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeEditModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="editForm" method="POST" action="" class="mt-5 space-y-4">
+        <div>
+          <label for="edit_title" class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider font-mono">
+            Document Title <span class="text-violet-400">*</span>
+          </label>
+          <input type="text" name="document_title" id="edit_title" required class="quartz-input w-full px-3.5 py-2.5 rounded-xl text-sm text-white">
+        </div>
+        <div>
+          <label for="edit_desc" class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider font-mono">
+            Description / Notes (Optional)
+          </label>
+          <textarea name="description" id="edit_desc" rows="3" placeholder="Add optional tags, context, or notes..." class="quartz-input w-full px-3.5 py-2 rounded-xl text-xs text-white"></textarea>
+        </div>
+        <div class="pt-2 flex items-center gap-2">
+          <button type="button" onclick="closeEditModal()" class="w-1/2 py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 border border-white/10 font-mono">
+            Cancel
+          </button>
+          <button type="submit" class="w-1/2 py-2.5 px-4 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 shadow-md border border-violet-400/30 font-mono">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Secure Share Modal (<dialog>) -->
+  <dialog id="shareModal" class="rounded-2xl quartz-surface text-slate-100 p-0 shadow-2xl w-full max-w-md overflow-hidden">
+    <div class="p-6">
+      <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-violet-600/15 border border-violet-500/30 text-violet-300 flex items-center justify-center">
+            <i class="fa-solid fa-share-nodes text-base"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-base text-white">Share Document</h2>
+            <p class="text-xs text-slate-400">Generate public view & download link</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeShareModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="mt-5 space-y-4">
+        <div>
+          <p id="shareDocTitle" class="text-xs font-bold text-white truncate"></p>
+          <p class="text-[11px] text-slate-400 font-mono mt-0.5">Anyone with this link can view or download this document.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="text" id="shareUrlInput" readonly class="quartz-input w-full px-3 py-2 rounded-xl text-xs font-mono text-violet-300 select-all bg-[#0a0c14]">
+          <button type="button" id="copyShareBtn" onclick="copyShareLinkAction(this)" class="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold font-mono shrink-0 shadow-sm">
+            Copy
+          </button>
+        </div>
+        <div class="p-3 rounded-xl bg-violet-500/10 border border-violet-500/20 text-[11px] text-violet-300 flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-xs"></i>
+          <span>Public access token is cryptographically random and unique.</span>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- File Details / Inspector Modal (<dialog>) -->
+  <dialog id="infoModal" class="rounded-2xl quartz-surface text-slate-100 p-0 shadow-2xl w-full max-w-lg overflow-hidden">
+    <div class="p-6">
+      <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+        <div class="flex items-center gap-3">
+          <div id="infoIcon" class="w-10 h-10 rounded-xl bg-violet-600/15 border border-violet-500/30 text-violet-300 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-circle-info"></i>
+          </div>
+          <div class="overflow-hidden">
+            <h2 id="infoTitle" class="font-bold text-base text-white truncate">Document Details</h2>
+            <p id="infoSubtitle" class="text-xs text-slate-400 font-mono truncate"></p>
+          </div>
+        </div>
+        <button type="button" onclick="closeInfoModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="mt-5 space-y-3 font-mono text-xs">
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-white/[0.05]">
+          <span class="text-slate-400">File Name:</span>
+          <span id="infoFileName" class="col-span-2 text-white truncate"></span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-white/[0.05]">
+          <span class="text-slate-400">Author / Scholar:</span>
+          <span id="infoStudent" class="col-span-2 text-white"></span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-white/[0.05]">
+          <span class="text-slate-400">File Size:</span>
+          <span id="infoSize" class="col-span-2 text-violet-300 font-semibold"></span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-white/[0.05]">
+          <span class="text-slate-400">MIME Type:</span>
+          <span id="infoMime" class="col-span-2 text-slate-300 truncate"></span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-white/[0.05]">
+          <span class="text-slate-400">Archived Date:</span>
+          <span id="infoDate" class="col-span-2 text-slate-300"></span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-white/[0.05]">
+          <span class="text-slate-400">Storage Anchor:</span>
+          <span id="infoHash" class="col-span-2 text-amber-300 truncate"></span>
+        </div>
+        <div id="infoDescContainer" class="hidden pt-1">
+          <span class="text-slate-400 block mb-1">Notes:</span>
+          <p id="infoDesc" class="p-2.5 rounded-lg bg-black/40 border border-white/5 text-slate-200 text-[11px]"></p>
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-end gap-2">
+        <a id="infoDownloadBtn" href="#" download class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold font-mono flex items-center gap-1.5 border border-white/10">
+          <i class="fa-solid fa-download text-[11px]"></i>
+          <span>Download</span>
+        </a>
+        <button type="button" onclick="closeInfoModal()" class="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold font-mono">
+          Close
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Global Modal & Interaction Scripts -->
+  <script>
+    // Light dismiss for <dialog> as per modern web guidance
+    function setupDialogLightDismiss(dialog) {
+      if (!dialog) return;
+      dialog.addEventListener('click', (e) => {
+        const rect = dialog.getBoundingClientRect();
+        const isInDialog = (
+          rect.top <= e.clientY &&
+          e.clientY <= rect.top + rect.height &&
+          rect.left <= e.clientX &&
+          e.clientX <= rect.left + rect.width
+        );
+        if (!isInDialog) {
+          dialog.close();
+        }
+      });
+    }
+
+    const previewModal = document.getElementById('previewModal');
+    const uploadModal = document.getElementById('uploadModal');
+    const editModal = document.getElementById('editModal');
+    const shareModal = document.getElementById('shareModal');
+    const infoModal = document.getElementById('infoModal');
+
+    setupDialogLightDismiss(previewModal);
+    setupDialogLightDismiss(uploadModal);
+    setupDialogLightDismiss(editModal);
+    setupDialogLightDismiss(shareModal);
+    setupDialogLightDismiss(infoModal);
+
+    function openUploadModal() {
+      if (uploadModal) uploadModal.showModal();
+    }
+    function closeUploadModal() {
+      if (uploadModal) uploadModal.close();
+    }
+
+    function openEditModal(docId, title, desc) {
+      if (!editModal) return;
+      document.getElementById('editForm').action = `/document/${docId}/edit`;
+      document.getElementById('edit_title').value = title;
+      document.getElementById('edit_desc').value = desc || '';
+      editModal.showModal();
+    }
+    function closeEditModal() {
+      if (editModal) editModal.close();
+    }
+
+    function openShareModal(docId, title) {
+      if (!shareModal) return;
+      document.getElementById('shareDocTitle').textContent = title;
+      document.getElementById('shareUrlInput').value = 'Generating secure share link...';
+      shareModal.showModal();
+
+      fetch(`/document/${docId}/share`, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(res => res.json())
+        .then(data => {
+          if (data.share_url) {
+            document.getElementById('shareUrlInput').value = data.share_url;
+          }
+        })
+        .catch(() => {
+          document.getElementById('shareUrlInput').value = 'Failed to generate link.';
+        });
+    }
+    function closeShareModal() {
+      if (shareModal) shareModal.close();
+    }
+
+    function copyShareLinkAction(btn) {
+      const input = document.getElementById('shareUrlInput');
+      if (input && input.value) {
+        navigator.clipboard.writeText(input.value).then(() => {
+          const orig = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = orig; }, 1800);
+        });
+      }
+    }
+
+    function openInfoModal(title, student, fileName, size, mime, date, hash, blobUrl, desc) {
+      if (!infoModal) return;
+      document.getElementById('infoTitle').textContent = title;
+      document.getElementById('infoSubtitle').textContent = `Record: ${fileName}`;
+      document.getElementById('infoFileName').textContent = fileName;
+      document.getElementById('infoStudent').textContent = student;
+      document.getElementById('infoSize').textContent = size;
+      document.getElementById('infoMime').textContent = mime || 'application/octet-stream';
+      document.getElementById('infoDate').textContent = date;
+      document.getElementById('infoHash').textContent = hash ? hash.substring(0, 16) + '...' : 'Verified';
+      document.getElementById('infoDownloadBtn').href = blobUrl;
+
+      const descBox = document.getElementById('infoDescContainer');
+      if (desc && desc.trim()) {
+        document.getElementById('infoDesc').textContent = desc;
+        descBox.classList.remove('hidden');
+      } else {
+        descBox.classList.add('hidden');
+      }
+
+      infoModal.showModal();
+    }
+    function closeInfoModal() {
+      if (infoModal) infoModal.close();
+    }
+
+    function toggleStar(docId, btn) {
+      fetch(`/document/${docId}/star`, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const icon = btn.querySelector('i');
+            if (data.is_starred) {
+              icon.classList.remove('fa-regular', 'text-slate-500');
+              icon.classList.add('fa-solid', 'text-amber-400');
+              btn.setAttribute('data-starred', 'true');
+            } else {
+              icon.classList.remove('fa-solid', 'text-amber-400');
+              icon.classList.add('fa-regular', 'text-slate-500');
+              btn.setAttribute('data-starred', 'false');
+            }
+            // Update row/card attribute for client filter
+            const container = btn.closest('.doc-row') || btn.closest('.doc-card');
+            if (container) {
+              container.setAttribute('data-starred', data.is_starred ? 'true' : 'false');
+            }
+          }
+        });
+    }
+
+    function openPreviewModal(url, title, student, extOrIsPdf, categoryOrDocId, docId) {
+      if (!previewModal) return;
+
+      let ext = '';
+      let category = 'document';
+      let id = docId;
+
+      if (typeof extOrIsPdf === 'boolean') {
+        category = extOrIsPdf ? 'pdf' : 'image';
+        ext = extOrIsPdf ? 'pdf' : 'img';
+        id = categoryOrDocId;
+      } else {
+        ext = (extOrIsPdf || '').toLowerCase();
+        category = (categoryOrDocId || 'other').toLowerCase();
+      }
+
+      const modalDocTitle = document.getElementById('modalDocTitle');
+      const modalDocSubtitle = document.getElementById('modalDocSubtitle');
+      const modalDownloadLink = document.getElementById('modalDownloadLink');
+      const modalExternalLink = document.getElementById('modalExternalLink');
+      const modalTypeIcon = document.getElementById('modalTypeIcon');
+      const previewIframe = document.getElementById('previewIframe');
+      const previewImage = document.getElementById('previewImage');
+      const previewVideo = document.getElementById('previewVideo');
+      const previewAudio = document.getElementById('previewAudio');
+      const previewFallback = document.getElementById('previewFallback');
+      const previewLoading = document.getElementById('previewLoading');
+      const modalMetaInfo = document.getElementById('modalMetaInfo');
+
+      modalDocTitle.textContent = title;
+      modalDocSubtitle.textContent = `Student: ${student} • Record #${id || '0'}`;
+      modalDownloadLink.href = url;
+      modalExternalLink.href = url;
+      modalMetaInfo.textContent = `Checksum: SHA256:${Math.random().toString(16).substring(2, 10).toUpperCase()}`;
+
+      // Reset preview components
+      previewLoading.classList.add('hidden');
+      previewIframe.classList.add('hidden');
+      previewImage.classList.add('hidden');
+      previewVideo.classList.add('hidden');
+      previewAudio.classList.add('hidden');
+      previewFallback.classList.add('hidden');
+
+      if (category === 'pdf' || ext === 'pdf') {
+        modalTypeIcon.innerHTML = '<i class="fa-solid fa-file-pdf text-rose-400"></i>';
+        previewLoading.classList.remove('hidden');
+        previewIframe.src = url;
+        previewIframe.onload = () => {
+          previewLoading.classList.add('hidden');
+          previewIframe.classList.remove('hidden');
+        };
+      } else if (category === 'image' || ['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'].includes(ext)) {
+        modalTypeIcon.innerHTML = '<i class="fa-solid fa-file-image text-cyan-400"></i>';
+        previewLoading.classList.remove('hidden');
+        previewImage.src = url;
+        previewImage.onload = () => {
+          previewLoading.classList.add('hidden');
+          previewImage.classList.remove('hidden');
+        };
+        previewImage.onerror = () => {
+          previewLoading.innerHTML = '<span class="text-rose-400">Unable to render inline image preview.</span>';
+        };
+      } else if (category === 'video' || ['mp4', 'webm', 'ogg', 'mov', 'mkv'].includes(ext)) {
+        modalTypeIcon.innerHTML = '<i class="fa-solid fa-file-video text-amber-400"></i>';
+        previewVideo.src = url;
+        previewVideo.classList.remove('hidden');
+      } else if (category === 'audio' || ['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac'].includes(ext)) {
+        modalTypeIcon.innerHTML = '<i class="fa-solid fa-file-audio text-purple-400"></i>';
+        previewAudio.src = url;
+        previewAudio.classList.remove('hidden');
+      } else {
+        const iconMap = {
+          'word': '<i class="fa-solid fa-file-word text-blue-400"></i>',
+          'spreadsheet': '<i class="fa-solid fa-file-excel text-emerald-400"></i>',
+          'archive': '<i class="fa-solid fa-file-zipper text-amber-400"></i>',
+          'code': '<i class="fa-solid fa-file-code text-yellow-400"></i>'
+        };
+        modalTypeIcon.innerHTML = iconMap[category] || '<i class="fa-solid fa-file text-violet-400"></i>';
+        
+        const fallbackIcon = document.getElementById('previewFallbackIcon');
+        if (fallbackIcon) {
+          fallbackIcon.innerHTML = iconMap[category] || '<i class="fa-solid fa-file text-3xl"></i>';
+        }
+        document.getElementById('previewFallbackTitle').textContent = `${title} (.${ext || 'file'})`;
+        document.getElementById('previewFallbackSubtitle').textContent = `Format category: ${category.toUpperCase()} • Direct in-app preview unavailable`;
+        document.getElementById('previewFallbackDownload').href = url;
+        document.getElementById('previewFallbackExternal').href = url;
+        previewFallback.classList.remove('hidden');
+      }
+
+      previewModal.showModal();
+    }
+
+    function closePreviewModal() {
+      if (previewModal) {
+        const previewIframe = document.getElementById('previewIframe');
+        const previewImage = document.getElementById('previewImage');
+        const previewVideo = document.getElementById('previewVideo');
+        const previewAudio = document.getElementById('previewAudio');
+
+        if (previewVideo) { previewVideo.pause(); previewVideo.src = ''; }
+        if (previewAudio) { previewAudio.pause(); previewAudio.src = ''; }
+        if (previewIframe) { previewIframe.src = 'about:blank'; }
+        if (previewImage) { previewImage.src = ''; }
+
+        previewModal.close();
+      }
+    }
+
+    // Modal File Drag & Drop
+    const modalDropzone = document.getElementById('modalDropzone');
+    const modalFileInput = document.getElementById('modalFileInput');
+    const modalDropzonePrompt = document.getElementById('modalDropzonePrompt');
+    const modalFilePreview = document.getElementById('modalFilePreview');
+    const modalFileNameDisplay = document.getElementById('modalFileNameDisplay');
+    const modalFileSizeDisplay = document.getElementById('modalFileSizeDisplay');
+
+    if (modalDropzone) {
+      ['dragenter', 'dragover'].forEach(name => {
+        modalDropzone.addEventListener(name, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          modalDropzone.classList.add('border-violet-500', 'bg-violet-950/30');
+        });
+      });
+      ['dragleave', 'drop'].forEach(name => {
+        modalDropzone.addEventListener(name, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          modalDropzone.classList.remove('border-violet-500', 'bg-violet-950/30');
+        });
+      });
+      modalDropzone.addEventListener('drop', (e) => {
+        if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+          modalFileInput.files = e.dataTransfer.files;
+          handleModalFileSelected(modalFileInput);
+        }
+      });
+    }
+
+    function handleModalFileSelected(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        modalFileNameDisplay.textContent = file.name;
+        modalFileSizeDisplay.textContent = formatBytes(file.size);
+        modalDropzonePrompt.classList.add('hidden');
+        modalFilePreview.classList.remove('hidden');
+      }
+    }
+
+    function clearModalFileSelection(e) {
+      e.stopPropagation();
+      modalFileInput.value = '';
+      modalDropzonePrompt.classList.remove('hidden');
+      modalFilePreview.classList.add('hidden');
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes || bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Keyboard shortcut 'N' opens upload modal
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'n' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) && !previewModal.open && !uploadModal.open) {
+        e.preventDefault();
+        openUploadModal();
+      }
+    });
+  </script>
+
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>
