@@ -17,8 +17,35 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(50), default="student", nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
-    # Relationship to user's uploaded documents
+    # Relationships
     documents = db.relationship("Document", backref="user", lazy=True, cascade="all, delete-orphan")
+    activities = db.relationship("ActivityLog", backref="user", lazy=True, cascade="all, delete-orphan", order_by="desc(ActivityLog.created_at)")
+
+    @property
+    def storage_used_bytes(self):
+        """Calculates total active (non-deleted) storage used by this user in bytes."""
+        return sum(d.file_size or 0 for d in self.documents if not d.is_deleted)
+
+    @property
+    def storage_quota_bytes(self):
+        """Standard student quota: 1.0 GB (1024 * 1024 * 1024 bytes)."""
+        return 1024 * 1024 * 1024
+
+    @property
+    def storage_percentage(self):
+        """Returns storage percentage consumed (0.0 to 100.0)."""
+        if not self.storage_quota_bytes:
+            return 0.0
+        return min(round((self.storage_used_bytes / self.storage_quota_bytes) * 100, 1), 100.0)
+
+    @property
+    def formatted_storage_used(self):
+        bytes_val = float(self.storage_used_bytes)
+        for unit in ["B", "KB", "MB", "GB"]:
+            if bytes_val < 1024.0:
+                return f"{bytes_val:.1f} {unit}"
+            bytes_val /= 1024.0
+        return f"{bytes_val:.1f} TB"
 
     def set_password(self, password):
         """Hashes and sets user password."""
@@ -34,6 +61,8 @@ class User(UserMixin, db.Model):
             "username": self.username,
             "email": self.email,
             "role": self.role,
+            "storage_used": self.formatted_storage_used,
+            "storage_percent": self.storage_percentage,
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S UTC"),
         }
 
@@ -164,3 +193,38 @@ class Document(db.Model):
             "description": self.description or "",
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S UTC"),
         }
+
+
+class ActivityLog(db.Model):
+    __tablename__ = "activity_logs"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    action = db.Column(db.String(50), nullable=False, index=True)  # UPLOAD, DELETE, RESTORE, STAR, UNSTAR, SHARE, LOGIN, EDIT
+    details = db.Column(db.String(500), nullable=False)
+    ip_address = db.Column(db.String(50), nullable=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False, index=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "action": self.action,
+            "details": self.details,
+            "ip_address": self.ip_address,
+            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "relative_time": self.relative_time,
+        }
+
+    @property
+    def relative_time(self):
+        now = datetime.now(timezone.utc)
+        diff = now - (self.created_at if self.created_at.tzinfo else self.created_at.replace(tzinfo=timezone.utc))
+        secs = int(diff.total_seconds())
+        if secs < 60:
+            return "just now"
+        elif secs < 3600:
+            return f"{secs // 60}m ago"
+        elif secs < 86400:
+            return f"{secs // 3600}h ago"
+        return f"{secs // 86400}d ago"
+

@@ -3,7 +3,7 @@ import logging
 import os
 import secrets
 import zipfile
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import requests
 from flask import (
     Flask,
@@ -27,7 +27,7 @@ from flask_login import (
 from dotenv import load_dotenv
 from werkzeug.exceptions import RequestEntityTooLarge
 
-from models import db, Document, User
+from models import db, Document, User, ActivityLog
 from storage import storage_manager
 
 # Load environment variables from .env file
@@ -84,6 +84,19 @@ def create_app(test_config=None):
 
     with app.app_context():
         db.create_all()
+
+    def log_activity(user_id, action, details):
+        """Records an immutable security/audit log event."""
+        try:
+            client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+            if client_ip and "," in client_ip:
+                client_ip = client_ip.split(",")[0].strip()
+            entry = ActivityLog(user_id=user_id, action=action, details=details, ip_address=client_ip)
+            db.session.add(entry)
+            db.session.commit()
+        except Exception as log_err:
+            app.logger.warning(f"Could not record activity log: {log_err}")
+            db.session.rollback()
 
     def allowed_file(filename):
         """Allows all file extensions (Word, Excel, PDF, Audio, Video, Archives, Code, etc.)."""
@@ -143,6 +156,9 @@ def create_app(test_config=None):
             db.session.add(new_user)
             db.session.commit()
 
+            # Audit log event
+            log_activity(new_user.id, "SIGNUP", f"Account registered with email {new_user.email}")
+
             # Auto-login upon registration
             login_user(new_user)
             flash(f"Welcome to CloudVault, {new_user.username}! Your account has been registered.", "success")
@@ -174,6 +190,7 @@ def create_app(test_config=None):
                 return render_template("login.html")
 
             login_user(user, remember=remember)
+            log_activity(user.id, "LOGIN", "Signed in via password credentials")
             flash(f"Welcome back, {user.username}!", "success")
 
             next_page = request.args.get("next")
@@ -204,11 +221,13 @@ def create_app(test_config=None):
             user.set_password(secrets.token_urlsafe(32))
             db.session.add(user)
             db.session.commit()
+            log_activity(user.id, "SIGNUP", f"Google SSO account provisioned for {user.email}")
             flash(f"Welcome to CloudVault, {user.username}! Signed in with Google.", "success")
         else:
             flash(f"Welcome back, {user.username}! Signed in with Google.", "success")
 
         login_user(user)
+        log_activity(user.id, "LOGIN", "Signed in via Google OAuth Single Sign-On")
         return redirect(url_for("index"))
 
     @app.route("/login/google", methods=["GET", "POST"])
@@ -307,6 +326,8 @@ def create_app(test_config=None):
     @login_required
     def logout():
         """Clears user session."""
+        if current_user.is_authenticated:
+            log_activity(current_user.id, "LOGOUT", "Signed out of CloudVault")
         logout_user()
         flash("You have been signed out securely.", "success")
         return redirect(url_for("login"))
@@ -331,95 +352,222 @@ def create_app(test_config=None):
     def index():
         """Renders dashboard with documents belonging to the authenticated user."""
         query = request.args.get("q", "").strip()
+        sort_by = request.args.get("sort", "newest").strip()
+        time_filter = request.args.get("time", "all").strip()
+        category_filter = request.args.get("category", "all").strip()
 
         # Users see their own registered documents; Admins can audit all documents
         if current_user.role == "admin":
-            all_records = Document.query.order_by(Document.created_at.desc()).all()
+            all_records = Document.query.all()
         else:
             all_records = Document.query.filter(
                 (Document.user_id == current_user.id) | (Document.user_id.is_(None))
-            ).order_by(Document.created_at.desc()).all()
+            ).all()
 
         active_documents = [d for d in all_records if not d.is_deleted]
         trash_documents = [d for d in all_records if d.is_deleted]
         starred_count = sum(1 for d in active_documents if d.is_starred)
         trash_count = len(trash_documents)
 
+        # Storage capacity breakdown calculation
+        category_breakdown = {
+            "pdf": 0,
+            "image": 0,
+            "media": 0,
+            "spreadsheet": 0,
+            "word": 0,
+            "code": 0,
+            "archive": 0,
+            "other": 0,
+        }
+        for d in active_documents:
+            cat = d.category
+            if cat in ("audio", "video"):
+                category_breakdown["media"] += (d.file_size or 0)
+            elif cat in category_breakdown:
+                category_breakdown[cat] += (d.file_size or 0)
+            else:
+                category_breakdown["other"] += (d.file_size or 0)
+
+        # Filtering
+        filtered = list(active_documents)
         if query:
             q_lower = query.lower()
-            filtered_active = [
-                d for d in active_documents
+            filtered = [
+                d for d in filtered
                 if q_lower in d.student_name.lower() or q_lower in d.document_title.lower() or q_lower in d.file_name.lower()
             ]
-        else:
-            filtered_active = active_documents
+
+        if category_filter and category_filter != "all":
+            if category_filter == "starred":
+                filtered = [d for d in filtered if d.is_starred]
+            elif category_filter == "documents":
+                filtered = [d for d in filtered if d.category in ("pdf", "word")]
+            elif category_filter == "media":
+                filtered = [d for d in filtered if d.category in ("audio", "video", "image")]
+            else:
+                filtered = [d for d in filtered if d.category == category_filter]
+
+        now = datetime.now(timezone.utc)
+        if time_filter == "today":
+            filtered = [
+                d for d in filtered
+                if d.created_at and (now - (d.created_at if d.created_at.tzinfo else d.created_at.replace(tzinfo=timezone.utc))).total_seconds() <= 86400
+            ]
+        elif time_filter == "week":
+            filtered = [
+                d for d in filtered
+                if d.created_at and (now - (d.created_at if d.created_at.tzinfo else d.created_at.replace(tzinfo=timezone.utc))).total_seconds() <= 7 * 86400
+            ]
+        elif time_filter == "month":
+            filtered = [
+                d for d in filtered
+                if d.created_at and (now - (d.created_at if d.created_at.tzinfo else d.created_at.replace(tzinfo=timezone.utc))).total_seconds() <= 30 * 86400
+            ]
+
+        # Sorting
+        if sort_by == "oldest":
+            filtered.sort(key=lambda d: d.created_at or datetime.min)
+        elif sort_by == "name-asc":
+            filtered.sort(key=lambda d: d.document_title.lower())
+        elif sort_by == "name-desc":
+            filtered.sort(key=lambda d: d.document_title.lower(), reverse=True)
+        elif sort_by == "size-desc":
+            filtered.sort(key=lambda d: d.file_size or 0, reverse=True)
+        elif sort_by == "size-asc":
+            filtered.sort(key=lambda d: d.file_size or 0)
+        else:  # "newest"
+            filtered.sort(key=lambda d: d.created_at or datetime.min, reverse=True)
 
         total_bytes = sum(d.file_size or 0 for d in active_documents)
-        quota_bytes = int(os.getenv("USER_QUOTA_MB", "5120")) * 1024 * 1024  # 5 GB standard cloud tier
+        quota_bytes = current_user.storage_quota_bytes if hasattr(current_user, "storage_quota_bytes") else 1024 * 1024 * 1024
         quota_percent = min(100.0, round((total_bytes / quota_bytes) * 100, 1)) if quota_bytes > 0 else 0
 
-        total_students = User.query.count()
+        # Formatted breakdown sizes and quota percentages
+        formatted_breakdown = {k: format_size(v) for k, v in category_breakdown.items()}
+        percent_breakdown = {k: round((v / quota_bytes) * 100, 2) if quota_bytes > 0 else 0 for k, v in category_breakdown.items()}
+
+        # Recent security audit activities
+        recent_activities = ActivityLog.query.filter_by(user_id=current_user.id).order_by(ActivityLog.created_at.desc()).limit(20).all()
 
         return render_template(
             "index.html",
-            documents=filtered_active,
+            documents=filtered,
             trash_documents=trash_documents,
             total_docs=len(active_documents),
             starred_count=starred_count,
             trash_count=trash_count,
-            total_students=total_students,
+            total_students=User.query.count(),
             storage_used=format_size(total_bytes),
             storage_quota=format_size(quota_bytes),
             storage_percent=quota_percent,
+            category_breakdown=formatted_breakdown,
+            category_percents=percent_breakdown,
+            recent_activities=recent_activities,
             is_cloud_active=storage_manager.is_cloud_active,
             container_name=storage_manager.container_name,
             search_query=query,
+            current_sort=sort_by,
+            current_time=time_filter,
+            current_category=category_filter,
         )
 
     @app.route("/upload", methods=["POST"])
     @login_required
     def upload_document():
-        """Handles document upload and associates with authenticated user."""
+        """Handles single or multi-file document upload with quota enforcement."""
         student_name = request.form.get("student_name", "").strip() or current_user.username
-        document_title = request.form.get("document_title", "").strip()
-        file = request.files.get("file")
+        custom_title = request.form.get("document_title", "").strip()
+        is_ajax = (
+            request.headers.get("X-Requested-With") == "XMLHttpRequest"
+            or request.is_json
+            or "application/json" in request.headers.get("Accept", "")
+        )
 
-        # Validation
-        if not document_title:
-            flash("Document Title is required.", "error")
+        # Retrieve uploaded files (handles both single & multi-file form inputs)
+        uploaded_files = request.files.getlist("file")
+        if not uploaded_files or (len(uploaded_files) == 1 and not uploaded_files[0].filename):
+            single_file = request.files.get("file")
+            uploaded_files = [single_file] if single_file and single_file.filename else []
+
+        valid_files = [f for f in uploaded_files if f and f.filename and allowed_file(f.filename)]
+        if not valid_files:
+            msg = "Please select at least one valid file to upload."
+            if is_ajax:
+                return jsonify({"success": False, "error": msg}), 400
+            flash(msg, "error")
             return redirect(url_for("index"))
 
-        if not file or not file.filename or not allowed_file(file.filename):
-            flash("Please select a valid file to upload.", "error")
+        # Storage Quota Check
+        current_used = current_user.storage_used_bytes
+        quota_bytes = current_user.storage_quota_bytes
+        if current_used >= quota_bytes:
+            msg = f"Storage quota limit exceeded ({current_user.formatted_storage_used} / 1.0 GB). Please delete files to proceed."
+            if is_ajax:
+                return jsonify({"success": False, "error": msg}), 400
+            flash(msg, "error")
             return redirect(url_for("index"))
 
-        try:
-            # Upload to Cloud Storage (or local storage fallback)
-            blob_url, blob_name, file_size, content_type = storage_manager.upload_file(file)
+        saved_docs = []
+        errors = []
 
-            # Persist record in database linked to user
-            new_doc = Document(
-                user_id=current_user.id,
-                student_name=student_name,
-                document_title=document_title,
-                file_name=file.filename,
-                blob_url=blob_url,
-                blob_name=blob_name,
-                file_size=file_size,
-                content_type=content_type,
-            )
-            db.session.add(new_doc)
-            db.session.commit()
+        for file_obj in valid_files:
+            try:
+                if len(valid_files) == 1 and custom_title:
+                    doc_title = custom_title
+                else:
+                    clean_base = file_obj.filename.rsplit(".", 1)[0]
+                    doc_title = clean_base.replace("_", " ").replace("-", " ").title()
 
-            storage_type = "Secure Cloud Storage" if storage_manager.is_cloud_active else "Local Vault"
-            flash(
-                f"Successfully registered '{document_title}' for {student_name} in {storage_type}!",
-                "success",
-            )
-        except Exception as e:
-            app.logger.error(f"Upload failed: {e}", exc_info=True)
-            db.session.rollback()
-            flash(f"Failed to process upload: {str(e)}", "error")
+                blob_url, blob_name, file_size, content_type = storage_manager.upload_file(file_obj)
+
+                new_doc = Document(
+                    user_id=current_user.id,
+                    student_name=student_name,
+                    document_title=doc_title,
+                    file_name=file_obj.filename,
+                    blob_url=blob_url,
+                    blob_name=blob_name,
+                    file_size=file_size,
+                    content_type=content_type,
+                )
+                db.session.add(new_doc)
+                db.session.commit()
+                saved_docs.append(new_doc)
+
+                log_activity(
+                    current_user.id,
+                    "UPLOAD",
+                    f"Uploaded '{new_doc.document_title}' ({new_doc.formatted_size})"
+                )
+            except Exception as e:
+                app.logger.error(f"Upload error on {file_obj.filename}: {e}", exc_info=True)
+                db.session.rollback()
+                errors.append(f"{file_obj.filename}: {str(e)}")
+
+        if is_ajax:
+            if saved_docs:
+                return jsonify({
+                    "success": True,
+                    "count": len(saved_docs),
+                    "documents": [d.to_dict() for d in saved_docs],
+                    "errors": errors,
+                })
+            return jsonify({"success": False, "error": "; ".join(errors) or "Upload failed."}), 500
+
+        if saved_docs:
+            if len(saved_docs) == 1:
+                flash(
+                    f"Successfully registered '{saved_docs[0].document_title}' for {student_name} in encrypted vault!",
+                    "success",
+                )
+            else:
+                flash(
+                    f"Successfully uploaded {len(saved_docs)} document(s) to encrypted vault!",
+                    "success",
+                )
+        if errors:
+            flash(f"Some files could not be uploaded: {'; '.join(errors)}", "error")
 
         return redirect(url_for("index"))
 
@@ -438,7 +586,7 @@ def create_app(test_config=None):
             return redirect(url_for("index"))
 
         try:
-            # Optionally delete from cloud storage if active
+            # Delete from cloud storage if active
             if storage_manager.is_cloud_active and storage_manager.blob_service_client:
                 try:
                     blob_client = storage_manager.blob_service_client.get_blob_client(
@@ -448,9 +596,11 @@ def create_app(test_config=None):
                 except Exception as blob_err:
                     app.logger.warning(f"Could not delete blob: {blob_err}")
 
+            doc_title = doc.document_title
             db.session.delete(doc)
             db.session.commit()
-            flash(f"Document '{doc.document_title}' deleted successfully.", "success")
+            log_activity(current_user.id, "DELETE", f"Permanently deleted '{doc_title}'")
+            flash(f"Document '{doc_title}' deleted successfully.", "success")
         except Exception as e:
             db.session.rollback()
             flash(f"Error deleting document: {str(e)}", "error")
@@ -466,6 +616,7 @@ def create_app(test_config=None):
             return jsonify({"error": "Unauthorized"}), 403
         doc.is_starred = not doc.is_starred
         db.session.commit()
+        log_activity(current_user.id, "STAR" if doc.is_starred else "UNSTAR", f"{'Starred' if doc.is_starred else 'Unstarred'} '{doc.document_title}'")
         if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
             return jsonify({"success": True, "is_starred": doc.is_starred})
         flash(f"{'Starred' if doc.is_starred else 'Unstarred'} '{doc.document_title}'.", "success")
@@ -482,6 +633,7 @@ def create_app(test_config=None):
         doc.is_deleted = True
         doc.deleted_at = datetime.now(timezone.utc)
         db.session.commit()
+        log_activity(current_user.id, "TRASH", f"Moved '{doc.document_title}' to Trash")
         flash(f"Moved '{doc.document_title}' to Trash.", "success")
         return redirect(url_for("index"))
 
@@ -496,6 +648,7 @@ def create_app(test_config=None):
         doc.is_deleted = False
         doc.deleted_at = None
         db.session.commit()
+        log_activity(current_user.id, "RESTORE", f"Restored '{doc.document_title}' from Trash")
         flash(f"Restored '{doc.document_title}' from Trash.", "success")
         return redirect(url_for("index"))
 
@@ -513,6 +666,7 @@ def create_app(test_config=None):
             doc.document_title = new_title
         doc.description = new_desc
         db.session.commit()
+        log_activity(current_user.id, "EDIT", f"Updated metadata for '{doc.document_title}'")
         flash(f"Updated metadata for '{doc.document_title}'.", "success")
         return redirect(url_for("index"))
 
@@ -527,6 +681,7 @@ def create_app(test_config=None):
             doc.share_token = secrets.token_urlsafe(16)
             db.session.commit()
         share_url = url_for("public_share", token=doc.share_token, _external=True)
+        log_activity(current_user.id, "SHARE", f"Created public share link for '{doc.document_title}'")
         return jsonify({"success": True, "share_url": share_url, "share_token": doc.share_token})
 
     @app.route("/share/<string:token>", methods=["GET"])
@@ -567,12 +722,14 @@ def create_app(test_config=None):
                 d.is_deleted = True
                 d.deleted_at = datetime.now(timezone.utc)
             db.session.commit()
+            log_activity(current_user.id, "BATCH_TRASH", f"Moved {len(authorized_docs)} item(s) to Trash")
             flash(f"Moved {len(authorized_docs)} item(s) to Trash.", "success")
         elif action == "restore":
             for d in authorized_docs:
                 d.is_deleted = False
                 d.deleted_at = None
             db.session.commit()
+            log_activity(current_user.id, "BATCH_RESTORE", f"Restored {len(authorized_docs)} item(s) from Trash")
             flash(f"Restored {len(authorized_docs)} item(s) to repository.", "success")
         elif action == "delete_permanent":
             for d in authorized_docs:
@@ -585,6 +742,7 @@ def create_app(test_config=None):
                         pass
                 db.session.delete(d)
             db.session.commit()
+            log_activity(current_user.id, "BATCH_DELETE", f"Permanently deleted {len(authorized_docs)} item(s)")
             flash(f"Permanently purged {len(authorized_docs)} item(s).", "success")
         elif action == "download_zip":
             zip_buffer = io.BytesIO()
@@ -594,6 +752,7 @@ def create_app(test_config=None):
                     if file_data:
                         zip_file.writestr(d.file_name, file_data)
             zip_buffer.seek(0)
+            log_activity(current_user.id, "BATCH_EXPORT", f"Downloaded ZIP archive of {len(authorized_docs)} item(s)")
             return send_file(
                 zip_buffer,
                 mimetype="application/zip",
@@ -604,6 +763,13 @@ def create_app(test_config=None):
             flash(f"Unknown batch action: '{action}'", "error")
 
         return redirect(url_for("index"))
+
+    @app.route("/api/activity-log", methods=["GET"])
+    @login_required
+    def get_activity_log():
+        """Returns chronological security audit trail for the authenticated user."""
+        activities = ActivityLog.query.filter_by(user_id=current_user.id).order_by(ActivityLog.created_at.desc()).limit(30).all()
+        return jsonify([a.to_dict() for a in activities])
 
     @app.route("/uploads/<path:filename>")
     @login_required

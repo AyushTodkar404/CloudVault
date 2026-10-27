@@ -200,6 +200,46 @@ C:\CC_MINI_PROJECT\
 
 ---
 
+## 6. Enterprise Cloud Features (v2.5 Production Suite)
+
+CloudVault includes 4 enterprise-grade capabilities that transition it into a complete, professional, production cloud storage platform:
+
+### 1. Visual Storage Quota & Capacity Allocation Meter
+- **Capacity Metering**: Real-time calculation of consumed bytes vs. 1.0 GB institutional cloud tier per tenant.
+- **Multi-Segment Color Spectrum**:
+  - **Violet**: PDF credentials & research certificates.
+  - **Cyan**: High-resolution imagery & photographs.
+  - **Amber**: Audio recordings & video media.
+  - **Emerald**: Excel, CSV, and tabular data spreadsheets.
+  - **Rose**: Word documents & institutional summaries.
+  - **Indigo**: Code repositories, compressed archives, and miscellaneous assets.
+- **Quota Enforcement**: Backend intercept prevents storage exhaustion by rejecting uploads when the user's quota is reached.
+
+### 2. Desktop Drag-and-Drop Multi-File Batch Uploader
+- **Global Dropzone**: Full-screen reactive frosted glass overlay appears automatically when dragging files over any window surface.
+- **Batch Processing**: Simultaneous multi-file upload (`request.files.getlist("file")`) with automatic title normalization and clean document titling.
+- **Asynchronous AJAX Telemetry**: Real-time progress bar with live byte transfer percentages and automatic vault synchronization.
+
+### 3. Quick Sorting & Smart Time Filtering
+- **Multi-Vector Sorting**: Sort by Newest First, Oldest First, Name (A-Z), Name (Z-A), Largest Size, and Smallest Size.
+- **Time Range Filtering**: Instant filtering by All Time, Today (past 24h), Past 7 Days, and Past 30 Days.
+- **Hybrid Performance**: Instant zero-latency client-side filtering combined with server-side query parameter persistence (`?sort=...&time=...&category=...`).
+
+### 4. Cloud Security Audit & Activity Telemetry (SECaaS)
+- **Immutable Audit Trail**: Chronological event tracking table (`ActivityLog`) in Azure SQL Database.
+- **Tracked Security Actions**:
+  - `SIGNUP`: New account registrations and Google SSO provisioning.
+  - `LOGIN` / `LOGOUT`: Credential verifications and session terminations.
+  - `UPLOAD`: File ingestion with byte size and integrity hash tracking.
+  - `STAR` / `UNSTAR`: Bookmark and favorite state changes.
+  - `SHARE`: Cryptographic public token generation.
+  - `TRASH` / `RESTORE`: Recycle bin state transitions.
+  - `DELETE`: Permanent blob removal from hot storage.
+  - `BATCH`: Multi-file bulk operations (ZIP export, bulk delete, bulk restore).
+- **In-App SECaaS Viewer**: Interactive modal drawer with color-coded badges, masked client IP logging, and live synchronization via `/api/activity-log`.
+
+---
+
 ## 7. Automated Test Suite & Quality Verification
 
 Run the comprehensive test suite locally:
@@ -218,6 +258,10 @@ python test_app.py
 8. `test_cloud_storage_advanced_features`: Tests starring, soft-delete, restore, and public sharing.
 9. `test_google_oauth_flow`: Validates OAuth initiation, state tracking, and token callback.
 10. `test_emergent_zero_config_google_login`: Tests 1-click passwordless login and account picker.
+11. `test_multi_file_batch_upload_and_ajax`: Verifies batch multi-upload and AJAX drag-and-drop response.
+12. `test_storage_quota_calculation_and_enforcement`: Verifies 1.0 GB quota calculations and enforcement.
+13. `test_quick_sorting_and_time_filtering`: Validates alphabetical sorting, time ranges, and category filters.
+14. `test_security_audit_activity_log_and_api`: Verifies SQL telemetry tracking and `/api/activity-log` endpoint.
 
 ---
 

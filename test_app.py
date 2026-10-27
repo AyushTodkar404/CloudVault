@@ -1,8 +1,9 @@
 import io
+import secrets
 import unittest
 from unittest import mock
 from app import create_app
-from models import db, Document, User
+from models import db, Document, User, ActivityLog
 
 
 class CloudVaultAuthTestCase(unittest.TestCase):
@@ -349,8 +350,163 @@ class CloudVaultAuthTestCase(unittest.TestCase):
         self.assertIn(b"Welcome back", relogin_resp.data)
 
 
+class CloudVaultProfessionalFeaturesTestCase(unittest.TestCase):
+    def setUp(self):
+        """Set up isolated test app with mock storage."""
+        self.app = create_app(
+            {
+                "TESTING": True,
+                "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+                "WTF_CSRF_ENABLED": False,
+            }
+        )
+        self.client = self.app.test_client()
+
+        with self.app.app_context():
+            db.create_all()
+
+    def tearDown(self):
+        """Clean up database."""
+        with self.app.app_context():
+            db.session.remove()
+            db.drop_all()
+
+    def register_and_login(self, username="prostudent", email="pro@university.edu", password="password123"):
+        self.client.post(
+            "/signup",
+            data={
+                "username": username,
+                "email": email,
+                "password": password,
+                "confirm_password": password,
+            },
+            follow_redirects=True,
+        )
+
+    @mock.patch("storage.storage_manager.upload_file")
+    def test_multi_file_batch_upload_and_ajax(self, mock_upload):
+        """Feature 2: Multi-file batch upload and AJAX drag-and-drop response."""
+        self.register_and_login()
+        mock_upload.side_effect = [
+            ("https://cloudvault1.blob.core.windows.net/documents/report.pdf", "report.pdf", 1024, "application/pdf"),
+            ("https://cloudvault1.blob.core.windows.net/documents/data.xlsx", "data.xlsx", 2048, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+        ]
+
+        files = [
+            (io.BytesIO(b"PDF content"), "report.pdf"),
+            (io.BytesIO(b"Excel content"), "data.xlsx"),
+        ]
+
+        data = {"student_name": "Pro Scholar"}
+        data["file"] = files
+
+        resp = self.client.post(
+            "/upload",
+            data=data,
+            headers={"X-Requested-With": "XMLHttpRequest", "Accept": "application/json"},
+            content_type="multipart/form-data",
+        )
+        self.assertEqual(resp.status_code, 200)
+        json_data = resp.get_json()
+        self.assertTrue(json_data["success"])
+        self.assertEqual(json_data["count"], 2)
+        self.assertEqual(len(json_data["documents"]), 2)
+
+        with self.app.app_context():
+            docs = Document.query.all()
+            self.assertEqual(len(docs), 2)
+            titles = [d.document_title for d in docs]
+            self.assertIn("Report", titles)
+            self.assertIn("Data", titles)
+
+    def test_storage_quota_calculation_and_enforcement(self):
+        """Feature 1: Visual storage quota and capacity calculation."""
+        self.register_and_login()
+        with self.app.app_context():
+            user = User.query.filter_by(username="prostudent").first()
+            self.assertEqual(user.storage_quota_bytes, 1024 * 1024 * 1024)  # 1.0 GB
+            self.assertEqual(user.storage_used_bytes, 0)
+            self.assertEqual(user.storage_percentage, 0.0)
+
+            # Add dummy document to test used bytes
+            doc = Document(
+                user_id=user.id,
+                student_name="prostudent",
+                document_title="Sample Doc",
+                file_name="sample.pdf",
+                blob_url="https://blob/sample.pdf",
+                blob_name="sample.pdf",
+                file_size=500 * 1024 * 1024,  # 500 MB
+            )
+            db.session.add(doc)
+            db.session.commit()
+
+            self.assertEqual(user.storage_used_bytes, 500 * 1024 * 1024)
+            self.assertAlmostEqual(user.storage_percentage, 48.8, delta=0.5)
+
+    @mock.patch("storage.storage_manager.upload_file")
+    def test_quick_sorting_and_time_filtering(self, mock_upload):
+        """Feature 3: Quick sorting and smart filters on index route."""
+        self.register_and_login()
+        mock_upload.side_effect = lambda f: (f"https://blob/{f.filename}", f"blob_{secrets.token_hex(4)}_{f.filename}", 100, "application/pdf")
+
+        # Create two docs
+        self.client.post("/upload", data={"file": (io.BytesIO(b"data"), "Alpha.pdf"), "document_title": "Alpha Doc"})
+        self.client.post("/upload", data={"file": (io.BytesIO(b"data"), "Zeta.pdf"), "document_title": "Zeta Doc"})
+
+        # Test sort A-Z
+        resp_asc = self.client.get("/?sort=name-asc")
+        self.assertEqual(resp_asc.status_code, 200)
+        self.assertIn(b"Alpha Doc", resp_asc.data)
+        self.assertIn(b"Zeta Doc", resp_asc.data)
+
+        # Test time filtering
+        resp_time = self.client.get("/?time=today")
+        self.assertEqual(resp_time.status_code, 200)
+
+        # Test category filtering
+        resp_cat = self.client.get("/?category=pdf")
+        self.assertEqual(resp_cat.status_code, 200)
+
+    @mock.patch("storage.storage_manager.upload_file")
+    def test_security_audit_activity_log_and_api(self, mock_upload):
+        """Feature 4: Cloud security audit log telemetry and API endpoint."""
+        self.register_and_login()
+        mock_upload.return_value = ("https://blob/audit.pdf", "audit.pdf", 500, "application/pdf")
+
+        # 1. Upload creates UPLOAD activity
+        self.client.post("/upload", data={"file": (io.BytesIO(b"audit"), "audit.pdf"), "document_title": "Audit Cert"})
+
+        with self.app.app_context():
+            user = User.query.filter_by(username="prostudent").first()
+            logs = ActivityLog.query.filter_by(user_id=user.id).all()
+            actions = [l.action for l in logs]
+            self.assertIn("SIGNUP", actions)
+            self.assertIn("UPLOAD", actions)
+
+            doc = Document.query.first()
+            doc_id = doc.id
+
+        # 2. Star creates STAR activity
+        self.client.post(f"/document/{doc_id}/star")
+
+        # 3. Share creates SHARE activity
+        self.client.post(f"/document/{doc_id}/share")
+
+        # 4. Fetch /api/activity-log
+        resp = self.client.get("/api/activity-log")
+        self.assertEqual(resp.status_code, 200)
+        log_items = resp.get_json()
+        self.assertTrue(len(log_items) >= 3)
+        api_actions = [item["action"] for item in log_items]
+        self.assertIn("UPLOAD", api_actions)
+        self.assertIn("STAR", api_actions)
+        self.assertIn("SHARE", api_actions)
+
+
 if __name__ == "__main__":
     unittest.main()
+
 
 
 
