@@ -307,4 +307,21 @@ git push origin main
 
 ---
 
+## 10. Genuine Upload Protection & File Validation Engine
+
+CloudVault enforces strict, multi-layered file validation to guarantee that only genuine, legitimate files enter the cloud storage repository:
+
+1. **Extension Whitelisting**:
+   - Only permitted file formats: documents (`pdf`, `doc`, `docx`, `txt`, `rtf`, `odt`), spreadsheets (`xls`, `xlsx`, `csv`), presentations (`ppt`, `pptx`), images (`png`, `jpg`, `webp`, `svg`), media (`mp4`, `webm`, `mp3`, `wav`), archives (`zip`, `tar`, `gz`, `7z`), and source code (`py`, `js`, `json`, `sql`, `md`).
+2. **Malware & Executable Blacklisting**:
+   - Dangerous formats (`.exe`, `.bat`, `.cmd`, `.sh`, `.ps1`, `.vbs`, `.msi`, `.dll`, `.com`, `.scr`, `.pif`, `.reg`, `.wsf`, `.hta`, `.cpl`, `.jar`) are blocked at both client and server boundaries.
+3. **Empty File (0-Byte) Rejection**:
+   - Files with 0 bytes are rejected immediately before storage dispatch, preventing empty blobs and wasted cloud resources.
+4. **Filename Sanitization**:
+   - `secure_filename()` strips directory traversal attempts (`../`) and illegal character sequences before assigning unique cryptographic storage identifiers.
+5. **Test Environment Isolation**:
+   - Automated tests run against ephemeral temporary storage directories (`tempfile.TemporaryDirectory()`), completely isolating developer test runs from production upload directories.
+
+---
+
 *CloudVault &bull; Engineered with Microsoft Azure Cloud Architecture &bull; 2026*

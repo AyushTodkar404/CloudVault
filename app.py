@@ -39,6 +39,29 @@ logging.basicConfig(
     format="[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
 )
 
+# Whitelist of genuine document, media, spreadsheet, archive, and code extensions
+ALLOWED_EXTENSIONS = {
+    # Documents & Text
+    "pdf", "doc", "docx", "txt", "rtf", "odt", "tex",
+    # Spreadsheets
+    "xls", "xlsx", "csv", "tsv", "ods",
+    # Presentations
+    "ppt", "pptx", "odp",
+    # Images
+    "png", "jpg", "jpeg", "webp", "svg", "gif", "bmp", "tiff", "ico",
+    # Audio & Video
+    "mp4", "webm", "mov", "mkv", "avi", "mp3", "wav", "ogg", "m4a", "flac", "aac",
+    # Compressed Archives
+    "zip", "tar", "gz", "7z", "rar", "bz2",
+    # Code & Data
+    "py", "java", "c", "cpp", "cs", "js", "ts", "html", "css", "json", "xml", "sql", "yaml", "yml", "md"
+}
+
+# Explicit blacklist of dangerous executables and script formats
+BLOCKED_EXTENSIONS = {
+    "exe", "bat", "cmd", "sh", "ps1", "vbs", "msi", "dll", "com", "scr", "pif", "reg", "wsf", "hta", "cpl", "jar"
+}
+
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -99,8 +122,13 @@ def create_app(test_config=None):
             db.session.rollback()
 
     def allowed_file(filename):
-        """Allows all file extensions (Word, Excel, PDF, Audio, Video, Archives, Code, etc.)."""
-        return bool(filename and filename.strip())
+        """Validates that filename has a legitimate genuine extension and is not a dangerous binary/script."""
+        if not filename or "." not in filename:
+            return False
+        ext = filename.rsplit(".", 1)[1].lower().strip()
+        if ext in BLOCKED_EXTENSIONS:
+            return False
+        return ext in ALLOWED_EXTENSIONS
 
     # --------------------------------------------------------------------------
     # Authentication Routes
@@ -490,9 +518,22 @@ def create_app(test_config=None):
             single_file = request.files.get("file")
             uploaded_files = [single_file] if single_file and single_file.filename else []
 
-        valid_files = [f for f in uploaded_files if f and f.filename and allowed_file(f.filename)]
-        if not valid_files:
+        if not uploaded_files:
             msg = "Please select at least one valid file to upload."
+            if is_ajax:
+                return jsonify({"success": False, "error": msg}), 400
+            flash(msg, "error")
+            return redirect(url_for("index"))
+
+        # Filter genuine files vs rejected files
+        valid_files = [f for f in uploaded_files if f and f.filename and allowed_file(f.filename)]
+        rejected_files = [f.filename for f in uploaded_files if f and f.filename and not allowed_file(f.filename)]
+
+        if not valid_files:
+            if rejected_files:
+                msg = f"Upload rejected: '{rejected_files[0]}' is not a permitted genuine file type. Executables, scripts, and unknown formats are blocked."
+            else:
+                msg = "Please select at least one valid file to upload."
             if is_ajax:
                 return jsonify({"success": False, "error": msg}), 400
             flash(msg, "error")
@@ -510,9 +551,19 @@ def create_app(test_config=None):
 
         saved_docs = []
         errors = []
+        if rejected_files:
+            errors.extend([f"{fn}: Blocked (unsupported or non-genuine file format)" for fn in rejected_files])
 
         for file_obj in valid_files:
             try:
+                # Reject empty (0-byte) files before storage dispatch
+                file_obj.seek(0, os.SEEK_END)
+                file_length = file_obj.tell()
+                file_obj.seek(0)
+                if file_length == 0:
+                    errors.append(f"{file_obj.filename}: Empty (0-byte) files cannot be uploaded.")
+                    continue
+
                 if len(valid_files) == 1 and custom_title:
                     doc_title = custom_title
                 else:
@@ -540,6 +591,9 @@ def create_app(test_config=None):
                     "UPLOAD",
                     f"Uploaded '{new_doc.document_title}' ({new_doc.formatted_size})"
                 )
+            except ValueError as ve:
+                db.session.rollback()
+                errors.append(f"{file_obj.filename}: {str(ve)}")
             except Exception as e:
                 app.logger.error(f"Upload error on {file_obj.filename}: {e}", exc_info=True)
                 db.session.rollback()
@@ -553,7 +607,7 @@ def create_app(test_config=None):
                     "documents": [d.to_dict() for d in saved_docs],
                     "errors": errors,
                 })
-            return jsonify({"success": False, "error": "; ".join(errors) or "Upload failed."}), 500
+            return jsonify({"success": False, "error": "; ".join(errors) or "Upload failed."}), 400
 
         if saved_docs:
             if len(saved_docs) == 1:

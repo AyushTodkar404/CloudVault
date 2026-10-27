@@ -58,7 +58,8 @@ class CloudStorageManager:
             app.logger.info("Running in Local Storage Mode (Set AZURE_STORAGE_CONNECTION_STRING to enable Azure Blob Storage).")
 
         # Ensure local uploads directory exists for fallback/local mode
-        self.local_upload_dir = os.path.join(app.root_path, "uploads")
+        upload_folder = app.config.get("UPLOAD_FOLDER") if app else None
+        self.local_upload_dir = upload_folder if upload_folder else os.path.join(app.root_path, "uploads")
         os.makedirs(self.local_upload_dir, exist_ok=True)
 
     def upload_file(self, file_storage):
@@ -77,6 +78,8 @@ class CloudStorageManager:
         # Read data stream
         file_bytes = file_storage.read()
         file_size = len(file_bytes)
+        if file_size == 0:
+            raise ValueError("Empty (0-byte) files cannot be uploaded.")
 
         if self.is_cloud_active and self.blob_service_client:
             # Upload to Azure Blob Storage

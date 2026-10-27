@@ -1,5 +1,7 @@
 import io
+import os
 import secrets
+import tempfile
 import unittest
 from unittest import mock
 from app import create_app
@@ -8,12 +10,14 @@ from models import db, Document, User, ActivityLog
 
 class CloudVaultAuthTestCase(unittest.TestCase):
     def setUp(self):
-        """Set up test client and in-memory database."""
+        """Set up test client, temporary upload directory, and in-memory database."""
+        self.temp_dir = tempfile.TemporaryDirectory()
         self.app = create_app(
             {
                 "TESTING": True,
                 "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
                 "WTF_CSRF_ENABLED": False,
+                "UPLOAD_FOLDER": self.temp_dir.name,
             }
         )
         self.client = self.app.test_client()
@@ -22,7 +26,8 @@ class CloudVaultAuthTestCase(unittest.TestCase):
             db.create_all()
 
     def tearDown(self):
-        """Clean up database after each test."""
+        """Clean up database and temporary files after each test."""
+        self.temp_dir.cleanup()
         with self.app.app_context():
             db.session.remove()
             db.drop_all()
@@ -502,6 +507,87 @@ class CloudVaultProfessionalFeaturesTestCase(unittest.TestCase):
         self.assertIn("UPLOAD", api_actions)
         self.assertIn("STAR", api_actions)
         self.assertIn("SHARE", api_actions)
+
+    def test_blocked_dangerous_extension_rejected(self):
+        """Ensure dangerous executables, binaries, and scripts are strictly rejected."""
+        self.register_and_login()
+
+        # Attempt to upload dangerous executable
+        resp = self.client.post(
+            "/upload",
+            data={
+                "file": (io.BytesIO(b"malicious payload"), "exploit.exe"),
+                "document_title": "Trojan Horse",
+            },
+            headers={"X-Requested-With": "XMLHttpRequest"},
+        )
+        self.assertEqual(resp.status_code, 400)
+        data = resp.get_json()
+        self.assertFalse(data["success"])
+        self.assertIn("not a permitted genuine file type", data["error"])
+
+        # Attempt via regular form post
+        form_resp = self.client.post(
+            "/upload",
+            data={
+                "file": (io.BytesIO(b"echo malicious"), "hack.bat"),
+                "document_title": "Batch Script",
+            },
+            follow_redirects=True,
+        )
+        self.assertEqual(form_resp.status_code, 200)
+        self.assertIn(b"not a permitted genuine file type", form_resp.data)
+
+        # Confirm no document was created in DB
+        with self.app.app_context():
+            doc_count = Document.query.count()
+            self.assertEqual(doc_count, 0)
+
+    def test_empty_file_upload_rejected(self):
+        """Ensure 0-byte / empty files cannot be uploaded to storage."""
+        self.register_and_login()
+
+        # Attempt to upload 0-byte file
+        resp = self.client.post(
+            "/upload",
+            data={
+                "file": (io.BytesIO(b""), "empty_doc.pdf"),
+                "document_title": "Empty Document",
+            },
+            headers={"X-Requested-With": "XMLHttpRequest"},
+        )
+        self.assertEqual(resp.status_code, 400)
+        data = resp.get_json()
+        self.assertFalse(data["success"])
+        self.assertIn("Empty (0-byte) files cannot be uploaded", data["error"])
+
+        # Confirm no document was created in DB
+        with self.app.app_context():
+            doc_count = Document.query.count()
+            self.assertEqual(doc_count, 0)
+
+    def test_genuine_upload_accepted(self):
+        """Ensure genuine documents, media, and code files are accepted and stored."""
+        self.register_and_login()
+
+        resp = self.client.post(
+            "/upload",
+            data={
+                "file": (io.BytesIO(b"%PDF-1.4 genuine syllabus content"), "syllabus.pdf"),
+                "document_title": "Course Syllabus",
+            },
+            headers={"X-Requested-With": "XMLHttpRequest"},
+        )
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["count"], 1)
+
+        with self.app.app_context():
+            doc = Document.query.filter_by(document_title="Course Syllabus").first()
+            self.assertIsNotNone(doc)
+            self.assertEqual(doc.file_name, "syllabus.pdf")
+            self.assertTrue(doc.file_size > 0)
 
 
 if __name__ == "__main__":

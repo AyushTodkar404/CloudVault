@@ -442,6 +442,7 @@
             class="border-2 border-dashed border-white/[0.12] hover:border-violet-500/70 rounded-xl p-5 text-center cursor-pointer transition-all bg-[#0e1019]/60 relative group"
             onclick="document.getElementById('modalFileInput').click()">
             <input type="file" name="file" id="modalFileInput" required multiple
+              accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.tex,.xls,.xlsx,.csv,.tsv,.ods,.ppt,.pptx,.odp,.png,.jpg,.jpeg,.webp,.svg,.gif,.bmp,.tiff,.ico,.mp4,.webm,.mov,.mkv,.avi,.mp3,.wav,.ogg,.m4a,.flac,.aac,.zip,.tar,.gz,.7z,.rar,.bz2,.py,.java,.c,.cpp,.cs,.js,.ts,.html,.css,.json,.xml,.sql,.yaml,.yml,.md"
               class="hidden" onchange="handleModalFileSelected(this)">
 
             <div id="modalDropzonePrompt" class="space-y-1.5">
@@ -453,7 +454,7 @@
                 <span class="text-violet-400 font-semibold underline decoration-violet-400/40">Browse files</span> or
                 drag & drop here
               </p>
-              <p class="text-[11px] text-slate-500 font-mono">Single or Multi-File Batch &bull; Max 100 MB</p>
+              <p class="text-[11px] text-slate-500 font-mono">Genuine Documents, Media, Archives & Code &bull; Max 100 MB</p>
             </div>
 
             <div id="modalFilePreview" class="hidden text-left">
@@ -992,8 +993,25 @@
       });
     }
 
+    const BLOCKED_EXTENSIONS = ['exe', 'bat', 'cmd', 'sh', 'ps1', 'vbs', 'msi', 'dll', 'com', 'scr', 'pif', 'reg', 'wsf', 'hta', 'cpl', 'jar'];
+
     function handleModalFileSelected(input) {
       if (input.files && input.files.length > 0) {
+        for (let i = 0; i < input.files.length; i++) {
+          const file = input.files[i];
+          const ext = file.name.includes('.') ? file.name.split('.').pop().toLowerCase() : '';
+          if (file.size === 0) {
+            alert(`"${file.name}" is an empty (0-byte) file. Only genuine, non-empty files can be uploaded.`);
+            clearModalFileSelection({ stopPropagation: () => {} });
+            return;
+          }
+          if (BLOCKED_EXTENSIONS.includes(ext)) {
+            alert(`"${file.name}" is a blocked executable or script format. Only genuine documents, media, archives, and code files are permitted.`);
+            clearModalFileSelection({ stopPropagation: () => {} });
+            return;
+          }
+        }
+
         if (input.files.length === 1) {
           const file = input.files[0];
           modalFileNameDisplay.textContent = file.name;
@@ -1139,6 +1157,21 @@
     function handleBatchDropUpload(fileList) {
       const files = Array.from(fileList);
       if (!files.length) return;
+
+      const invalidFiles = [];
+      files.forEach(f => {
+        const ext = f.name.includes('.') ? f.name.split('.').pop().toLowerCase() : '';
+        if (f.size === 0) {
+          invalidFiles.push(`"${f.name}" (empty 0-byte file)`);
+        } else if (BLOCKED_EXTENSIONS.includes(ext)) {
+          invalidFiles.push(`"${f.name}" (executable/script blocked)`);
+        }
+      });
+
+      if (invalidFiles.length > 0) {
+        alert("Upload rejected: Only genuine files are allowed.\n\n" + invalidFiles.join("\n"));
+        return;
+      }
 
       const progressToast = document.getElementById('uploadProgressToast');
       const progressBar = document.getElementById('uploadProgressBar');
