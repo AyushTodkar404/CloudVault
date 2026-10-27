@@ -29,10 +29,10 @@
   </div>
 
   <!-- Metric Highlights (Refined Human-Crafted Panels) -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
     
     <!-- Metric 1: Total Documents -->
-    <div class="quartz-surface quartz-surface-hover rounded-2xl p-4 relative overflow-hidden group">
+    <div class="quartz-surface quartz-surface-hover rounded-2xl p-3.5 sm:p-4 relative overflow-hidden group">
       <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
         <span class="font-mono uppercase tracking-wider text-[10px]">Active Vault Files</span>
         <span class="w-7 h-7 rounded-lg bg-violet-500/15 border border-violet-500/30 flex items-center justify-center text-violet-300">
@@ -40,9 +40,9 @@
         </span>
       </div>
       <div class="flex items-baseline gap-2">
-        <span class="text-3xl font-extrabold font-mono text-white tracking-tight">{{ total_docs }}</span>
-        <span class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1 font-mono">
-          <i class="fa-solid fa-star text-[10px]"></i> {{ starred_count }} Starred
+        <span class="text-2xl sm:text-3xl font-extrabold font-mono text-white tracking-tight">{{ total_docs }}</span>
+        <span class="text-[10px] sm:text-[11px] text-emerald-400 font-semibold flex items-center gap-1 font-mono">
+          <i class="fa-solid fa-star text-[9px]"></i> {{ starred_count }} Starred
         </span>
       </div>
       <p class="text-[11px] text-slate-400 mt-1 font-mono">Indexed in Azure SQL</p>
@@ -57,9 +57,9 @@
           <i class="fa-solid fa-hard-drive text-xs"></i>
         </span>
       </div>
-      <div class="flex items-baseline gap-2">
-        <span class="text-2xl font-extrabold font-mono text-white tracking-tight">{{ storage_used }}</span>
-        <span class="text-[11px] text-slate-400 font-mono">/ {{ storage_quota }}</span>
+      <div class="flex items-baseline gap-1.5 sm:gap-2">
+        <span class="text-xl sm:text-2xl font-extrabold font-mono text-white tracking-tight">{{ storage_used }}</span>
+        <span class="text-[10px] sm:text-[11px] text-slate-400 font-mono">/ {{ storage_quota }}</span>
       </div>
       <!-- Multi-Segment Visual Capacity Breakdown Bar -->
       <div class="w-full bg-white/[0.08] h-2 rounded-full mt-2.5 overflow-hidden flex" title="Capacity Breakdown">
@@ -225,7 +225,7 @@
       </div>
 
       <!-- Right Toolbar: Search, Sort, View Switcher, Upload Button -->
-      <div class="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+      <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full lg:w-auto">
         
         <!-- Live Instant Search Bar -->
         <div class="relative w-full sm:w-56">
@@ -236,63 +236,65 @@
             type="text" 
             id="instantSearch" 
             oninput="handleInstantSearch(this.value)"
-            placeholder="Search files..." 
-            class="quartz-input w-full pl-8 pr-8 py-1.5 rounded-lg text-xs placeholder-slate-500"
+            placeholder="Search vault... (Ctrl+K)" 
+            class="quartz-input w-full pl-8 pr-12 py-1.5 rounded-xl text-xs placeholder-slate-500"
           >
-          <span class="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none text-[10px] font-mono text-slate-500">
-            /
+          <span class="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none text-[10px] font-mono text-slate-500 hidden sm:inline">
+            Ctrl+K
           </span>
         </div>
 
-        <!-- Time Filter Select -->
-        <select id="timeFilterSelect" onchange="handleTimeFilterChange(this.value)" class="quartz-input py-1.5 px-2 rounded-lg text-xs font-mono bg-[#0e1019]/90 border border-white/[0.08] text-slate-300" title="Filter by date range">
-          <option value="all" {% if current_time == 'all' %}selected{% endif %}>All Time</option>
-          <option value="today" {% if current_time == 'today' %}selected{% endif %}>Today</option>
-          <option value="week" {% if current_time == 'week' %}selected{% endif %}>Past 7 Days</option>
-          <option value="month" {% if current_time == 'month' %}selected{% endif %}>Past 30 Days</option>
-        </select>
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+          <!-- Time Filter Select -->
+          <select id="timeFilterSelect" onchange="handleTimeFilterChange(this.value)" class="quartz-input py-1.5 px-2 rounded-xl text-xs font-mono bg-[#0e1019]/90 border border-white/[0.08] text-slate-300 flex-1 sm:flex-initial" title="Filter by date range">
+            <option value="all" {% if current_time == 'all' %}selected{% endif %}>All Time</option>
+            <option value="today" {% if current_time == 'today' %}selected{% endif %}>Today</option>
+            <option value="week" {% if current_time == 'week' %}selected{% endif %}>Past 7 Days</option>
+            <option value="month" {% if current_time == 'month' %}selected{% endif %}>Past 30 Days</option>
+          </select>
 
-        <!-- Sort Select -->
-        <select id="sortSelect" onchange="handleSortChange(this.value)" class="quartz-input py-1.5 px-2 rounded-lg text-xs font-mono bg-[#0e1019]/90 border border-white/[0.08] text-slate-300" title="Sort files">
-          <option value="date-desc" {% if current_sort in ('newest', 'date-desc') %}selected{% endif %}>Newest</option>
-          <option value="date-asc" {% if current_sort in ('oldest', 'date-asc') %}selected{% endif %}>Oldest</option>
-          <option value="name-asc" {% if current_sort == 'name-asc' %}selected{% endif %}>Name (A-Z)</option>
-          <option value="name-desc" {% if current_sort == 'name-desc' %}selected{% endif %}>Name (Z-A)</option>
-          <option value="size-desc" {% if current_sort == 'size-desc' %}selected{% endif %}>Largest</option>
-          <option value="size-asc" {% if current_sort == 'size-asc' %}selected{% endif %}>Smallest</option>
-        </select>
+          <!-- Sort Select -->
+          <select id="sortSelect" onchange="handleSortChange(this.value)" class="quartz-input py-1.5 px-2 rounded-xl text-xs font-mono bg-[#0e1019]/90 border border-white/[0.08] text-slate-300 flex-1 sm:flex-initial" title="Sort files">
+            <option value="date-desc" {% if current_sort in ('newest', 'date-desc') %}selected{% endif %}>Newest</option>
+            <option value="date-asc" {% if current_sort in ('oldest', 'date-asc') %}selected{% endif %}>Oldest</option>
+            <option value="name-asc" {% if current_sort == 'name-asc' %}selected{% endif %}>Name (A-Z)</option>
+            <option value="name-desc" {% if current_sort == 'name-desc' %}selected{% endif %}>Name (Z-A)</option>
+            <option value="size-desc" {% if current_sort == 'size-desc' %}selected{% endif %}>Largest</option>
+            <option value="size-asc" {% if current_sort == 'size-asc' %}selected{% endif %}>Smallest</option>
+          </select>
 
-        <!-- View Switcher (Table vs Grid) -->
-        <div class="flex items-center p-1 rounded-lg bg-[#0e1019]/90 border border-white/[0.08] text-xs">
+          <!-- View Switcher (Table vs Grid) -->
+          <div class="flex items-center p-0.5 rounded-xl bg-[#0e1019]/90 border border-white/[0.08] text-xs shrink-0">
+            <button 
+              type="button" 
+              onclick="switchView('table')" 
+              id="viewTableBtn"
+              class="p-1.5 rounded-lg bg-violet-600/20 text-violet-300 border border-violet-500/30 transition-colors" 
+              title="List Table View"
+            >
+              <i class="fa-solid fa-list text-xs"></i>
+            </button>
+            <button 
+              type="button" 
+              onclick="switchView('grid')" 
+              id="viewGridBtn"
+              class="p-1.5 rounded-lg text-slate-400 hover:text-white transition-colors" 
+              title="Card Grid View"
+            >
+              <i class="fa-solid fa-grip text-xs"></i>
+            </button>
+          </div>
+
+          <!-- Primary Upload Trigger CTA -->
           <button 
             type="button" 
-            onclick="switchView('table')" 
-            id="viewTableBtn"
-            class="p-1.5 rounded bg-violet-600/20 text-violet-300 border border-violet-500/30 transition-colors" 
-            title="List Table View"
+            onclick="openUploadModal()" 
+            class="px-3.5 py-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shadow-violet-600/25 border border-violet-400/30 whitespace-nowrap active:scale-95 shrink-0"
           >
-            <i class="fa-solid fa-list text-xs"></i>
-          </button>
-          <button 
-            type="button" 
-            onclick="switchView('grid')" 
-            id="viewGridBtn"
-            class="p-1.5 rounded text-slate-400 hover:text-white transition-colors" 
-            title="Card Grid View"
-          >
-            <i class="fa-solid fa-grip text-xs"></i>
+            <i class="fa-solid fa-cloud-arrow-up text-[11px]"></i>
+            <span class="hidden sm:inline">Upload</span>
           </button>
         </div>
-
-        <!-- Primary Upload Trigger CTA -->
-        <button 
-          type="button" 
-          onclick="openUploadModal()" 
-          class="px-3.5 py-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shadow-violet-600/25 border border-violet-400/30 whitespace-nowrap active:scale-95"
-        >
-          <i class="fa-solid fa-cloud-arrow-up text-[11px]"></i>
-          <span>Upload</span>
-        </button>
 
       </div>
 
@@ -440,10 +442,11 @@
 
                 <!-- Integrity Hash / Checksum (Desktop) -->
                 <td class="py-3 px-3 hidden md:table-cell font-mono">
-                  <span class="px-2.5 py-1 rounded-md bg-[#0a0c14] border border-white/[0.08] text-[10px] text-slate-400 inline-flex items-center gap-1.5 font-mono shadow-sm">
-                    <i class="fa-solid fa-shield text-[9px] text-violet-400"></i>
+                  <button type="button" onclick="copyHashText('{{ doc.blob_name }}', this)" title="Click to copy SHA-256 storage anchor" class="px-2.5 py-1 rounded-md bg-[#0a0c14] hover:bg-slate-800 border border-white/[0.08] text-[10px] text-slate-400 hover:text-white inline-flex items-center gap-1.5 font-mono shadow-sm transition-colors group/hash">
+                    <i class="fa-solid fa-shield text-[9px] text-violet-400 group-hover/hash:text-emerald-400"></i>
                     <span>{{ doc.blob_name[:12] }}...</span>
-                  </span>
+                    <i class="fa-regular fa-copy text-[8px] text-slate-500 opacity-60 group-hover/hash:opacity-100"></i>
+                  </button>
                 </td>
 
                 <!-- File Details (Desktop) -->
@@ -1045,21 +1048,42 @@
     }
   }
 
-  // Copy Direct Link with visual feedback
+  // Copy Direct Link with visual feedback & Toast
   function copyDirectUrl(url, button) {
     const fullUrl = url.startsWith('http') ? url : window.location.origin + url;
     navigator.clipboard.writeText(fullUrl).then(() => {
       const originalHtml = button.innerHTML;
       button.innerHTML = '<i class="fa-solid fa-check text-emerald-400 text-[11px]"></i>';
+      if (typeof showToast === 'function') {
+        showToast('Direct file link copied to clipboard!', 'success');
+      }
       setTimeout(() => {
         button.innerHTML = originalHtml;
       }, 1500);
+    }).catch(() => {
+      if (typeof showToast === 'function') showToast('Clipboard access denied.', 'error');
+    });
+  }
+
+  // Copy SHA-256 Hash with visual feedback & Toast
+  function copyHashText(hashText, button) {
+    navigator.clipboard.writeText(hashText).then(() => {
+      const originalHtml = button.innerHTML;
+      button.innerHTML = '<i class="fa-solid fa-check text-emerald-400 text-[10px]"></i>';
+      if (typeof showToast === 'function') {
+        showToast('SHA-256 hash copied to clipboard!', 'success');
+      }
+      setTimeout(() => {
+        button.innerHTML = originalHtml;
+      }, 1500);
+    }).catch(() => {
+      if (typeof showToast === 'function') showToast('Could not copy hash.', 'error');
     });
   }
 
   // Hotkey '/' to focus search input
   window.addEventListener('keydown', (e) => {
-    if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+    if ((e.key === '/' || ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K'))) && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
       e.preventDefault();
       const search = document.getElementById('instantSearch');
       if (search) search.focus();

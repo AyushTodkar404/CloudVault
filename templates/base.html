@@ -198,42 +198,31 @@
         </nav>
 
         <!-- System Status & Action Controls -->
-        <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-2">
 
-          <!-- Storage Cluster Status Pill -->
+          <!-- Storage Cluster Status Pill with Network Sentinel -->
           <div
+            id="clusterStatusPill"
             class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#12141f] border border-white/[0.08] text-xs font-mono shadow-sm"
             title="Active cloud object storage tier">
-            {% if is_cloud_active %}
             <span class="flex h-2 w-2 relative">
-              <span
-                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span id="clusterStatusPing" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span id="clusterStatusDot" class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span class="text-emerald-400 font-medium">Cluster: Hot-Store</span>
-            {% else %}
-            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-            <span class="text-emerald-400 font-medium">Cluster: Hot-Store</span>
-            {% endif %}
+            <span id="clusterStatusText" class="text-emerald-400 font-medium">Cluster: Hot-Store</span>
           </div>
-
-          <a href="{{ url_for('about') }}"
-            class="md:hidden inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#12141f] border border-white/[0.08] text-xs font-mono text-indigo-300"
-            title="About Developers">
-            <i class="fa-solid fa-users text-xs"></i>
-          </a>
 
           {% if current_user.is_authenticated %}
           <!-- Upload Modal Action Button -->
           <button type="button" onclick="openUploadModal()"
-            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-500 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-violet-600/30 border border-violet-400/30 active:scale-95 transition-all"
+            class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-500 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-violet-600/30 border border-violet-400/30 active:scale-95 transition-all"
             title="Upload new document (Press N)">
             <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
             <span>Upload</span>
           </button>
 
           <!-- User Profile & Logout -->
-          <div class="flex items-center gap-1.5 pl-1.5 border-l border-white/[0.1]">
+          <div class="hidden sm:flex items-center gap-1.5 pl-1.5 border-l border-white/[0.1]">
             <div class="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-[#12141f] border border-white/[0.08] text-xs">
               <span class="w-6 h-6 rounded-lg bg-violet-600/30 text-violet-300 flex items-center justify-center font-bold text-[11px] font-mono uppercase">
                 {{ current_user.username[0] }}
@@ -249,11 +238,66 @@
             </a>
           </div>
           {% else %}
-          <a href="{{ url_for('login') }}" class="px-3.5 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold font-mono transition-colors">Sign In</a>
+          <a href="{{ url_for('login') }}" class="hidden sm:inline-flex px-3.5 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold font-mono transition-colors">Sign In</a>
           {% endif %}
+
+          <!-- Mobile Hamburger Toggle Button -->
+          <button type="button" id="mobileMenuToggle" onclick="toggleMobileMenu()"
+            class="md:hidden w-9 h-9 rounded-xl bg-[#12141f] border border-white/[0.1] text-slate-200 hover:text-white flex items-center justify-center text-sm active:scale-95 transition-all"
+            aria-label="Open mobile navigation menu">
+            <i class="fa-solid fa-bars text-sm" id="mobileMenuIcon"></i>
+          </button>
         </div>
 
       </div>
+    </div>
+
+    <!-- Mobile Responsive Navigation Drawer -->
+    <div id="mobileDrawer" class="hidden md:hidden border-b border-white/[0.08] bg-[#0c0e18]/95 backdrop-blur-2xl px-4 py-3.5 space-y-3 transition-all animate-fade-in">
+      <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+        <a href="{{ url_for('index') }}" class="p-2.5 rounded-xl flex items-center gap-2 {% if request.endpoint == 'index' %}bg-white/10 text-white font-bold border border-white/10 shadow-sm{% else %}text-slate-300 hover:bg-white/5{% endif %}">
+          <i class="fa-solid fa-folder-tree text-violet-400"></i>
+          <span>Vault</span>
+        </a>
+        <a href="{{ url_for('about') }}" class="p-2.5 rounded-xl flex items-center gap-2 {% if request.endpoint == 'about' %}bg-white/10 text-white font-bold border border-white/10 shadow-sm{% else %}text-slate-300 hover:bg-white/5{% endif %}">
+          <i class="fa-solid fa-graduation-cap text-indigo-400"></i>
+          <span>Project & Team</span>
+        </a>
+      </div>
+
+      {% if current_user.is_authenticated %}
+      <div class="flex items-center gap-2 pt-2 border-t border-white/[0.08] text-xs font-mono">
+        <button type="button" onclick="openAuditModal(); toggleMobileMenu();" class="flex-1 py-2 px-3 rounded-xl bg-slate-900/80 border border-white/10 text-slate-200 hover:text-white flex items-center justify-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i>
+          <span>Audit Trail</span>
+        </button>
+        <button type="button" onclick="openUploadModal(); toggleMobileMenu();" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold flex items-center justify-center gap-2 shadow-sm">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Upload</span>
+        </button>
+      </div>
+
+      <!-- User Profile & Quota Info in Mobile Drawer -->
+      <div class="flex items-center justify-between pt-2 border-t border-white/[0.06] text-xs font-mono">
+        <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-lg bg-violet-600/30 text-violet-300 flex items-center justify-center font-bold text-[10px] uppercase">
+            {{ current_user.username[0] }}
+          </span>
+          <span class="font-bold text-white text-xs truncate max-w-[120px]">{{ current_user.username }}</span>
+          <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">5.0 GB Tier</span>
+        </div>
+        <a href="{{ url_for('logout') }}" class="px-2.5 py-1 rounded-lg bg-rose-950/40 border border-rose-500/30 text-rose-300 hover:text-white text-[11px] flex items-center gap-1 font-mono">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Sign Out</span>
+        </a>
+      </div>
+      {% else %}
+      <div class="pt-2 border-t border-white/[0.08]">
+        <a href="{{ url_for('login') }}" class="block w-full text-center py-2 px-4 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold font-mono">
+          Sign In to CloudVault
+        </a>
+      </div>
+      {% endif %}
     </div>
   </header>
 
@@ -859,7 +903,12 @@
         navigator.clipboard.writeText(input.value).then(() => {
           const orig = btn.textContent;
           btn.textContent = 'Copied!';
+          if (typeof showToast === 'function') {
+            showToast('Secure share link copied to clipboard!', 'success');
+          }
           setTimeout(() => { btn.textContent = orig; }, 1800);
+        }).catch(() => {
+          if (typeof showToast === 'function') showToast('Clipboard access denied.', 'error');
         });
       }
     }
@@ -1299,14 +1348,124 @@
       xhr.send(formData);
     }
 
-    // Keyboard shortcut 'N' opens upload modal
+    // Mobile Navigation Drawer Toggle
+    function toggleMobileMenu() {
+      const drawer = document.getElementById('mobileDrawer');
+      const icon = document.getElementById('mobileMenuIcon');
+      if (!drawer) return;
+      const isHidden = drawer.classList.contains('hidden');
+      if (isHidden) {
+        drawer.classList.remove('hidden');
+        if (icon) {
+          icon.classList.remove('fa-bars');
+          icon.classList.add('fa-xmark');
+        }
+      } else {
+        drawer.classList.add('hidden');
+        if (icon) {
+          icon.classList.remove('fa-xmark');
+          icon.classList.add('fa-bars');
+        }
+      }
+    }
+
+    // Interactive Toast Notification Engine
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = 'pointer-events-auto p-3.5 rounded-xl quartz-surface border text-xs font-mono shadow-2xl flex items-center justify-between gap-3 transition-all duration-300 opacity-0 translate-y-3';
+      
+      let borderClass = 'border-violet-500/30';
+      let iconHtml = '<i class="fa-solid fa-circle-info text-violet-400"></i>';
+      if (type === 'success') {
+        borderClass = 'border-emerald-500/40 bg-emerald-950/40 text-emerald-200';
+        iconHtml = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+      } else if (type === 'error') {
+        borderClass = 'border-rose-500/40 bg-rose-950/40 text-rose-200';
+        iconHtml = '<i class="fa-solid fa-triangle-exclamation text-rose-400"></i>';
+      } else if (type === 'warning') {
+        borderClass = 'border-amber-500/40 bg-amber-950/40 text-amber-200';
+        iconHtml = '<i class="fa-solid fa-bell text-amber-400"></i>';
+      }
+      toast.classList.add(...borderClass.split(' '));
+
+      toast.innerHTML = `
+        <div class="flex items-center gap-2.5 overflow-hidden">
+          ${iconHtml}
+          <span class="truncate">${message}</span>
+        </div>
+        <button type="button" class="text-slate-400 hover:text-white shrink-0 ml-2">
+          <i class="fa-solid fa-xmark text-[11px]"></i>
+        </button>
+      `;
+
+      toast.querySelector('button').onclick = () => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 250);
+      };
+
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.classList.remove('opacity-0', 'translate-y-3');
+        toast.classList.add('opacity-100', 'translate-y-0');
+      });
+
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.classList.add('opacity-0', 'translate-y-2');
+          setTimeout(() => toast.remove(), 250);
+        }
+      }, 3400);
+    }
+
+    // Cloud Connectivity Sentinel
+    function checkNetworkConnectivity() {
+      const ping = document.getElementById('clusterStatusPing');
+      const dot = document.getElementById('clusterStatusDot');
+      const text = document.getElementById('clusterStatusText');
+      if (!navigator.onLine) {
+        if (ping) ping.classList.add('hidden');
+        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-amber-400';
+        if (text) text.innerHTML = '<span class="text-amber-300 font-semibold">Offline (Local Cache)</span>';
+        showToast('Connection lost. Operating in offline cached mode.', 'warning');
+      } else {
+        if (ping) ping.classList.remove('hidden');
+        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-emerald-500';
+        if (text) text.innerHTML = '<span class="text-emerald-400 font-medium">Cluster: Hot-Store</span>';
+      }
+    }
+    window.addEventListener('offline', checkNetworkConnectivity);
+    window.addEventListener('online', () => {
+      checkNetworkConnectivity();
+      showToast('Reconnected to Azure Blob Hot-Store', 'success');
+    });
+
+    // Keyboard Shortcuts (N for upload, Ctrl+K or / for search, Esc to close)
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'n' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) && !previewModal.open && !uploadModal.open) {
+      const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+      if (e.key === 'Escape') {
+        const openDialogs = document.querySelectorAll('dialog[open]');
+        openDialogs.forEach(d => d.close());
+        const drawer = document.getElementById('mobileDrawer');
+        if (drawer && !drawer.classList.contains('hidden')) toggleMobileMenu();
+      } else if (!isInput && (e.key === 'n' || e.key === 'N')) {
+        const hasOpenDialog = document.querySelector('dialog[open]');
+        if (!hasOpenDialog) {
+          e.preventDefault();
+          openUploadModal();
+        }
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
-        openUploadModal();
+        const searchInput = document.getElementById('instantSearch');
+        if (searchInput) searchInput.focus();
       }
     });
   </script>
+
+  <!-- Universal Toast Notifications Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full px-4 sm:px-0"></div>
 
   {% block scripts %}{% endblock %}
 </body>
