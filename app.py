@@ -486,7 +486,8 @@ def create_app(test_config=None):
             filtered.sort(key=lambda d: d.created_at or datetime.min, reverse=True)
 
         total_bytes = sum(d.file_size or 0 for d in active_documents)
-        quota_bytes = current_user.storage_quota_bytes if hasattr(current_user, "storage_quota_bytes") else 1024 * 1024 * 1024
+        default_quota = int(float(os.getenv("USER_STORAGE_QUOTA_GB", "5.0")) * 1024 * 1024 * 1024)
+        quota_bytes = current_user.storage_quota_bytes if hasattr(current_user, "storage_quota_bytes") else default_quota
         quota_percent = min(100.0, round((total_bytes / quota_bytes) * 100, 1)) if quota_bytes > 0 else 0
 
         # Formatted breakdown sizes and quota percentages
@@ -561,7 +562,7 @@ def create_app(test_config=None):
         current_used = current_user.storage_used_bytes
         quota_bytes = current_user.storage_quota_bytes
         if current_used >= quota_bytes:
-            msg = f"Storage quota limit exceeded ({current_user.formatted_storage_used} / 1.0 GB). Please delete files to proceed."
+            msg = f"Storage quota limit exceeded ({current_user.formatted_storage_used} / {format_size(quota_bytes)}). Please delete files to proceed."
             if is_ajax:
                 return jsonify({"success": False, "error": msg}), 400
             flash(msg, "error")
@@ -852,7 +853,8 @@ def create_app(test_config=None):
     @app.route("/about", methods=["GET"])
     def about():
         """About the CloudVault Project, Developers, and Cloud Architecture."""
-        quota_bytes = current_user.storage_quota_bytes if current_user.is_authenticated and hasattr(current_user, "storage_quota_bytes") else 1024 * 1024 * 1024
+        default_quota = int(float(os.getenv("USER_STORAGE_QUOTA_GB", "5.0")) * 1024 * 1024 * 1024)
+        quota_bytes = current_user.storage_quota_bytes if current_user.is_authenticated and hasattr(current_user, "storage_quota_bytes") else default_quota
         used_bytes = current_user.storage_used_bytes if current_user.is_authenticated and hasattr(current_user, "storage_used_bytes") else 0
         return render_template(
             "about.html",

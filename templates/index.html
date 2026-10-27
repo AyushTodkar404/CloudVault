@@ -71,11 +71,11 @@
         <div class="bg-indigo-400 h-full transition-all duration-500" style="width: {{ category_percents.get('code', 0) + category_percents.get('archive', 0) + category_percents.get('other', 0) }}%" title="Other: {{ category_breakdown.get('other', '0 B') }}"></div>
       </div>
       <div class="flex items-center justify-between mt-1.5 text-[10px] font-mono">
-        <span class="text-slate-400">{{ storage_percent }}% of 1.0 GB Used</span>
+        <span class="text-slate-400">{{ storage_percent }}% of {{ storage_quota }} Used</span>
         {% if storage_percent > 85 %}
         <span class="text-rose-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> Low Space</span>
         {% else %}
-        <span class="text-emerald-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Standard 1.0 GB Tier</span>
+        <span class="text-emerald-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Standard {{ storage_quota }} Tier</span>
         {% endif %}
       </div>
       <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-amber-500/10 rounded-full blur-xl pointer-events-none group-hover:scale-150 transition-transform"></div>

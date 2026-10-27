@@ -28,7 +28,7 @@ The application is architected from the ground up to utilize all five primary cl
 | :--- | :---: | :--- |
 | **Ayush Todkar** | **57** | **Lead Cloud Architect & Full-Stack Developer** &bull; PaaS deployment orchestration, WSGI pipeline, multi-tenant document isolation, Google SSO, and UI/UX design. |
 | **Yahiya Siddiqui** | **49** | **Database & Cloud Infrastructure Engineer** &bull; Azure SQL Database (DBaaS) relational schema, indexing, foreign keys, and IaaS VM uptime sentinel. |
-| **Alister Varghese K.** | **03** | **Cloud Storage & Quota Systems Engineer** &bull; Azure Blob Storage integration, UUID namespaces, 1.0 GB student quota tracking, and batch drag-and-drop. |
+| **Alister Varghese K.** | **03** | **Cloud Storage & Quota Systems Engineer** &bull; Azure Blob Storage integration, UUID namespaces, 5.0 GB student quota tracking (matching Azure Free Tier), and batch drag-and-drop. |
 | **Jude Rebairo** | **31** | **Security, Access Control & QA Engineer** &bull; SECaaS security subsystem, scrypt password hashing, automated test suites (18 tests), and upload validation. |
 
 ---
@@ -216,7 +216,7 @@ C:\CC_MINI_PROJECT\
 CloudVault includes 4 enterprise-grade capabilities that transition it into a complete, professional, production cloud storage platform:
 
 ### 1. Visual Storage Quota & Capacity Allocation Meter
-- **Capacity Metering**: Real-time calculation of consumed bytes vs. 1.0 GB institutional cloud tier per tenant.
+- **Capacity Metering**: Real-time calculation of consumed bytes vs. 5.0 GB institutional cloud tier per tenant (matching Microsoft Azure Free Tier 5.0 GB Blob allocation).
 - **Multi-Segment Color Spectrum**:
   - **Violet**: PDF credentials & research certificates.
   - **Cyan**: High-resolution imagery & photographs.
@@ -270,7 +270,7 @@ python test_app.py
 9. `test_google_oauth_flow`: Validates OAuth initiation, state tracking, and token callback.
 10. `test_emergent_zero_config_google_login`: Tests 1-click passwordless login and account picker.
 11. `test_multi_file_batch_upload_and_ajax`: Verifies batch multi-upload and AJAX drag-and-drop response.
-12. `test_storage_quota_calculation_and_enforcement`: Verifies 1.0 GB quota calculations and enforcement.
+12. `test_storage_quota_calculation_and_enforcement`: Verifies 5.0 GB quota calculations and enforcement.
 13. `test_quick_sorting_and_time_filtering`: Validates alphabetical sorting, time ranges, and category filters.
 14. `test_security_audit_activity_log_and_api`: Verifies SQL telemetry tracking and `/api/activity-log` endpoint.
 

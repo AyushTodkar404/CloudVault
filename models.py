@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
@@ -28,8 +29,9 @@ class User(UserMixin, db.Model):
 
     @property
     def storage_quota_bytes(self):
-        """Standard student quota: 1.0 GB (1024 * 1024 * 1024 bytes)."""
-        return 1024 * 1024 * 1024
+        """Standard student quota: 5.0 GB (5,368,709,120 bytes) matching Microsoft Azure Free Tier Blob allowance."""
+        quota_gb = float(os.getenv("USER_STORAGE_QUOTA_GB", "5.0"))
+        return int(quota_gb * 1024 * 1024 * 1024)
 
     @property
     def storage_percentage(self):

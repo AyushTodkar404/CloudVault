@@ -429,7 +429,7 @@ class CloudVaultProfessionalFeaturesTestCase(unittest.TestCase):
         self.register_and_login()
         with self.app.app_context():
             user = User.query.filter_by(username="prostudent").first()
-            self.assertEqual(user.storage_quota_bytes, 1024 * 1024 * 1024)  # 1.0 GB
+            self.assertEqual(user.storage_quota_bytes, 5 * 1024 * 1024 * 1024)  # 5.0 GB
             self.assertEqual(user.storage_used_bytes, 0)
             self.assertEqual(user.storage_percentage, 0.0)
 
@@ -447,7 +447,7 @@ class CloudVaultProfessionalFeaturesTestCase(unittest.TestCase):
             db.session.commit()
 
             self.assertEqual(user.storage_used_bytes, 500 * 1024 * 1024)
-            self.assertAlmostEqual(user.storage_percentage, 48.8, delta=0.5)
+            self.assertAlmostEqual(user.storage_percentage, 9.8, delta=0.5)
 
     @mock.patch("storage.storage_manager.upload_file")
     def test_quick_sorting_and_time_filtering(self, mock_upload):
@@ -606,7 +606,7 @@ class CloudVaultProfessionalFeaturesTestCase(unittest.TestCase):
         self.assertIn("31", content)
 
         # Verify Storage Quota & Cloud Architecture
-        self.assertIn("1.0 GB", content)
+        self.assertIn("5.0 GB", content)
         self.assertIn("PaaS", content)
         self.assertIn("DBaaS", content)
         self.assertIn("Azure SQL", content)
