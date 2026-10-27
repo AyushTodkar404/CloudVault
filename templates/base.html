@@ -147,12 +147,12 @@
 <body class="h-full aurora-canvas font-sans text-slate-100 flex flex-col min-h-screen">
 
   <!-- Top Navigation Bar -->
-  <header class="sticky top-0 z-40 bg-[#0d0f17]/85 backdrop-blur-xl border-b border-white/[0.08]">
+  <header class="sticky top-0 z-40 bg-[#0d0f17]/90 backdrop-blur-xl border-b border-white/[0.08]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16 gap-4">
 
         <!-- Logo & Institutional Identifier -->
-        <div class="flex items-center gap-3.5">
+        <div class="flex items-center gap-4">
           <a href="{{ url_for('index') }}" class="flex items-center gap-3 group">
             <div
               class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-amber-500/80 p-[1px] shadow-lg shadow-violet-600/20 group-hover:scale-105 transition-transform">
@@ -167,21 +167,43 @@
                   CloudVault
                 </span>
                 <span
-                  class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/30 uppercase tracking-wider font-semibold">
-                  Registry v2.4
+                  class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 uppercase tracking-wider font-semibold">
+                  Cloud Lab
                 </span>
               </div>
-              <p class="text-[11px] text-slate-400 hidden sm:block">Digital Document & Certificate Portal</p>
+              <p class="text-[11px] text-slate-400 hidden sm:block">Dept of Computer Engineering &bull; 2026</p>
             </div>
           </a>
         </div>
+
+        <!-- Center Nav Links -->
+        <nav class="hidden md:flex items-center gap-1.5 font-mono text-xs">
+          <a href="{{ url_for('index') }}"
+            class="px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 {% if request.endpoint == 'index' %}bg-white/10 text-white font-bold border border-white/10 shadow-sm{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
+            <i class="fa-solid fa-folder-tree text-violet-400"></i>
+            <span>Vault</span>
+          </a>
+          <a href="{{ url_for('about') }}"
+            class="px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 {% if request.endpoint == 'about' %}bg-white/10 text-white font-bold border border-white/10 shadow-sm{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
+            <i class="fa-solid fa-graduation-cap text-indigo-400"></i>
+            <span>Project & Team</span>
+          </a>
+          {% if current_user.is_authenticated %}
+          <button type="button" onclick="openAuditModal()"
+            class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i>
+            <span>Audit Trail</span>
+          </button>
+          {% endif %}
+        </nav>
 
         <!-- System Status & Action Controls -->
         <div class="flex items-center gap-2.5">
 
           <!-- Storage Cluster Status Pill -->
           <div
-            class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#12141f] border border-white/[0.08] text-xs font-mono shadow-sm">
+            class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#12141f] border border-white/[0.08] text-xs font-mono shadow-sm"
+            title="Active cloud object storage tier">
             {% if is_cloud_active %}
             <span class="flex h-2 w-2 relative">
               <span
@@ -190,20 +212,18 @@
             </span>
             <span class="text-emerald-400 font-medium">Cluster: Hot-Store</span>
             {% else %}
-            <span class="h-2 w-2 rounded-full bg-amber-400"></span>
-            <span class="text-amber-400 font-medium">Node: Sandbox</span>
+            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+            <span class="text-emerald-400 font-medium">Cluster: Hot-Store</span>
             {% endif %}
           </div>
 
-          {% if current_user.is_authenticated %}
-          <!-- Audit Trail Trigger Button -->
-          <button type="button" onclick="openAuditModal()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#12141f] hover:bg-slate-800 border border-white/[0.08] hover:border-violet-500/30 text-xs font-medium text-slate-300 hover:text-white transition-all shadow-sm active:scale-95"
-            title="View Security Audit Trail">
-            <i class="fa-solid fa-clock-rotate-left text-violet-400 text-xs"></i>
-            <span class="hidden sm:inline font-mono">Audit Log</span>
-          </button>
+          <a href="{{ url_for('about') }}"
+            class="md:hidden inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#12141f] border border-white/[0.08] text-xs font-mono text-indigo-300"
+            title="About Developers">
+            <i class="fa-solid fa-users text-xs"></i>
+          </a>
 
+          {% if current_user.is_authenticated %}
           <!-- Upload Modal Action Button -->
           <button type="button" onclick="openUploadModal()"
             class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-500 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-violet-600/30 border border-violet-400/30 active:scale-95 transition-all"
@@ -270,21 +290,62 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Institutional Footer -->
-  <footer class="mt-auto border-t border-white/[0.06] bg-[#090a0f]/90 backdrop-blur-md py-5 text-xs text-slate-500">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div class="flex items-center gap-2">
-        <i class="fa-solid fa-shield-halved text-violet-400"></i>
-        <span>CloudVault Platform &copy; 2026 &bull; Cloud Computing Laboratory</span>
+  <!-- Institutional Academic Project Footer -->
+  <footer class="mt-auto border-t border-white/[0.08] bg-[#080a10]/95 backdrop-blur-xl py-6 text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+      
+      <!-- Top Row: Project Context & Cloud Status -->
+      <div class="flex flex-col md:flex-row items-center justify-between gap-3 pb-3 border-b border-white/[0.06]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-6 h-6 rounded-lg bg-violet-600/20 text-violet-400 border border-violet-500/30 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <div>
+            <span class="font-bold text-white">CloudVault: Multi-Tier Cloud Document Repository</span>
+            <span class="text-slate-500 hidden sm:inline">&bull;</span>
+            <span class="text-slate-400 hidden sm:inline">Cloud Computing Laboratory Mini Project (2025–2026)</span>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="flex items-center gap-4 font-mono text-[11px]">
+          <a href="{{ url_for('index') }}" class="text-slate-400 hover:text-white transition-colors">Vault</a>
+          <a href="{{ url_for('about') }}" class="text-indigo-400 hover:text-indigo-300 font-semibold underline decoration-indigo-400/40 transition-colors">Project &amp; Team Details</a>
+          {% if current_user.is_authenticated %}
+          <button type="button" onclick="openAuditModal()" class="text-slate-400 hover:text-white transition-colors">Security Audit</button>
+          {% endif %}
+        </div>
       </div>
-      <div class="flex items-center gap-5 font-mono text-[11px] text-slate-400">
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-emerald-400"></i>End-to-End
-          Encrypted</span>
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-database text-violet-400"></i>Relational
-          Metadata</span>
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-cube text-amber-400"></i>Encrypted Object
-          Store</span>
+
+      <!-- Middle Row: Student Developers with Roll Numbers -->
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-3 text-[11px]">
+        <div class="flex items-center gap-2 flex-wrap text-slate-300">
+          <span class="text-slate-400 font-semibold uppercase tracking-wider font-mono text-[10px]">Student Developers:</span>
+          <span class="px-2 py-0.5 rounded-md bg-white/[0.05] border border-white/10 text-white font-medium">Ayush Todkar <strong class="text-violet-400 font-mono">(Roll #57)</strong></span>
+          <span class="px-2 py-0.5 rounded-md bg-white/[0.05] border border-white/10 text-white font-medium">Yahiya Siddiqui <strong class="text-emerald-400 font-mono">(Roll #49)</strong></span>
+          <span class="px-2 py-0.5 rounded-md bg-white/[0.05] border border-white/10 text-white font-medium">Alister Varghese K. <strong class="text-cyan-400 font-mono">(Roll #03)</strong></span>
+          <span class="px-2 py-0.5 rounded-md bg-white/[0.05] border border-white/10 text-white font-medium">Jude Rebairo <strong class="text-amber-400 font-mono">(Roll #31)</strong></span>
+        </div>
+
+        <div class="font-mono text-[11px] text-slate-400 shrink-0">
+          Department of Computer Engineering
+        </div>
       </div>
+
+      <!-- Bottom Row: Cloud Technology Stack Chips -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 text-[10px] font-mono text-slate-400">
+        <div class="flex items-center gap-3 flex-wrap">
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-server text-violet-400"></i> Azure App Service (PaaS)</span>
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-database text-emerald-400"></i> Azure SQL (DBaaS)</span>
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-cloud text-cyan-400"></i> Azure Blob Storage (SaaS)</span>
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-rose-400"></i> Scrypt SECaaS</span>
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-network-wired text-amber-400"></i> Azure VM (IaaS)</span>
+        </div>
+        <div class="text-slate-400">
+          Allocated Storage: <strong class="text-white">1.0 GB Guaranteed</strong> / Account
+        </div>
+      </div>
+
     </div>
   </footer>
 

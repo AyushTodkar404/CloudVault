@@ -20,6 +20,17 @@ The application is architected from the ground up to utilize all five primary cl
 4. **Security as a Service (SECaaS)** &mdash; Azure Key Vault & Managed Identity
 5. **Infrastructure as a Service (IaaS)** &mdash; Azure Ubuntu Linux Virtual Machine in a dedicated VNet
 
+### Student Project Team (Cloud Computing Mini Project)
+* **Department**: Department of Computer Engineering / Information Technology
+* **Academic Year**: 2025–2026
+
+| Student Developer | Roll No | Project Role & Primary Responsibilities |
+| :--- | :---: | :--- |
+| **Ayush Todkar** | **57** | **Lead Cloud Architect & Full-Stack Developer** &bull; PaaS deployment orchestration, WSGI pipeline, multi-tenant document isolation, Google SSO, and UI/UX design. |
+| **Yahiya Siddiqui** | **49** | **Database & Cloud Infrastructure Engineer** &bull; Azure SQL Database (DBaaS) relational schema, indexing, foreign keys, and IaaS VM uptime sentinel. |
+| **Alister Varghese K.** | **03** | **Cloud Storage & Quota Systems Engineer** &bull; Azure Blob Storage integration, UUID namespaces, 1.0 GB student quota tracking, and batch drag-and-drop. |
+| **Jude Rebairo** | **31** | **Security, Access Control & QA Engineer** &bull; SECaaS security subsystem, scrypt password hashing, automated test suites (18 tests), and upload validation. |
+
 ---
 
 ## 2. High-Level Architecture Diagram

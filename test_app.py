@@ -589,6 +589,30 @@ class CloudVaultProfessionalFeaturesTestCase(unittest.TestCase):
             self.assertEqual(doc.file_name, "syllabus.pdf")
             self.assertTrue(doc.file_size > 0)
 
+    def test_about_page_and_developers(self):
+        """Ensure /about presents project summary, developer roll numbers, 1GB quota, and 5 cloud models."""
+        resp = self.client.get("/about")
+        self.assertEqual(resp.status_code, 200)
+
+        content = resp.data.decode("utf-8")
+        # Verify all 4 student developers
+        self.assertIn("Ayush Todkar", content)
+        self.assertIn("57", content)
+        self.assertIn("Yahiya Siddiqui", content)
+        self.assertIn("49", content)
+        self.assertIn("Alister Varghese K.", content)
+        self.assertIn("03", content)
+        self.assertIn("Jude Rebairo", content)
+        self.assertIn("31", content)
+
+        # Verify Storage Quota & Cloud Architecture
+        self.assertIn("1.0 GB", content)
+        self.assertIn("PaaS", content)
+        self.assertIn("DBaaS", content)
+        self.assertIn("Azure SQL", content)
+        self.assertIn("Azure Blob Storage", content)
+        self.assertIn("IaaS", content)
+
 
 if __name__ == "__main__":
     unittest.main()
