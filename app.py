@@ -125,7 +125,10 @@ def create_app(test_config=None):
         return db.session.get(User, int(user_id))
 
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+        except Exception as e:
+            app.logger.warning(f"Database auto-creation bypassed on startup: {e}")
 
     def log_activity(user_id, action, details):
         """Records an immutable security/audit log event."""

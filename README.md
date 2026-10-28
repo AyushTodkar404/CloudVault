@@ -4,6 +4,31 @@ A secure, responsive, production-ready cloud portal designed for a University Cl
 
 ---
 
+## 👥 Engineering Team & Developers
+
+| Name | Roll No. | Project Responsibility |
+|:---|:---:|:---|
+| **Ayush Todkar** | **57** | Lead Cloud Architect & Full-Stack Developer (Azure App Service PaaS, Flask, UI, CI/CD) |
+| **Yahiya Siddiqui** | **49** | Database & Cloud Infrastructure Engineer (Azure SQL DBaaS, Schema, Sentinel) |
+| **Alister Varghese K.** | **03** | Cloud Storage & Quota Systems Engineer (Azure Blob Storage SaaS, 5GB Quotas, Batch Upload) |
+| **Jude Rebairo** | **31** | Cloud Security & Threat Protection Engineer (Zero-Trust SECaaS, Magic-Byte Scanner) |
+
+---
+
+## ☁️ 4 Core Cloud Computing Service Models Implemented
+
+CloudVault directly demonstrates and validates four essential Cloud Computing service delivery models:
+
+| Service Model | Implementation in CloudVault | Cloud Provider & Tech Stack | Key Capabilities & Evaluation Rubric |
+|:---|:---|:---|:---|
+| **SaaS**<br>*(Software as a Service)* | **CloudVault Web Application & Portal** | Azure Blob Storage & Modern Quartz UI | End-user document vault, direct in-browser PDF/image/media preview, 1-click downloads, 5.0 GB per-user quota allocation, and offline queueing with IndexedDB auto-sync. |
+| **PaaS**<br>*(Platform as a Service)* | **Managed Web Compute Runtime** | Azure App Service (Linux B1 Plan, Central India) | Containerized Python 3.12 / Flask / Gunicorn WSGI pipeline, automatic TLS 1.3 termination, zero server patching, automated CI/CD via GitHub Actions. |
+| **DBaaS**<br>*(Database as a Service)* | **Relational Metadata Store** | Azure SQL Database (`cloudvaultdb`) | Fully managed relational database, ACID transactions, foreign keys (`users.id` -> `documents.user_id`), automated daily backups, auto-indexing. |
+| **SECaaS**<br>*(Security as a Service)* | **Zero-Trust Security & Threat Scanner** | Custom `scanner.py` + Scrypt / PBKDF2-SHA256 | Deep magic-byte inspection (blocking disguised executables, webshells, corrupt archives), per-user data isolation, SHA-256 integrity anchors, security audit trail. |
+| *(Bonus) **IaaS***<br>*(Infrastructure as a Service)* | **Virtual Network Linux Sentinel** | Azure Ubuntu Linux VM (`cloudvault1-vm`) | Dedicated Ubuntu Linux VM inside a private Virtual Network (VNet) with custom Network Security Group (NSG) firewall rules. |
+
+---
+
 ## 🏛️ Cloud Architecture Overview
 
 ```
@@ -48,14 +73,17 @@ c:\CC_MINI_PROJECT\
 ├── app.py                  # Flask application factory, auth routes & document controller
 ├── models.py               # SQLAlchemy User & Document database schemas & password hashing
 ├── storage.py              # Cloud storage integration & local fallback manager
-├── requirements.txt        # Production dependencies (Flask, Flask-Login, etc.)
+├── scanner.py              # Deep security & integrity scanner (magic bytes, webshells, archives)
+├── requirements.txt        # Production dependencies (Flask, Flask-Login, azure-storage-blob)
 ├── .env.example            # Environment variables configuration template
 ├── .gitignore              # Ignored files (venv, .env, *.db, temporary uploads)
-├── test_app.py             # Automated test suite (auth, hashing, uploads, isolation)
+├── test_app.py             # Automated test suite (23 unit tests covering auth, upload, SECaaS)
 ├── README.md               # Architecture documentation, local setup & VM deployment guide
 └── templates/
-    ├── base.html           # Layout with dynamic session header & preview modal
-    ├── index.html          # Dashboard: Metrics, view switcher, drag-and-drop upload
+    ├── base.html           # Layout with dynamic session header, preview modal & OfflineVault
+    ├── index.html          # Dashboard: Metrics, view switcher, drag-and-drop, offline queue
+    ├── about.html          # Project summary, developers, tech stack & cloud service models
+    ├── share.html          # Secure public recipient view for shared documents
     ├── login.html          # Modern quartz glassmorphic sign in page
     ├── signup.html         # User registration page with institutional validation
     └── 404.html            # User-friendly 404 error page
