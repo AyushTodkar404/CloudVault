@@ -15,6 +15,18 @@
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
 
+  <!-- Dark Mode Theme Bootstrapper (FOUC prevention) -->
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('cloudvault-theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -69,6 +81,7 @@
     body {
       background-color: #FAFAF9;
       color: #202124;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     /* Clean Card Surface Token */
@@ -76,6 +89,7 @@
       background: #FFFFFF;
       border: 1px solid #E9EAEC;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
     .quartz-surface-hover, .wm-card-hover {
@@ -142,6 +156,125 @@
 
     ::-webkit-scrollbar-thumb:hover {
       background: #C4C7CE;
+    }
+
+    /* ========================================================
+       Watermelon UI Dark Mode Overrides
+       ======================================================== */
+    html.dark body {
+      background-color: #0E0F12 !important;
+      color: #F3F4F6 !important;
+    }
+
+    html.dark .bg-white {
+      background-color: #16171C !important;
+    }
+
+    html.dark .bg-\[\#FAFAF9\] {
+      background-color: #101115 !important;
+    }
+
+    html.dark .bg-\[\#F4F4F5\] {
+      background-color: #090A0D !important;
+    }
+
+    html.dark .border-\[\#E9EAEC\] {
+      border-color: #262830 !important;
+    }
+
+    html.dark .border-b-\[\#E9EAEC\] {
+      border-bottom-color: #262830 !important;
+    }
+
+    html.dark .border-t-\[\#E9EAEC\] {
+      border-top-color: #262830 !important;
+    }
+
+    html.dark .text-\[\#202124\] {
+      color: #F3F4F6 !important;
+    }
+
+    html.dark .text-\[\#5F6368\] {
+      color: #9CA3AF !important;
+    }
+
+    html.dark .text-\[\#777B83\] {
+      color: #838A95 !important;
+    }
+
+    html.dark .hover\:bg-\[\#FAFAF9\]:hover {
+      background-color: #1D1E24 !important;
+    }
+
+    html.dark .hover\:bg-white:hover {
+      background-color: #1F2128 !important;
+    }
+
+    html.dark .quartz-surface, html.dark .wm-card {
+      background: #16171C !important;
+      border-color: #262830 !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4) !important;
+    }
+
+    html.dark .quartz-surface-hover:hover, html.dark .wm-card-hover:hover {
+      border-color: #383B46 !important;
+      box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.6) !important;
+    }
+
+    html.dark .quartz-input, html.dark .wm-input {
+      background: #111216 !important;
+      border-color: #262830 !important;
+      color: #F3F4F6 !important;
+    }
+
+    html.dark .quartz-input:focus, html.dark .wm-input:focus {
+      border-color: #F0445E !important;
+      box-shadow: 0 0 0 3px rgba(240, 68, 94, 0.25) !important;
+    }
+
+    html.dark dialog {
+      background: #16171C !important;
+      border-color: #262830 !important;
+      color: #F3F4F6 !important;
+    }
+
+    html.dark dialog::backdrop {
+      background: rgba(0, 0, 0, 0.72) !important;
+    }
+
+    html.dark .bg-\[\#FFF0F2\] {
+      background-color: rgba(240, 68, 94, 0.14) !important;
+    }
+
+    html.dark .border-\[\#FECDD3\] {
+      border-color: rgba(240, 68, 94, 0.35) !important;
+    }
+
+    html.dark .bg-\[\#EAF6EF\] {
+      background-color: rgba(38, 139, 101, 0.16) !important;
+    }
+
+    html.dark .border-\[\#BEE7D5\] {
+      border-color: rgba(38, 139, 101, 0.35) !important;
+    }
+
+    html.dark header {
+      background-color: rgba(22, 23, 28, 0.95) !important;
+      border-color: #262830 !important;
+    }
+
+    html.dark footer {
+      background-color: #111216 !important;
+      border-color: #262830 !important;
+      color: #9CA3AF !important;
+    }
+
+    html.dark ::-webkit-scrollbar-thumb {
+      background: #343742;
+    }
+
+    html.dark ::-webkit-scrollbar-thumb:hover {
+      background: #4C5060;
     }
   </style>
 </head>
@@ -211,6 +344,13 @@
             </span>
             <span id="clusterStatusText" class="text-[#268B65] font-semibold">Cluster: Hot-Store</span>
           </div>
+
+          <!-- Theme Toggle (Light / Dark) -->
+          <button type="button" onclick="toggleTheme()" id="themeToggleBtn"
+            class="w-8 h-8 rounded-xl bg-[#FAFAF9] hover:bg-[#FFF0F2] text-[#5F6368] hover:text-[#F0445E] border border-[#E9EAEC] hover:border-[#FECDD3] flex items-center justify-center transition-colors text-xs active:scale-95"
+            title="Toggle theme (Light / Dark)" aria-label="Toggle dark mode">
+            <i class="fa-solid fa-moon text-xs" id="themeToggleIcon"></i>
+          </button>
 
           {% if current_user.is_authenticated %}
           <!-- Upload Modal Action Button -->
@@ -298,6 +438,15 @@
         </a>
       </div>
       {% endif %}
+
+      <!-- Mobile Theme Toggle -->
+      <div class="pt-2 border-t border-[#E9EAEC]">
+        <button type="button" onclick="toggleTheme()"
+          class="w-full py-2 px-3 rounded-xl bg-[#FAFAF9] hover:bg-[#FFF0F2] border border-[#E9EAEC] text-[#202124] text-xs font-mono flex items-center justify-center gap-2 transition-colors">
+          <i class="fa-solid fa-moon text-xs text-[#F0445E]" id="mobileThemeToggleIcon"></i>
+          <span id="themeToggleLabel">Switch to Dark Mode</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -1750,6 +1899,38 @@
         const searchInput = document.getElementById('instantSearch');
         if (searchInput) searchInput.focus();
       }
+    });
+
+    // Watermelon UI Theme Management (Light / Dark with localStorage persistence)
+    function updateThemeUI(isDark) {
+      const desktopIcon = document.getElementById('themeToggleIcon');
+      const mobileIcon = document.getElementById('mobileThemeToggleIcon');
+      const mobileLabel = document.getElementById('themeToggleLabel');
+
+      if (desktopIcon) {
+        desktopIcon.className = isDark ? 'fa-solid fa-sun text-amber-400 text-xs' : 'fa-solid fa-moon text-xs';
+      }
+      if (mobileIcon) {
+        mobileIcon.className = isDark ? 'fa-solid fa-sun text-amber-400 text-xs' : 'fa-solid fa-moon text-xs text-[#F0445E]';
+      }
+      if (mobileLabel) {
+        mobileLabel.textContent = isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('cloudvault-theme', isDark ? 'dark' : 'light');
+      updateThemeUI(isDark);
+      if (typeof showToast === 'function') {
+        showToast(isDark ? 'Dark mode enabled' : 'Light mode enabled', 'info');
+      }
+    }
+
+    // Initialize toggle icon states on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      updateThemeUI(isDark);
     });
   </script>
 
