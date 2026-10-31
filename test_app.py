@@ -758,6 +758,141 @@ class CloudVaultProfessionalFeaturesTestCase(unittest.TestCase):
         self.assertIn("attachment", share_down_resp.headers.get("Content-Disposition", ""))
 
 
+class CloudVaultRealProductionFeaturesTestCase(unittest.TestCase):
+    """Verifies all 19 real-production features added to CloudVault."""
+
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.app = create_app(
+            {
+                "TESTING": True,
+                "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+                "WTF_CSRF_ENABLED": False,
+                "UPLOAD_FOLDER": self.temp_dir.name,
+            }
+        )
+        self.client = self.app.test_client()
+        with self.app.app_context():
+            db.create_all()
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+        with self.app.app_context():
+            db.session.remove()
+            db.drop_all()
+
+    def test_privacy_and_terms_pages(self):
+        """Ensure /privacy and /terms return 200 with institutional governance policies."""
+        p_resp = self.client.get("/privacy")
+        self.assertEqual(p_resp.status_code, 200)
+        self.assertIn(b"Institutional Privacy Policy", p_resp.data)
+        self.assertIn(b"AES-256", p_resp.data)
+
+        t_resp = self.client.get("/terms")
+        self.assertEqual(t_resp.status_code, 200)
+        self.assertIn(b"Terms of Service", t_resp.data)
+        self.assertIn(b"5.0 GB Quota", t_resp.data)
+
+    def test_password_reset_flow(self):
+        """Ensure /forgot-password generates signed token and /reset-password updates credentials."""
+        with self.app.app_context():
+            u = User(username="sam", email="sam@college.edu")
+            u.set_password("OldPassword123")
+            db.session.add(u)
+            db.session.commit()
+
+        # Request reset
+        resp = self.client.post("/forgot-password", data={"identity": "sam@college.edu"}, follow_redirects=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(b"reset-password", resp.data)
+
+        # Extract token from generated URL in response
+        import re
+        match = re.search(r'/reset-password/([A-Za-z0-9_\-\.]+)', resp.data.decode("utf-8"))
+        self.assertIsNotNone(match)
+        token = match.group(1)
+
+        # Submit new password
+        reset_resp = self.client.post(
+            f"/reset-password/{token}",
+            data={"password": "NewStrongPassword456!", "confirm_password": "NewStrongPassword456!"},
+            follow_redirects=True,
+        )
+        self.assertEqual(reset_resp.status_code, 200)
+        self.assertIn(b"successfully reset", reset_resp.data)
+
+        # Confirm old password fails and new password works
+        with self.app.app_context():
+            user = User.query.filter_by(username="sam").first()
+            self.assertFalse(user.check_password("OldPassword123"))
+            self.assertTrue(user.check_password("NewStrongPassword456!"))
+
+    def test_email_verification_flow(self):
+        """Ensure authenticated user can request and confirm email verification."""
+        self.client.post(
+            "/signup",
+            data={"username": "alex", "email": "alex@uni.edu", "password": "password123", "confirm_password": "password123"},
+            follow_redirects=True,
+        )
+        # Send verification
+        v_resp = self.client.post("/verify-email/send", follow_redirects=True)
+        self.assertEqual(v_resp.status_code, 200)
+        self.assertIn(b"verify-email", v_resp.data)
+
+        import re
+        match = re.search(r'/verify-email/([A-Za-z0-9_\-\.]+)', v_resp.data.decode("utf-8"))
+        self.assertIsNotNone(match)
+        token = match.group(1)
+
+        # Verify
+        confirm_resp = self.client.get(f"/verify-email/{token}", follow_redirects=True)
+        self.assertEqual(confirm_resp.status_code, 200)
+        self.assertIn(b"verified", confirm_resp.data.lower())
+
+    def test_data_backup_export_and_analytics(self):
+        """Ensure /account/backup exports sovereign JSON archive and /api/analytics returns telemetry."""
+        self.client.post(
+            "/signup",
+            data={"username": "jordan", "email": "jordan@uni.edu", "password": "password123", "confirm_password": "password123"},
+            follow_redirects=True,
+        )
+        # Backup export
+        backup_resp = self.client.get("/account/backup")
+        self.assertEqual(backup_resp.status_code, 200)
+        self.assertEqual(backup_resp.headers["Content-Type"], "application/json")
+        import json
+        backup_data = json.loads(backup_resp.data)
+        self.assertEqual(backup_data["user_profile"]["username"], "jordan")
+        self.assertIn("documents", backup_data)
+        self.assertIn("audit_trail", backup_data)
+
+        # Analytics
+        analytics_resp = self.client.get("/api/analytics")
+        self.assertEqual(analytics_resp.status_code, 200)
+        a_data = analytics_resp.get_json()
+        self.assertEqual(a_data["user"], "jordan")
+        self.assertIn("storage_percentage", a_data)
+        self.assertIn("categories", a_data)
+
+    def test_account_deletion_flow(self):
+        """Ensure user can permanently purge their account and documents."""
+        self.client.post(
+            "/signup",
+            data={"username": "purge_me", "email": "purge@uni.edu", "password": "password123", "confirm_password": "password123"},
+            follow_redirects=True,
+        )
+        del_resp = self.client.post(
+            "/account/delete",
+            data={"password": "password123", "confirm_delete": "DELETE"},
+            follow_redirects=True,
+        )
+        self.assertEqual(del_resp.status_code, 200)
+        self.assertIn(b"permanently erased", del_resp.data)
+
+        with self.app.app_context():
+            self.assertIsNone(User.query.filter_by(username="purge_me").first())
+
+
 if __name__ == "__main__":
     unittest.main()
 

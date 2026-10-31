@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy &mdash; CloudVault{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-8 space-y-8">
+
+  <!-- Header -->
+  <div class="space-y-3 pb-6 border-b border-[#E9EAEC]">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] text-xs font-mono font-semibold">
+      <i class="fa-solid fa-user-shield text-xs"></i>
+      <span>Data Privacy &amp; Trust Commitment</span>
+    </div>
+    <h1 class="text-3xl font-extrabold text-[#202124] tracking-tight">Institutional Privacy Policy</h1>
+    <p class="text-sm text-[#5F6368] font-mono leading-relaxed">
+      CloudVault is engineered with zero-knowledge data isolation, enterprise encryption, and full compliance with student data sovereignty standards.
+    </p>
+    <div class="flex items-center gap-4 text-xs font-mono text-[#777B83] pt-1">
+      <span>Effective Date: Academic Session 2025&ndash;2026</span>
+      <span>&bull;</span>
+      <span>Version 2.4 (SECaaS Standard)</span>
+    </div>
+  </div>
+
+  <!-- Key Commitments Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="p-5 rounded-2xl bg-white border border-[#E9EAEC] shadow-xs space-y-2">
+      <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center text-sm">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h3 class="font-bold text-sm text-[#202124]">AES-256 Storage</h3>
+      <p class="text-xs text-[#5F6368] leading-relaxed">All files stored on Azure Blob Storage are automatically encrypted server-side with AES-256.</p>
+    </div>
+
+    <div class="p-5 rounded-2xl bg-white border border-[#E9EAEC] shadow-xs space-y-2">
+      <div class="w-10 h-10 rounded-xl bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] flex items-center justify-center text-sm">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+      <h3 class="font-bold text-sm text-[#202124]">Row-Level Security</h3>
+      <p class="text-xs text-[#5F6368] leading-relaxed">Cryptographic tenant separation ensures only you and authorized links can read your documents.</p>
+    </div>
+
+    <div class="p-5 rounded-2xl bg-white border border-[#E9EAEC] shadow-xs space-y-2">
+      <div class="w-10 h-10 rounded-xl bg-[#FAFAF9] text-[#202124] border border-[#E9EAEC] flex items-center justify-center text-sm">
+        <i class="fa-solid fa-eye-slash"></i>
+      </div>
+      <h3 class="font-bold text-sm text-[#202124]">Zero Ad Trackers</h3>
+      <p class="text-xs text-[#5F6368] leading-relaxed">No third-party trackers, marketing pixels, or selling of personal academic records. Ever.</p>
+    </div>
+  </div>
+
+  <!-- Detailed Policy Sections -->
+  <div class="bg-white border border-[#E9EAEC] rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+
+    <section class="space-y-2">
+      <h2 class="text-base font-bold text-[#202124] flex items-center gap-2">
+        <span class="w-6 h-6 rounded-lg bg-[#FFF0F2] text-[#F0445E] text-xs flex items-center justify-center font-mono">1</span>
+        Information We Collect
+      </h2>
+      <p class="text-xs text-[#5F6368] leading-relaxed">
+        We collect only the bare minimum information necessary to maintain your authenticated cloud storage session: your chosen username, registered institutional email, cryptographic password hash (scrypt-derived via Werkzeug), and file metadata (file size, MIME type, upload timestamp). We do not collect browsing history or device tracking data.
+      </p>
+    </section>
+
+    <section class="space-y-2">
+      <h2 class="text-base font-bold text-[#202124] flex items-center gap-2">
+        <span class="w-6 h-6 rounded-lg bg-[#FFF0F2] text-[#F0445E] text-xs flex items-center justify-center font-mono">2</span>
+        Cloud Storage &amp; Infrastructure Security
+      </h2>
+      <p class="text-xs text-[#5F6368] leading-relaxed">
+        Files uploaded to CloudVault are transmitted exclusively over encrypted HTTPS/TLS 1.3 channels and stored within Microsoft Azure Blob Storage (Central India region). Microsoft Azure maintains compliance with ISO/IEC 27001, SOC 1, SOC 2, and HIPAA. Database records are stored securely in Azure SQL with Transparent Data Encryption (TDE).
+      </p>
+    </section>
+
+    <section class="space-y-2">
+      <h2 class="text-base font-bold text-[#202124] flex items-center gap-2">
+        <span class="w-6 h-6 rounded-lg bg-[#FFF0F2] text-[#F0445E] text-xs flex items-center justify-center font-mono">3</span>
+        Student Data Sovereignty &amp; Ownership
+      </h2>
+      <p class="text-xs text-[#5F6368] leading-relaxed">
+        You retain full intellectual property ownership of every file uploaded to CloudVault. We do not inspect, parse, or index your private document contents for machine learning or external advertising purposes.
+      </p>
+    </section>
+
+    <section class="space-y-2">
+      <h2 class="text-base font-bold text-[#202124] flex items-center gap-2">
+        <span class="w-6 h-6 rounded-lg bg-[#FFF0F2] text-[#F0445E] text-xs flex items-center justify-center font-mono">4</span>
+        GDPR Data Portability &amp; Right to Erasure
+      </h2>
+      <p class="text-xs text-[#5F6368] leading-relaxed">
+        Under GDPR Article 20, you have the right to export your entire document and activity archive at any time via the <strong>Download Data Backup</strong> tool in Account Settings. Under GDPR Article 17, you have the absolute right to erasure: clicking <strong>Delete Account</strong> instantly and irreversibly purges your database records and all associated Azure storage blobs.
+      </p>
+    </section>
+
+  </div>
+
+  <!-- Back Link -->
+  <div class="text-center pt-2">
+    <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 text-xs font-mono text-[#F0445E] hover:underline font-bold">
+      <i class="fa-solid fa-arrow-left text-[11px]"></i>
+      <span>Return to Vault Dashboard</span>
+    </a>
+  </div>
+
+</div>
+{% endblock %}

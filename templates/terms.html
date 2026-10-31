@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Terms of Service &mdash; CloudVault{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-8 space-y-8">
+
+  <!-- Header -->
+  <div class="space-y-3 pb-6 border-b border-[#E9EAEC]">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] text-xs font-mono font-semibold">
+      <i class="fa-solid fa-scale-balanced text-xs"></i>
+      <span>Terms of Service &amp; Acceptable Use</span>
+    </div>
+    <h1 class="text-3xl font-extrabold text-[#202124] tracking-tight">Terms of Service</h1>
+    <p class="text-sm text-[#5F6368] font-mono leading-relaxed">
+      Guidelines and governance rules for utilizing the Cloud Computing Laboratory CloudVault Storage System.
+    </p>
+    <div class="flex items-center gap-4 text-xs font-mono text-[#777B83] pt-1">
+      <span>Academic Year 2025&ndash;2026</span>
+      <span>&bull;</span>
+      <span>Department of Computer Engineering</span>
+    </div>
+  </div>
+
+  <!-- Terms Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="p-5 rounded-2xl bg-white border border-[#E9EAEC] shadow-xs space-y-2">
+      <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center text-sm">
+        <i class="fa-solid fa-hard-drive"></i>
+      </div>
+      <h3 class="font-bold text-sm text-[#202124]">5.0 GB Quota</h3>
+      <p class="text-xs text-[#5F6368] leading-relaxed">Each account receives 5.0 GB of high-speed Azure Hot-Store object capacity.</p>
+    </div>
+
+    <div class="p-5 rounded-2xl bg-white border border-[#E9EAEC] shadow-xs space-y-2">
+      <div class="w-10 h-10 rounded-xl bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] flex items-center justify-center text-sm">
+        <i class="fa-solid fa-shield-virus"></i>
+      </div>
+      <h3 class="font-bold text-sm text-[#202124]">Clean Vault Policy</h3>
+      <p class="text-xs text-[#5F6368] leading-relaxed">Automated virus/malware scanners reject executables and malicious scripts on upload.</p>
+    </div>
+
+    <div class="p-5 rounded-2xl bg-white border border-[#E9EAEC] shadow-xs space-y-2">
+      <div class="w-10 h-10 rounded-xl bg-[#FAFAF9] text-[#202124] border border-[#E9EAEC] flex items-center justify-center text-sm">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+      </div>
+      <h3 class="font-bold text-sm text-[#202124]">Auditability</h3>
+      <p class="text-xs text-[#5F6368] leading-relaxed">All document operations maintain an immutable chronological audit trail for verification.</p>
+    </div>
+  </div>
+
+  <!-- Detailed Policy Sections -->
+  <div class="bg-white border border-[#E9EAEC] rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+
+    <section class="space-y-2">
+      <h2 class="text-base font-bold text-[#202124] flex items-center gap-2">
+        <span class="w-6 h-6 rounded-lg bg-[#EAF6EF] text-[#268B65] text-xs flex items-center justify-center font-mono">1</span>
+        Acceptance of Terms
+      </h2>
+      <p class="text-xs text-[#5F6368] leading-relaxed">
+        By registering or signing into CloudVault, you agree to comply with institutional academic regulations and these Terms of Service. CloudVault is provided as part of the Cloud Computing Laboratory curriculum (2025&ndash;2026).
+      </p>
+    </section>
+
+    <section class="space-y-2">
+      <h2 class="text-base font-bold text-[#202124] flex items-center gap-2">
+        <span class="w-6 h-6 rounded-lg bg-[#EAF6EF] text-[#268B65] text-xs flex items-center justify-center font-mono">2</span>
+        Acceptable Use &amp; Prohibited Content
+      </h2>
+      <p class="text-xs text-[#5F6368] leading-relaxed">
+        Users must not upload, share, or distribute: (a) executable malware, worms, trojans, ransomware, or backdoor scripts (.exe, .bat, .cmd, .sh, .ps1); (b) copyrighted material without authorization; (c) content that violates college disciplinary or privacy guidelines. CloudVault reserves the right to reject and remove non-compliant files automatically.
+      </p>
+    </section>
+
+    <section class="space-y-2">
+      <h2 class="text-base font-bold text-[#202124] flex items-center gap-2">
+        <span class="w-6 h-6 rounded-lg bg-[#EAF6EF] text-[#268B65] text-xs flex items-center justify-center font-mono">3</span>
+        Service Availability &amp; Azure SLA
+      </h2>
+      <p class="text-xs text-[#5F6368] leading-relaxed">
+        CloudVault leverages Microsoft Azure App Service and Azure Blob Storage architectures, which provide 99.95% cloud availability. Offline synchronization is supported via client-side local caching so work can proceed uninterrupted during localized network dropouts.
+      </p>
+    </section>
+
+    <section class="space-y-2">
+      <h2 class="text-base font-bold text-[#202124] flex items-center gap-2">
+        <span class="w-6 h-6 rounded-lg bg-[#EAF6EF] text-[#268B65] text-xs flex items-center justify-center font-mono">4</span>
+        Academic Project Attribution
+      </h2>
+      <p class="text-xs text-[#5F6368] leading-relaxed">
+        CloudVault was created by student developers: <strong>Ayush Todkar (Roll #57)</strong>, <strong>Yahiya Siddiqui (Roll #49)</strong>, <strong>Alister Varghese K. (Roll #03)</strong>, and <strong>Jude Rebairo (Roll #31)</strong> under the guidance of the Department of Computer Engineering.
+      </p>
+    </section>
+
+  </div>
+
+  <!-- Back Link -->
+  <div class="text-center pt-2">
+    <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 text-xs font-mono text-[#F0445E] hover:underline font-bold">
+      <i class="fa-solid fa-arrow-left text-[11px]"></i>
+      <span>Return to Vault Dashboard</span>
+    </a>
+  </div>
+
+</div>
+{% endblock %}

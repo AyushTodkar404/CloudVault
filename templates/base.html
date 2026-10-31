@@ -352,6 +352,13 @@
             <i class="fa-solid fa-moon text-xs" id="themeToggleIcon"></i>
           </button>
 
+          <!-- Interactive Onboarding Tour Button -->
+          <button type="button" onclick="openOnboardingModal()" id="tourBtn"
+            class="w-8 h-8 rounded-xl bg-[#FAFAF9] hover:bg-[#FFF0F2] text-[#5F6368] hover:text-[#F0445E] border border-[#E9EAEC] hover:border-[#FECDD3] flex items-center justify-center transition-colors text-xs active:scale-95"
+            title="Interactive CloudVault Guide &amp; Tour" aria-label="Open walkthrough tour">
+            <i class="fa-solid fa-circle-question text-xs"></i>
+          </button>
+
           {% if current_user.is_authenticated %}
           <!-- Upload Modal Action Button -->
           <button type="button" onclick="openUploadModal()"
@@ -363,7 +370,9 @@
 
           <!-- User Profile & Logout -->
           <div class="hidden sm:flex items-center gap-1.5 pl-1.5 border-l border-[#E9EAEC]">
-            <div class="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-xs">
+            <!-- Clickable Profile Chip triggering Account Settings -->
+            <button type="button" onclick="openAccountModal()" title="Open Account Settings &amp; Data Governance"
+              class="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-[#FAFAF9] hover:bg-[#FFF0F2] border border-[#E9EAEC] hover:border-[#FECDD3] text-xs transition-colors">
               <span class="w-6 h-6 rounded-lg bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center font-bold text-[11px] font-mono uppercase">
                 {{ current_user.username[0] }}
               </span>
@@ -371,7 +380,11 @@
                 <span class="font-bold text-[#202124] block leading-tight truncate max-w-[90px]">{{ current_user.username }}</span>
                 <span class="text-[9px] font-mono text-[#5F6368] uppercase tracking-wider block">{{ current_user.role }}</span>
               </div>
-            </div>
+            </button>
+            <button type="button" onclick="openAccountModal()" title="Account Settings &amp; Data Governance"
+              class="w-8 h-8 rounded-xl bg-[#FAFAF9] hover:bg-[#FFF0F2] text-[#5F6368] hover:text-[#202124] border border-[#E9EAEC] hover:border-[#FECDD3] flex items-center justify-center transition-colors text-xs active:scale-95">
+              <i class="fa-solid fa-gear text-xs"></i>
+            </button>
             <a href="{{ url_for('logout') }}" title="Sign out securely"
               class="w-8 h-8 rounded-xl bg-[#FAFAF9] hover:bg-[#FFF0F2] text-[#5F6368] hover:text-[#F0445E] border border-[#E9EAEC] hover:border-[#FECDD3] flex items-center justify-center transition-colors text-xs active:scale-95">
               <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -411,6 +424,10 @@
           <i class="fa-solid fa-clock-rotate-left text-[#268B65]"></i>
           <span>Audit Trail</span>
         </button>
+        <button type="button" onclick="openAccountModal(); toggleMobileMenu();" class="flex-1 py-2 px-3 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] hover:bg-white flex items-center justify-center gap-2">
+          <i class="fa-solid fa-gear text-[#F0445E]"></i>
+          <span>Settings</span>
+        </button>
         <button type="button" onclick="openUploadModal(); toggleMobileMenu();" class="flex-1 py-2 px-3 rounded-xl bg-[#F0445E] text-white font-bold flex items-center justify-center gap-2 shadow-xs">
           <i class="fa-solid fa-cloud-arrow-up"></i>
           <span>Upload</span>
@@ -438,6 +455,19 @@
         </a>
       </div>
       {% endif %}
+
+      <!-- Mobile Secondary Links -->
+      <div class="grid grid-cols-3 gap-2 pt-2 border-t border-[#E9EAEC] text-[11px] font-mono text-center">
+        <button type="button" onclick="openOnboardingModal(); toggleMobileMenu();" class="p-2 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#5F6368] hover:text-[#202124]">
+          <i class="fa-solid fa-circle-question text-[#F0445E] block mx-auto mb-1"></i> Tour
+        </button>
+        <a href="{{ url_for('privacy') }}" class="p-2 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#5F6368] hover:text-[#202124] block">
+          <i class="fa-solid fa-user-shield text-[#268B65] block mx-auto mb-1"></i> Privacy
+        </a>
+        <a href="{{ url_for('terms') }}" class="p-2 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#5F6368] hover:text-[#202124] block">
+          <i class="fa-solid fa-scale-balanced text-amber-500 block mx-auto mb-1"></i> Terms
+        </a>
+      </div>
 
       <!-- Mobile Theme Toggle -->
       <div class="pt-2 border-t border-[#E9EAEC]">
@@ -501,9 +531,11 @@
         </div>
 
         <!-- Quick Links -->
-        <div class="flex items-center gap-4 font-mono text-[11px]">
+        <div class="flex items-center gap-3 sm:gap-4 font-mono text-[11px] flex-wrap">
           <a href="{{ url_for('index') }}" class="text-[#5F6368] hover:text-[#202124] transition-colors">Vault</a>
           <a href="{{ url_for('about') }}" class="text-[#F0445E] hover:text-[#D92D50] font-semibold underline decoration-[#FECDD3] transition-colors">Project &amp; Team Details</a>
+          <a href="{{ url_for('privacy') }}" class="text-[#5F6368] hover:text-[#202124] transition-colors">Privacy Policy</a>
+          <a href="{{ url_for('terms') }}" class="text-[#5F6368] hover:text-[#202124] transition-colors">Terms</a>
           {% if current_user.is_authenticated %}
           <button type="button" onclick="openAuditModal()" class="text-[#5F6368] hover:text-[#202124] transition-colors">Security Audit</button>
           {% endif %}
@@ -929,6 +961,263 @@
     </div>
   </dialog>
 
+  <!-- Account Settings & Sovereign Governance Modal (<dialog>) -->
+  <dialog id="accountModal" class="rounded-2xl bg-white text-[#202124] border border-[#E9EAEC] p-0 shadow-2xl w-full max-w-xl overflow-hidden">
+    <div class="p-6">
+      <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-lg">
+            <i class="fa-solid fa-user-gear"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-base text-[#202124]">Account Governance &amp; Security</h2>
+            <p class="text-xs text-[#5F6368] font-mono">Sovereign identity, backups &amp; erasure controls</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAccountModal()" class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm" aria-label="Close dialog">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="mt-5 space-y-4">
+        <!-- Identity Summary Card -->
+        <div class="p-4 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center font-bold font-mono text-sm uppercase">
+              {{ current_user.username[0] if current_user.is_authenticated else 'U' }}
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-sm text-[#202124]">{{ current_user.username if current_user.is_authenticated else '' }}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] font-mono font-semibold">
+                  {{ current_user.role|capitalize if current_user.is_authenticated else 'Student' }}
+                </span>
+              </div>
+              <p class="text-xs text-[#5F6368] font-mono">{{ current_user.email if current_user.is_authenticated else '' }}</p>
+            </div>
+          </div>
+          <div>
+            <form method="POST" action="{{ url_for('send_email_verification') }}" class="inline">
+              <button type="submit" class="w-full sm:w-auto px-3 py-1.5 rounded-xl bg-white hover:bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] text-[11px] font-mono font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-xs">
+                <i class="fa-solid fa-envelope-circle-check"></i>
+                <span>Verify Email</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Sovereign Backup & Export Section (GDPR Art. 20) -->
+        <div class="p-4 rounded-xl bg-white border border-[#E9EAEC] space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-database text-[#268B65] text-sm"></i>
+              <h3 class="text-xs font-bold text-[#202124]">Database Backup &amp; Data Portability</h3>
+            </div>
+            <span class="text-[10px] font-mono text-[#777B83] px-2 py-0.5 rounded bg-[#FAFAF9] border border-[#E9EAEC]">GDPR Art. 20</span>
+          </div>
+          <p class="text-[11px] text-[#5F6368] leading-relaxed">
+            Download a portable JSON archive of your entire account profile, all document descriptors, and full cryptographic audit trails.
+          </p>
+          <div class="pt-1 flex items-center gap-2 flex-wrap">
+            <a href="{{ url_for('export_account_data') }}" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-xs font-mono text-[#202124] font-semibold flex items-center gap-1.5 shadow-xs transition-colors">
+              <i class="fa-solid fa-file-arrow-down text-[#268B65]"></i>
+              <span>Download JSON Backup</span>
+            </a>
+            <button type="button" onclick="closeAccountModal(); openAnalyticsModal();" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-xs font-mono text-[#202124] font-semibold flex items-center gap-1.5 shadow-xs transition-colors">
+              <i class="fa-solid fa-chart-pie text-[#F0445E]"></i>
+              <span>View Analytics</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Danger Zone: Permanent Account Erasure (GDPR Art. 17) -->
+        <div class="p-4 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation text-[#F0445E] text-sm"></i>
+              <h3 class="text-xs font-bold text-[#D92D50]">Danger Zone: Irreversible Account Erasure</h3>
+            </div>
+            <span class="text-[10px] font-mono text-[#F0445E] font-semibold">GDPR Art. 17</span>
+          </div>
+          <p class="text-[11px] text-[#777B83] leading-relaxed">
+            Permanently purges your account, credentials, all file descriptors, and all underlying blobs stored in Microsoft Azure.
+          </p>
+          <form method="POST" action="{{ url_for('delete_account') }}" onsubmit="return confirm('WARNING: Are you absolutely certain you want to permanently delete your CloudVault account and purge all files from Azure Blob Storage? This action cannot be reversed.')" class="space-y-2">
+            <div class="flex items-center gap-2 flex-col sm:flex-row">
+              <input type="password" name="password" placeholder="Confirm password to purge" class="wm-input text-xs px-3 py-2 rounded-xl w-full bg-white" required>
+              <button type="submit" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-bold font-mono transition-colors shrink-0 shadow-xs">
+                Purge Account
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+      <div class="mt-5 pt-3 border-t border-[#E9EAEC] flex items-center justify-between text-[11px] text-[#5F6368] font-mono">
+        <a href="{{ url_for('privacy') }}" class="hover:underline flex items-center gap-1">
+          <i class="fa-solid fa-shield text-[#268B65]"></i> Privacy Policy
+        </a>
+        <button type="button" onclick="closeAccountModal()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] text-xs font-mono shadow-xs">
+          Close
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Vault Analytics & Telemetry Modal (<dialog>) -->
+  <dialog id="analyticsModal" class="rounded-2xl bg-white text-[#202124] border border-[#E9EAEC] p-0 shadow-2xl w-full max-w-lg overflow-hidden">
+    <div class="p-6">
+      <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-lg">
+            <i class="fa-solid fa-chart-simple"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-base text-[#202124]">Storage Telemetry &amp; Insights</h2>
+            <p class="text-xs text-[#5F6368] font-mono">Real-time object distribution and cloud health</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAnalyticsModal()" class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm" aria-label="Close dialog">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="mt-5 space-y-4 font-mono text-xs">
+        <!-- Storage Gauge -->
+        <div class="p-4 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[#5F6368]">Capacity Consumed:</span>
+            <span class="font-bold text-[#F0445E]" id="analyticsPercent">Calculating...</span>
+          </div>
+          <div class="w-full bg-[#E9EAEC] h-2 rounded-full overflow-hidden">
+            <div id="analyticsProgressBar" class="h-full bg-gradient-to-r from-[#F0445E] to-[#D92D50] rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-[#777B83]">
+            <span id="analyticsUsed">0 B Used</span>
+            <span>5.0 GB Tier</span>
+          </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <div class="p-3 rounded-xl bg-white border border-[#E9EAEC] space-y-1">
+            <span class="text-[10px] text-[#777B83] uppercase tracking-wider block">Active Documents</span>
+            <span class="text-base font-bold text-[#202124]" id="analyticsDocCount">&mdash;</span>
+          </div>
+          <div class="p-3 rounded-xl bg-white border border-[#E9EAEC] space-y-1">
+            <span class="text-[10px] text-[#777B83] uppercase tracking-wider block">Encryption Engine</span>
+            <span class="text-xs font-bold text-[#268B65]">AES-256 (Azure)</span>
+          </div>
+        </div>
+
+        <!-- Cloud Engine Details -->
+        <div class="p-3 rounded-xl bg-[#EAF6EF] border border-[#BEE7D5] text-[11px] text-[#268B65] space-y-1">
+          <div class="flex items-center gap-1.5 font-bold">
+            <i class="fa-solid fa-cloud"></i>
+            <span>Microsoft Azure Central India Tier</span>
+          </div>
+          <p class="text-[10px] text-[#1F7052]">Row-Level Isolation active. End-to-end TLS 1.3 encrypted transport.</p>
+        </div>
+      </div>
+
+      <div class="mt-5 pt-3 border-t border-[#E9EAEC] flex items-center justify-end">
+        <button type="button" onclick="closeAnalyticsModal()" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] text-xs font-mono shadow-xs">
+          Close
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Interactive Onboarding & Feature Walkthrough Modal (<dialog>) -->
+  <dialog id="onboardingModal" class="rounded-2xl bg-white text-[#202124] border border-[#E9EAEC] p-0 shadow-2xl w-full max-w-lg overflow-hidden">
+    <div class="p-6">
+      
+      <!-- Slide Container -->
+      <div id="onboardingSlide1" class="onboarding-slide space-y-4 text-center">
+        <div class="w-16 h-16 rounded-2xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-2xl mx-auto shadow-sm">
+          <i class="fa-solid fa-vault"></i>
+        </div>
+        <div class="space-y-1.5">
+          <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFF0F2] text-[#F0445E] text-[10px] font-mono font-bold uppercase tracking-wider">
+            Step 1 of 4 &bull; Welcome
+          </div>
+          <h2 class="text-xl font-extrabold text-[#202124] tracking-tight">Welcome to CloudVault</h2>
+          <p class="text-xs text-[#5F6368] font-mono max-w-sm mx-auto leading-relaxed">
+            Your encrypted academic document vault powered by Microsoft Azure (PaaS, SaaS, DBaaS, SECaaS, IaaS).
+          </p>
+        </div>
+      </div>
+
+      <div id="onboardingSlide2" class="onboarding-slide space-y-4 text-center hidden">
+        <div class="w-16 h-16 rounded-2xl bg-[#EAF6EF] border border-[#BEE7D5] text-[#268B65] flex items-center justify-center text-2xl mx-auto shadow-sm">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <div class="space-y-1.5">
+          <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#EAF6EF] text-[#268B65] text-[10px] font-mono font-bold uppercase tracking-wider">
+            Step 2 of 4 &bull; Effortless Uploads
+          </div>
+          <h2 class="text-xl font-extrabold text-[#202124] tracking-tight">Drag, Drop &amp; Batch Upload</h2>
+          <p class="text-xs text-[#5F6368] font-mono max-w-sm mx-auto leading-relaxed">
+            Drag files anywhere on screen or press shortcut <kbd class="px-1.5 py-0.5 rounded bg-[#FAFAF9] border border-[#E9EAEC] font-mono text-[10px]">N</kbd> anytime to open the upload console.
+          </p>
+        </div>
+      </div>
+
+      <div id="onboardingSlide3" class="onboarding-slide space-y-4 text-center hidden">
+        <div class="w-16 h-16 rounded-2xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-2xl mx-auto shadow-sm">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <div class="space-y-1.5">
+          <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFF0F2] text-[#F0445E] text-[10px] font-mono font-bold uppercase tracking-wider">
+            Step 3 of 4 &bull; Instant Discovery
+          </div>
+          <h2 class="text-xl font-extrabold text-[#202124] tracking-tight">Rapid Search &amp; Smart Filters</h2>
+          <p class="text-xs text-[#5F6368] font-mono max-w-sm mx-auto leading-relaxed">
+            Press <kbd class="px-1.5 py-0.5 rounded bg-[#FAFAF9] border border-[#E9EAEC] font-mono text-[10px]">Ctrl+K</kbd> to search instantly by document name, scholar, or category.
+          </p>
+        </div>
+      </div>
+
+      <div id="onboardingSlide4" class="onboarding-slide space-y-4 text-center hidden">
+        <div class="w-16 h-16 rounded-2xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] flex items-center justify-center text-2xl mx-auto shadow-sm">
+          <i class="fa-solid fa-moon"></i>
+        </div>
+        <div class="space-y-1.5">
+          <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FAFAF9] text-[#202124] border border-[#E9EAEC] text-[10px] font-mono font-bold uppercase tracking-wider">
+            Step 4 of 4 &bull; Watermelon UI &amp; Offline
+          </div>
+          <h2 class="text-xl font-extrabold text-[#202124] tracking-tight">Offline Vault &amp; Dark Mode</h2>
+          <p class="text-xs text-[#5F6368] font-mono max-w-sm mx-auto leading-relaxed">
+            CloudVault functions even offline with automatic queue synchronization, plus a rich Watermelon UI dark mode.
+          </p>
+        </div>
+      </div>
+
+      <!-- Carousel Stepper Controls -->
+      <div class="mt-6 pt-4 border-t border-[#E9EAEC] flex items-center justify-between">
+        <div class="flex items-center gap-1.5" id="onboardingDots">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#F0445E]"></span>
+          <span class="w-2 h-2 rounded-full bg-[#E9EAEC]"></span>
+          <span class="w-2 h-2 rounded-full bg-[#E9EAEC]"></span>
+          <span class="w-2 h-2 rounded-full bg-[#E9EAEC]"></span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="onboardingPrevBtn" onclick="prevOnboardingSlide()" class="hidden px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-xs font-mono text-[#5F6368] transition-colors">
+            Back
+          </button>
+          <button type="button" id="onboardingNextBtn" onclick="nextOnboardingSlide()" class="px-4 py-1.5 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-mono font-bold shadow-xs transition-colors">
+            Next &rarr;
+          </button>
+          <button type="button" id="onboardingFinishBtn" onclick="finishOnboarding()" class="hidden px-4 py-1.5 rounded-xl bg-[#268B65] hover:bg-[#1f7052] text-white text-xs font-mono font-bold shadow-xs transition-colors">
+            Got it, Let's Start!
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </dialog>
+
   <!-- Desktop Full-Screen Drag & Drop Overlay -->
   <div id="globalDropzone" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/95 backdrop-blur-md border-4 border-dashed border-[#F0445E] m-4 rounded-3xl pointer-events-none opacity-0 transition-all duration-300 transform scale-98 shadow-2xl">
     <div class="text-center p-8 max-w-md space-y-4 pointer-events-none">
@@ -990,6 +1279,9 @@
     const shareModal = document.getElementById('shareModal');
     const infoModal = document.getElementById('infoModal');
     const auditModal = document.getElementById('auditModal');
+    const accountModal = document.getElementById('accountModal');
+    const analyticsModal = document.getElementById('analyticsModal');
+    const onboardingModal = document.getElementById('onboardingModal');
 
     setupDialogLightDismiss(previewModal);
     setupDialogLightDismiss(uploadModal);
@@ -997,6 +1289,137 @@
     setupDialogLightDismiss(shareModal);
     setupDialogLightDismiss(infoModal);
     setupDialogLightDismiss(auditModal);
+    setupDialogLightDismiss(accountModal);
+    setupDialogLightDismiss(analyticsModal);
+    setupDialogLightDismiss(onboardingModal);
+
+    function openAccountModal() {
+      if (accountModal) accountModal.showModal();
+    }
+    function closeAccountModal() {
+      if (accountModal) accountModal.close();
+    }
+
+    function openAnalyticsModal() {
+      if (analyticsModal) {
+        analyticsModal.showModal();
+        loadVaultAnalytics();
+      }
+    }
+    function closeAnalyticsModal() {
+      if (analyticsModal) analyticsModal.close();
+    }
+
+    function loadVaultAnalytics() {
+      fetch('/api/analytics', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(res => res.json())
+        .then(data => {
+          const percentEl = document.getElementById('analyticsPercent');
+          const barEl = document.getElementById('analyticsProgressBar');
+          const usedEl = document.getElementById('analyticsUsed');
+          const docCountEl = document.getElementById('analyticsDocCount');
+
+          if (percentEl) percentEl.textContent = `${data.storage_percentage}%`;
+          if (barEl) barEl.style.width = `${Math.min(data.storage_percentage, 100)}%`;
+          if (usedEl) usedEl.textContent = `${data.formatted_used} Used`;
+          if (docCountEl) docCountEl.textContent = `${data.total_active_docs} Files`;
+        })
+        .catch(() => {});
+    }
+
+    // Onboarding Walkthrough Carousel (4 steps)
+    let currentOnboardingStep = 1;
+    const totalOnboardingSteps = 4;
+
+    function openOnboardingModal() {
+      currentOnboardingStep = 1;
+      updateOnboardingSlide();
+      if (onboardingModal) onboardingModal.showModal();
+    }
+
+    function closeOnboardingModal() {
+      if (onboardingModal) onboardingModal.close();
+    }
+
+    function updateOnboardingSlide() {
+      for (let i = 1; i <= totalOnboardingSteps; i++) {
+        const slide = document.getElementById(`onboardingSlide${i}`);
+        if (slide) {
+          if (i === currentOnboardingStep) {
+            slide.classList.remove('hidden');
+          } else {
+            slide.classList.add('hidden');
+          }
+        }
+      }
+      const dots = document.getElementById('onboardingDots');
+      if (dots) {
+        const spans = dots.querySelectorAll('span');
+        spans.forEach((s, idx) => {
+          if (idx + 1 === currentOnboardingStep) {
+            s.className = 'w-2.5 h-2.5 rounded-full bg-[#F0445E] transition-all';
+          } else {
+            s.className = 'w-2 h-2 rounded-full bg-[#E9EAEC] transition-all';
+          }
+        });
+      }
+      const prevBtn = document.getElementById('onboardingPrevBtn');
+      const nextBtn = document.getElementById('onboardingNextBtn');
+      const finishBtn = document.getElementById('onboardingFinishBtn');
+
+      if (prevBtn) prevBtn.classList.toggle('hidden', currentOnboardingStep === 1);
+      if (nextBtn) nextBtn.classList.toggle('hidden', currentOnboardingStep === totalOnboardingSteps);
+      if (finishBtn) finishBtn.classList.toggle('hidden', currentOnboardingStep !== totalOnboardingSteps);
+    }
+
+    function nextOnboardingSlide() {
+      if (currentOnboardingStep < totalOnboardingSteps) {
+        currentOnboardingStep++;
+        updateOnboardingSlide();
+      }
+    }
+
+    function prevOnboardingSlide() {
+      if (currentOnboardingStep > 1) {
+        currentOnboardingStep--;
+        updateOnboardingSlide();
+      }
+    }
+
+    function finishOnboarding() {
+      localStorage.setItem('cloudvault_onboarded', 'true');
+      closeOnboardingModal();
+      if (typeof showToast === 'function') {
+        showToast('Welcome to CloudVault! Press Ctrl+K anytime to search.', 'success');
+      }
+    }
+
+    // Universal Form Submission Loading Feedback
+    document.addEventListener('submit', (e) => {
+      const form = e.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (submitBtn && !submitBtn.disabled && !form.classList.contains('no-loader')) {
+        const orig = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+        submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-xs mr-1"></i> Processing...';
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+          submitBtn.innerHTML = orig;
+        }, 6000);
+      }
+    });
+
+    // Auto-launch onboarding on first visit
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!localStorage.getItem('cloudvault_onboarded')) {
+        setTimeout(() => {
+          const hasOpenDialog = document.querySelector('dialog[open]');
+          if (!hasOpenDialog) openOnboardingModal();
+        }, 1500);
+      }
+    });
 
     function openAuditModal() {
       if (auditModal) {

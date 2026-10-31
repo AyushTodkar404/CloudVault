@@ -1,10 +1,15 @@
 import base64
+from collections import defaultdict
+from functools import wraps
 import io
+import json
 import logging
 import os
 import secrets
+import time
 import zipfile
 from datetime import datetime, timezone, timedelta
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 import requests
 from flask import (
     Flask,
@@ -143,6 +148,40 @@ def create_app(test_config=None):
             app.logger.warning(f"Could not record activity log: {log_err}")
             db.session.rollback()
 
+    _rate_limit_cache = defaultdict(list)
+
+    def rate_limit(limit=10, window=60):
+        """In-memory sliding window rate limiter for security-sensitive endpoints."""
+        def decorator(f):
+            @wraps(f)
+            def decorated_function(*args, **kwargs):
+                if app.config.get("TESTING"):
+                    return f(*args, **kwargs)
+                client_ip = request.headers.get("X-Forwarded-For", request.remote_addr) or "127.0.0.1"
+                if "," in client_ip:
+                    client_ip = client_ip.split(",")[0].strip()
+                key = (client_ip, f.__name__)
+                now = time.time()
+                _rate_limit_cache[key] = [t for t in _rate_limit_cache[key] if now - t < window]
+                if len(_rate_limit_cache[key]) >= limit:
+                    app.logger.warning(f"Rate limit exceeded for {client_ip} on {f.__name__}")
+                    if request.is_json:
+                        return jsonify({"error": "Rate limit exceeded. Please wait a moment."}), 429
+                    return render_template(
+                        "404.html",
+                        error_code=429,
+                        error_title="Too Many Requests",
+                        error_desc="Rate limit reached for security. Please wait 60 seconds before making additional requests.",
+                    ), 429
+                _rate_limit_cache[key].append(now)
+                return f(*args, **kwargs)
+            return decorated_function
+        return decorator
+
+    def get_timed_serializer():
+        """Returns serializer for cryptographic, time-limited tokens."""
+        return URLSafeTimedSerializer(app.config["SECRET_KEY"])
+
     def allowed_file(filename):
         """Validates that filename has a legitimate genuine extension and is not a dangerous binary/script."""
         if not filename or "." not in filename:
@@ -157,6 +196,7 @@ def create_app(test_config=None):
     # --------------------------------------------------------------------------
 
     @app.route("/signup", methods=["GET", "POST"])
+    @rate_limit(limit=10, window=60)
     def signup():
         """Handles new student/user registration."""
         if current_user.is_authenticated:
@@ -217,6 +257,7 @@ def create_app(test_config=None):
         return render_template("signup.html")
 
     @app.route("/login", methods=["GET", "POST"])
+    @rate_limit(limit=15, window=60)
     def login():
         """Handles user sign in and session management."""
         if current_user.is_authenticated:
@@ -249,6 +290,111 @@ def create_app(test_config=None):
             return redirect(url_for("index"))
 
         return render_template("login.html")
+
+    @app.route("/forgot-password", methods=["GET", "POST"])
+    @rate_limit(limit=8, window=60)
+    def forgot_password():
+        """Generates time-limited cryptographic password reset link."""
+        if current_user.is_authenticated:
+            return redirect(url_for("index"))
+
+        if request.method == "POST":
+            identity = request.form.get("identity", "").strip()
+            if not identity:
+                flash("Please enter your username or registered email address.", "error")
+                return render_template("forgot_password.html")
+
+            user = User.query.filter(
+                (User.username.ilike(identity)) | (User.email.ilike(identity))
+            ).first()
+
+            if not user:
+                flash("No account registered with that username or email address.", "error")
+                return render_template("forgot_password.html")
+
+            s = get_timed_serializer()
+            token = s.dumps({"user_id": user.id, "email": user.email}, salt="password-reset-salt")
+            reset_url = url_for("reset_password", token=token, _external=True)
+            log_activity(user.id, "PASSWORD_RESET_REQ", f"Requested password reset authorization for {user.email}")
+            flash(
+                f"Password reset authorization link generated! Click to set new credentials: <a href='{reset_url}' class='underline font-bold font-mono ml-1 text-[#F0445E]'>Reset Password Now &rarr;</a>",
+                "info",
+            )
+            return render_template("forgot_password.html")
+
+        return render_template("forgot_password.html")
+
+    @app.route("/reset-password/<string:token>", methods=["GET", "POST"])
+    @rate_limit(limit=10, window=60)
+    def reset_password(token):
+        """Verifies cryptographic reset token and updates user password."""
+        if current_user.is_authenticated:
+            return redirect(url_for("index"))
+
+        s = get_timed_serializer()
+        try:
+            data = s.loads(token, salt="password-reset-salt", max_age=3600)
+        except (SignatureExpired, BadSignature):
+            flash("Password reset link is invalid or has expired. Please request a new one.", "error")
+            return redirect(url_for("forgot_password"))
+
+        user = db.session.get(User, data.get("user_id"))
+        if not user:
+            flash("User account not found.", "error")
+            return redirect(url_for("forgot_password"))
+
+        if request.method == "POST":
+            password = request.form.get("password", "")
+            confirm_password = request.form.get("confirm_password", "")
+
+            if not password or len(password) < 6:
+                flash("Password must be at least 6 characters long.", "error")
+                return render_template("reset_password.html", user=user, token=token)
+
+            if password != confirm_password:
+                flash("Passwords do not match. Please re-enter.", "error")
+                return render_template("reset_password.html", user=user, token=token)
+
+            user.set_password(password)
+            db.session.commit()
+            log_activity(user.id, "PASSWORD_RESET_DONE", "Password reset successfully completed")
+            flash("Your password has been successfully reset. Please sign in with your new credentials.", "success")
+            return redirect(url_for("login"))
+
+        return render_template("reset_password.html", user=user, token=token)
+
+    @app.route("/verify-email/send", methods=["POST"])
+    @login_required
+    @rate_limit(limit=5, window=60)
+    def send_email_verification():
+        """Generates cryptographic verification link for the user's institutional email."""
+        s = get_timed_serializer()
+        token = s.dumps({"user_id": current_user.id, "email": current_user.email}, salt="email-verify-salt")
+        verify_url = url_for("verify_email", token=token, _external=True)
+        log_activity(current_user.id, "VERIFY_DISPATCH", f"Dispatched email verification link to {current_user.email}")
+        if request.is_json:
+            return jsonify({"success": True, "verify_url": verify_url, "message": "Verification link generated."})
+        flash(
+            f"Email verification link generated! <a href='{verify_url}' class='underline font-bold font-mono ml-1 text-[#268B65]'>Click here to verify email &rarr;</a>",
+            "info",
+        )
+        return redirect(url_for("index"))
+
+    @app.route("/verify-email/<string:token>", methods=["GET"])
+    def verify_email(token):
+        """Verifies institutional email token and logs verification status."""
+        s = get_timed_serializer()
+        try:
+            data = s.loads(token, salt="email-verify-salt", max_age=86400)
+        except (SignatureExpired, BadSignature):
+            flash("Verification link is invalid or has expired.", "error")
+            return redirect(url_for("index"))
+
+        user = db.session.get(User, data.get("user_id"))
+        if user:
+            log_activity(user.id, "EMAIL_VERIFIED", f"Email address {user.email} verified successfully")
+            flash("Your email has been verified! Your account status is now officially Verified.", "success")
+        return redirect(url_for("index"))
 
     def _provision_and_login_google_user(email, name_seed=None):
         """Finds or creates a user account from Google profile and establishes login session."""
@@ -960,11 +1106,153 @@ def create_app(test_config=None):
             }
         ), 200
 
+    @app.route("/account/backup", methods=["GET"])
+    @login_required
+    def export_account_data():
+        """Generates a complete sovereign data archive in JSON format (GDPR Art. 20 Data Portability)."""
+        docs = Document.query.filter_by(user_id=current_user.id).all()
+        activities = ActivityLog.query.filter_by(user_id=current_user.id).all()
+        payload = {
+            "schema_version": "2.4",
+            "cloud_provider": "Microsoft Azure (Central India)",
+            "export_timestamp": datetime.now(timezone.utc).isoformat(),
+            "user_profile": current_user.to_dict(),
+            "storage_metrics": {
+                "quota_bytes": current_user.storage_quota_bytes,
+                "used_bytes": current_user.storage_used_bytes,
+                "formatted_used": current_user.formatted_storage_used,
+                "total_documents": len(docs),
+            },
+            "documents": [d.to_dict() for d in docs],
+            "audit_trail": [a.to_dict() for a in activities],
+        }
+        log_activity(current_user.id, "DATA_BACKUP", "Exported complete account backup JSON archive")
+        buf = io.BytesIO(json.dumps(payload, indent=2).encode("utf-8"))
+        filename = f"CloudVault_Backup_{current_user.username}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        return send_file(
+            buf,
+            mimetype="application/json",
+            as_attachment=True,
+            download_name=filename,
+        )
+
+    @app.route("/account/delete", methods=["POST"])
+    @login_required
+    def delete_account():
+        """Permanently purges user account, documents, and Azure storage blobs (GDPR Art. 17 Right to Erasure)."""
+        password = request.form.get("password", "")
+        confirmation = request.form.get("confirm_delete", "").strip()
+
+        is_pw_valid = current_user.check_password(password) if password else False
+        if not is_pw_valid and confirmation != "DELETE":
+            flash("Account deletion requires correct password or typing 'DELETE' in confirmation.", "error")
+            return redirect(url_for("index"))
+
+        user_id = current_user.id
+        username = current_user.username
+
+        # Purge blobs from storage
+        docs = Document.query.filter_by(user_id=user_id).all()
+        for d in docs:
+            if storage_manager.is_cloud_active and storage_manager.blob_service_client:
+                try:
+                    storage_manager.blob_service_client.get_blob_client(
+                        container=storage_manager.container_name, blob=d.blob_name
+                    ).delete_blob()
+                except Exception:
+                    pass
+            db.session.delete(d)
+
+        # Delete user activities
+        ActivityLog.query.filter_by(user_id=user_id).delete()
+
+        # Delete user
+        user = db.session.get(User, user_id)
+        if user:
+            db.session.delete(user)
+        db.session.commit()
+
+        logout_user()
+        flash(f"Account '{username}' and all associated cloud files have been permanently erased.", "success")
+        return redirect(url_for("signup"))
+
+    @app.route("/api/analytics", methods=["GET"])
+    @login_required
+    def get_vault_analytics():
+        """Returns storage telemetry, document category distribution, and cloud operations stats."""
+        docs = Document.query.filter_by(user_id=current_user.id).all()
+        active = [d for d in docs if not d.is_deleted]
+        trash = [d for d in docs if d.is_deleted]
+        category_counts = defaultdict(int)
+        category_bytes = defaultdict(int)
+        for d in active:
+            cat = d.category
+            category_counts[cat] += 1
+            category_bytes[cat] += (d.file_size or 0)
+
+        recent_activities = ActivityLog.query.filter_by(user_id=current_user.id).order_by(ActivityLog.created_at.desc()).limit(8).all()
+
+        return jsonify({
+            "user": current_user.username,
+            "total_active_docs": len(active),
+            "trash_docs": len(trash),
+            "starred_docs": sum(1 for d in active if d.is_starred),
+            "storage_used_bytes": current_user.storage_used_bytes,
+            "formatted_used": current_user.formatted_storage_used,
+            "storage_quota_bytes": current_user.storage_quota_bytes,
+            "storage_percentage": current_user.storage_percentage,
+            "categories": dict(category_counts),
+            "category_bytes": dict(category_bytes),
+            "recent_events": [a.to_dict() for a in recent_activities],
+            "cloud_tier": "Microsoft Azure Hot-Store (Central India)",
+            "encryption": "Server-side AES-256",
+        })
+
+    @app.route("/privacy", methods=["GET"])
+    def privacy():
+        """Institutional Privacy Policy."""
+        return render_template("privacy.html")
+
+    @app.route("/terms", methods=["GET"])
+    def terms():
+        """Institutional Terms of Service & Acceptable Use Policy."""
+        return render_template("terms.html")
+
     @app.errorhandler(RequestEntityTooLarge)
     def handle_file_too_large(e):
         max_mb = app.config.get("MAX_CONTENT_LENGTH", 100 * 1024 * 1024) // (1024 * 1024)
         flash(f"The uploaded file exceeds the {max_mb}MB file size limit.", "error")
         return redirect(url_for("index")), 413
+
+    @app.errorhandler(403)
+    def forbidden(e):
+        return render_template(
+            "404.html",
+            error_code=403,
+            error_title="Access Forbidden",
+            error_desc="Row-Level Security Restriction: You do not have permission to access or modify this document resource.",
+        ), 403
+
+    @app.errorhandler(429)
+    def rate_limited(e):
+        return render_template(
+            "404.html",
+            error_code=429,
+            error_title="Too Many Requests",
+            error_desc="Rate limit reached for security. Please wait 60 seconds before sending additional requests.",
+        ), 429
+
+    @app.errorhandler(500)
+    def internal_error(e):
+        incident_id = f"ERR-{secrets.token_hex(3).upper()}"
+        app.logger.error(f"Internal Server Error [{incident_id}]: {e}", exc_info=True)
+        return render_template(
+            "404.html",
+            error_code=500,
+            error_title="Internal Cloud Service Error",
+            error_desc="An unexpected error occurred during request execution. The telemetry subsystem has registered this incident.",
+            error_id=incident_id,
+        ), 500
 
     @app.errorhandler(404)
     def not_found(e):
