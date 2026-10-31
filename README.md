@@ -21,7 +21,7 @@ CloudVault directly demonstrates and validates four essential Cloud Computing se
 
 | Service Model | Implementation in CloudVault | Cloud Provider & Tech Stack | Key Capabilities & Evaluation Rubric |
 |:---|:---|:---|:---|
-| **SaaS**<br>*(Software as a Service)* | **CloudVault Web Application & Portal** | Azure Blob Storage & Modern Quartz UI | End-user document vault, direct in-browser PDF/image/media preview, 1-click downloads, 5.0 GB per-user quota allocation, and offline queueing with IndexedDB auto-sync. |
+| **SaaS**<br>*(Software as a Service)* | **CloudVault Web Application & Portal** | Azure Blob Storage & Watermelon UI | End-user document vault, direct in-browser PDF/image/media preview, 1-click downloads, 5.0 GB per-user quota allocation, and offline queueing with IndexedDB auto-sync. |
 | **PaaS**<br>*(Platform as a Service)* | **Managed Web Compute Runtime** | Azure App Service (Linux B1 Plan, Central India) | Containerized Python 3.12 / Flask / Gunicorn WSGI pipeline, automatic TLS 1.3 termination, zero server patching, automated CI/CD via GitHub Actions. |
 | **DBaaS**<br>*(Database as a Service)* | **Relational Metadata Store** | Azure SQL Database (`cloudvaultdb`) | Fully managed relational database, ACID transactions, foreign keys (`users.id` -> `documents.user_id`), automated daily backups, auto-indexing. |
 | **SECaaS**<br>*(Security as a Service)* | **Zero-Trust Security & Threat Scanner** | Custom `scanner.py` + Scrypt / PBKDF2-SHA256 | Deep magic-byte inspection (blocking disguised executables, webshells, corrupt archives), per-user data isolation, SHA-256 integrity anchors, security audit trail. |
@@ -84,7 +84,7 @@ c:\CC_MINI_PROJECT\
     ├── index.html          # Dashboard: Metrics, view switcher, drag-and-drop, offline queue
     ├── about.html          # Project summary, developers, tech stack & cloud service models
     ├── share.html          # Secure public recipient view for shared documents
-    ├── login.html          # Modern quartz glassmorphic sign in page
+    ├── login.html          # Watermelon UI sign in page with Google 1-click SSO
     ├── signup.html         # User registration page with institutional validation
     └── 404.html            # User-friendly 404 error page
 ```

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-[#0a0b10] text-slate-100 antialiased selection:bg-violet-600 selection:text-white">
+<html lang="en" class="h-full bg-[#FAFAF9] text-[#202124] antialiased selection:bg-[#F0445E] selection:text-white">
 
 <head>
   <meta charset="UTF-8">
@@ -27,20 +27,33 @@
             mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
           },
           colors: {
-            titanium: {
-              850: '#151722',
-              900: '#0f1118',
-              950: '#0a0b10',
+            watermelon: {
+              50: '#FFF0F2',
+              100: '#FFE2E6',
+              200: '#FECDD3',
+              300: '#FDA4AF',
+              400: '#FB7185',
+              500: '#F0445E',
+              600: '#D92D50',
+              700: '#C02142',
+              800: '#9F1239',
+              900: '#881337',
             },
-            iris: {
-              400: '#a78bfa',
-              500: '#8b5cf6',
-              600: '#7c3aed',
-              700: '#6d28d9',
+            freshgreen: {
+              50: '#EAF6EF',
+              100: '#D2EFE0',
+              200: '#BEE7D5',
+              500: '#268B65',
+              600: '#1F7052',
+              700: '#185740',
             },
-            amber: {
-              350: '#fcd34d',
-              450: '#f59e0b',
+            canvas: '#FAFAF9',
+            surface: '#FFFFFF',
+            border: '#E9EAEC',
+            ink: {
+              primary: '#202124',
+              secondary: '#5F6368',
+              muted: '#777B83',
             }
           }
         }
@@ -52,69 +65,58 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
-    /* Aurora Obsidian Canvas with dual violet & amber ambient diffusion */
-    .aurora-canvas {
-      background-color: #0a0b10;
-      background-image:
-        radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.12) 0px, transparent 50%),
-        radial-gradient(at 100% 10%, rgba(245, 158, 11, 0.08) 0px, transparent 45%),
-        radial-gradient(at 50% 90%, rgba(99, 102, 241, 0.08) 0px, transparent 55%),
-        linear-gradient(to right, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-      background-size: 100% 100%, 100% 100%, 100% 100%, 36px 36px, 36px 36px;
-      background-attachment: fixed;
+    /* Watermelon UI Design System Tokens */
+    body {
+      background-color: #FAFAF9;
+      color: #202124;
     }
 
-    /* Quartz Glassmorphism Surface Token */
-    .quartz-surface {
-      background: rgba(17, 19, 29, 0.65);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.09);
+    /* Clean Card Surface Token */
+    .quartz-surface, .wm-card {
+      background: #FFFFFF;
+      border: 1px solid #E9EAEC;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
     }
 
-    .quartz-surface-hover {
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    .quartz-surface-hover, .wm-card-hover {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .quartz-surface-hover:hover {
-      background: rgba(22, 25, 38, 0.75);
-      border-color: rgba(167, 139, 250, 0.3);
-      box-shadow: 0 20px 48px -10px rgba(124, 58, 237, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
-      transform: translateY(-1.5px);
+    .quartz-surface-hover:hover, .wm-card-hover:hover {
+      border-color: #D3D5D9;
+      box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.06);
+      transform: translateY(-1px);
     }
 
-    /* Quartz Inputs */
-    .quartz-input {
-      background: rgba(12, 14, 22, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #f8fafc;
-      transition: all 0.2s ease;
+    /* Refined Inputs */
+    .quartz-input, .wm-input {
+      background: #FFFFFF;
+      border: 1px solid #E9EAEC;
+      color: #202124;
+      transition: all 0.15s ease;
     }
 
-    .quartz-input:focus {
-      border-color: #a78bfa;
-      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
-      background: rgba(15, 17, 27, 0.9);
+    .quartz-input:focus, .wm-input:focus {
+      border-color: #F0445E;
+      box-shadow: 0 0 0 3px rgba(240, 68, 94, 0.12);
       outline: none;
     }
 
-    /* Native Dialog Backdrop with Frosted Obsidian Diffusion */
+    /* Native Dialog Backdrop with Gentle Diffusion */
     dialog::backdrop {
-      background: rgba(5, 6, 10, 0.88);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
 
     dialog[open] {
-      animation: quartzModalEnter 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: wmModalEnter 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    @keyframes quartzModalEnter {
+    @keyframes wmModalEnter {
       from {
         opacity: 0;
-        transform: scale(0.96) translateY(12px);
+        transform: scale(0.97) translateY(8px);
       }
 
       to {
@@ -123,7 +125,7 @@
       }
     }
 
-    /* Custom Violet & Quartz Scrollbars */
+    /* Refined Subtle Scrollbars */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -134,20 +136,20 @@
     }
 
     ::-webkit-scrollbar-thumb {
-      background: rgba(167, 139, 250, 0.22);
+      background: #E2E4E8;
       border-radius: 9999px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(167, 139, 250, 0.45);
+      background: #C4C7CE;
     }
   </style>
 </head>
 
-<body class="h-full aurora-canvas font-sans text-slate-100 flex flex-col min-h-screen">
+<body class="h-full bg-[#FAFAF9] font-sans text-[#202124] flex flex-col min-h-screen">
 
   <!-- Top Navigation Bar -->
-  <header class="sticky top-0 z-40 bg-[#0d0f17]/90 backdrop-blur-xl border-b border-white/[0.08]">
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E9EAEC]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16 gap-4">
 
@@ -155,23 +157,21 @@
         <div class="flex items-center gap-4">
           <a href="{{ url_for('index') }}" class="flex items-center gap-3 group">
             <div
-              class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-amber-500/80 p-[1px] shadow-lg shadow-violet-600/20 group-hover:scale-105 transition-transform">
-              <div class="w-full h-full bg-[#0d0f17] rounded-[11px] flex items-center justify-center">
-                <i class="fa-solid fa-vault text-violet-400 text-sm"></i>
-              </div>
+              class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F0445E] to-[#D92D50] flex items-center justify-center text-white shadow-sm shadow-[#F0445E]/20 group-hover:scale-105 transition-transform">
+              <i class="fa-solid fa-vault text-white text-sm"></i>
             </div>
             <div>
               <div class="flex items-center gap-2">
                 <span
-                  class="font-extrabold text-base tracking-tight text-white group-hover:text-violet-300 transition-colors">
+                  class="font-extrabold text-base tracking-tight text-[#202124] group-hover:text-[#F0445E] transition-colors">
                   CloudVault
                 </span>
                 <span
-                  class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 uppercase tracking-wider font-semibold">
+                  class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] uppercase tracking-wider font-semibold">
                   Cloud Lab
                 </span>
               </div>
-              <p class="text-[11px] text-slate-400 hidden sm:block">Dept of Computer Engineering &bull; 2026</p>
+              <p class="text-[11px] text-[#5F6368] hidden sm:block">Dept of Computer Engineering &bull; 2026</p>
             </div>
           </a>
         </div>
@@ -179,19 +179,19 @@
         <!-- Center Nav Links -->
         <nav class="hidden md:flex items-center gap-1.5 font-mono text-xs">
           <a href="{{ url_for('index') }}"
-            class="px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 {% if request.endpoint == 'index' %}bg-white/10 text-white font-bold border border-white/10 shadow-sm{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
-            <i class="fa-solid fa-folder-tree text-violet-400"></i>
+            class="px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 {% if request.endpoint == 'index' %}bg-[#FFF0F2] text-[#F0445E] font-bold border border-[#FECDD3] shadow-xs{% else %}text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9]{% endif %}">
+            <i class="fa-solid fa-folder-tree {% if request.endpoint == 'index' %}text-[#F0445E]{% else %}text-[#5F6368]{% endif %}"></i>
             <span>Vault</span>
           </a>
           <a href="{{ url_for('about') }}"
-            class="px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 {% if request.endpoint == 'about' %}bg-white/10 text-white font-bold border border-white/10 shadow-sm{% else %}text-slate-400 hover:text-white hover:bg-white/5{% endif %}">
-            <i class="fa-solid fa-graduation-cap text-indigo-400"></i>
+            class="px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 {% if request.endpoint == 'about' %}bg-[#FFF0F2] text-[#F0445E] font-bold border border-[#FECDD3] shadow-xs{% else %}text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9]{% endif %}">
+            <i class="fa-solid fa-graduation-cap {% if request.endpoint == 'about' %}text-[#F0445E]{% else %}text-[#5F6368]{% endif %}"></i>
             <span>Project & Team</span>
           </a>
           {% if current_user.is_authenticated %}
           <button type="button" onclick="openAuditModal()"
-            class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
-            <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i>
+            class="px-3 py-1.5 rounded-xl text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-clock-rotate-left text-[#268B65]"></i>
             <span>Audit Trail</span>
           </button>
           {% endif %}
@@ -203,47 +203,47 @@
           <!-- Storage Cluster Status Pill with Network Sentinel -->
           <div
             id="clusterStatusPill"
-            class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#12141f] border border-white/[0.08] text-xs font-mono shadow-sm"
+            class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#EAF6EF] border border-[#BEE7D5] text-xs font-mono shadow-xs"
             title="Active cloud object storage tier">
             <span class="flex h-2 w-2 relative">
-              <span id="clusterStatusPing" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span id="clusterStatusDot" class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span id="clusterStatusPing" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#268B65] opacity-75"></span>
+              <span id="clusterStatusDot" class="relative inline-flex rounded-full h-2 w-2 bg-[#268B65]"></span>
             </span>
-            <span id="clusterStatusText" class="text-emerald-400 font-medium">Cluster: Hot-Store</span>
+            <span id="clusterStatusText" class="text-[#268B65] font-semibold">Cluster: Hot-Store</span>
           </div>
 
           {% if current_user.is_authenticated %}
           <!-- Upload Modal Action Button -->
           <button type="button" onclick="openUploadModal()"
-            class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-500 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-violet-600/30 border border-violet-400/30 active:scale-95 transition-all"
+            class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-semibold shadow-xs hover:shadow-sm active:scale-95 transition-all"
             title="Upload new document (Press N)">
             <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
             <span>Upload</span>
           </button>
 
           <!-- User Profile & Logout -->
-          <div class="hidden sm:flex items-center gap-1.5 pl-1.5 border-l border-white/[0.1]">
-            <div class="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-[#12141f] border border-white/[0.08] text-xs">
-              <span class="w-6 h-6 rounded-lg bg-violet-600/30 text-violet-300 flex items-center justify-center font-bold text-[11px] font-mono uppercase">
+          <div class="hidden sm:flex items-center gap-1.5 pl-1.5 border-l border-[#E9EAEC]">
+            <div class="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-xs">
+              <span class="w-6 h-6 rounded-lg bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center font-bold text-[11px] font-mono uppercase">
                 {{ current_user.username[0] }}
               </span>
               <div class="hidden md:block text-left">
-                <span class="font-bold text-white block leading-tight truncate max-w-[90px]">{{ current_user.username }}</span>
-                <span class="text-[9px] font-mono text-slate-400 uppercase tracking-wider block">{{ current_user.role }}</span>
+                <span class="font-bold text-[#202124] block leading-tight truncate max-w-[90px]">{{ current_user.username }}</span>
+                <span class="text-[9px] font-mono text-[#5F6368] uppercase tracking-wider block">{{ current_user.role }}</span>
               </div>
             </div>
             <a href="{{ url_for('logout') }}" title="Sign out securely"
-              class="w-8 h-8 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 hover:text-rose-100 border border-rose-500/30 flex items-center justify-center transition-colors text-xs active:scale-95">
+              class="w-8 h-8 rounded-xl bg-[#FAFAF9] hover:bg-[#FFF0F2] text-[#5F6368] hover:text-[#F0445E] border border-[#E9EAEC] hover:border-[#FECDD3] flex items-center justify-center transition-colors text-xs active:scale-95">
               <i class="fa-solid fa-arrow-right-from-bracket"></i>
             </a>
           </div>
           {% else %}
-          <a href="{{ url_for('login') }}" class="hidden sm:inline-flex px-3.5 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold font-mono transition-colors">Sign In</a>
+          <a href="{{ url_for('login') }}" class="hidden sm:inline-flex px-3.5 py-1.5 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-semibold font-mono transition-colors shadow-xs">Sign In</a>
           {% endif %}
 
           <!-- Mobile Hamburger Toggle Button -->
           <button type="button" id="mobileMenuToggle" onclick="toggleMobileMenu()"
-            class="md:hidden w-9 h-9 rounded-xl bg-[#12141f] border border-white/[0.1] text-slate-200 hover:text-white flex items-center justify-center text-sm active:scale-95 transition-all"
+            class="md:hidden w-9 h-9 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] hover:bg-white flex items-center justify-center text-sm active:scale-95 transition-all"
             aria-label="Open mobile navigation menu">
             <i class="fa-solid fa-bars text-sm" id="mobileMenuIcon"></i>
           </button>
@@ -253,47 +253,47 @@
     </div>
 
     <!-- Mobile Responsive Navigation Drawer -->
-    <div id="mobileDrawer" class="hidden md:hidden border-b border-white/[0.08] bg-[#0c0e18]/95 backdrop-blur-2xl px-4 py-3.5 space-y-3 transition-all animate-fade-in">
+    <div id="mobileDrawer" class="hidden md:hidden border-b border-[#E9EAEC] bg-white px-4 py-3.5 space-y-3 transition-all animate-fade-in shadow-lg">
       <div class="grid grid-cols-2 gap-2 text-xs font-mono">
-        <a href="{{ url_for('index') }}" class="p-2.5 rounded-xl flex items-center gap-2 {% if request.endpoint == 'index' %}bg-white/10 text-white font-bold border border-white/10 shadow-sm{% else %}text-slate-300 hover:bg-white/5{% endif %}">
-          <i class="fa-solid fa-folder-tree text-violet-400"></i>
+        <a href="{{ url_for('index') }}" class="p-2.5 rounded-xl flex items-center gap-2 {% if request.endpoint == 'index' %}bg-[#FFF0F2] text-[#F0445E] font-bold border border-[#FECDD3]{% else %}text-[#5F6368] hover:bg-[#FAFAF9]{% endif %}">
+          <i class="fa-solid fa-folder-tree text-[#F0445E]"></i>
           <span>Vault</span>
         </a>
-        <a href="{{ url_for('about') }}" class="p-2.5 rounded-xl flex items-center gap-2 {% if request.endpoint == 'about' %}bg-white/10 text-white font-bold border border-white/10 shadow-sm{% else %}text-slate-300 hover:bg-white/5{% endif %}">
-          <i class="fa-solid fa-graduation-cap text-indigo-400"></i>
+        <a href="{{ url_for('about') }}" class="p-2.5 rounded-xl flex items-center gap-2 {% if request.endpoint == 'about' %}bg-[#FFF0F2] text-[#F0445E] font-bold border border-[#FECDD3]{% else %}text-[#5F6368] hover:bg-[#FAFAF9]{% endif %}">
+          <i class="fa-solid fa-graduation-cap text-[#F0445E]"></i>
           <span>Project & Team</span>
         </a>
       </div>
 
       {% if current_user.is_authenticated %}
-      <div class="flex items-center gap-2 pt-2 border-t border-white/[0.08] text-xs font-mono">
-        <button type="button" onclick="openAuditModal(); toggleMobileMenu();" class="flex-1 py-2 px-3 rounded-xl bg-slate-900/80 border border-white/10 text-slate-200 hover:text-white flex items-center justify-center gap-2">
-          <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i>
+      <div class="flex items-center gap-2 pt-2 border-t border-[#E9EAEC] text-xs font-mono">
+        <button type="button" onclick="openAuditModal(); toggleMobileMenu();" class="flex-1 py-2 px-3 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] hover:bg-white flex items-center justify-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left text-[#268B65]"></i>
           <span>Audit Trail</span>
         </button>
-        <button type="button" onclick="openUploadModal(); toggleMobileMenu();" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold flex items-center justify-center gap-2 shadow-sm">
+        <button type="button" onclick="openUploadModal(); toggleMobileMenu();" class="flex-1 py-2 px-3 rounded-xl bg-[#F0445E] text-white font-bold flex items-center justify-center gap-2 shadow-xs">
           <i class="fa-solid fa-cloud-arrow-up"></i>
           <span>Upload</span>
         </button>
       </div>
 
       <!-- User Profile & Quota Info in Mobile Drawer -->
-      <div class="flex items-center justify-between pt-2 border-t border-white/[0.06] text-xs font-mono">
+      <div class="flex items-center justify-between pt-2 border-t border-[#E9EAEC] text-xs font-mono">
         <div class="flex items-center gap-2">
-          <span class="w-6 h-6 rounded-lg bg-violet-600/30 text-violet-300 flex items-center justify-center font-bold text-[10px] uppercase">
+          <span class="w-6 h-6 rounded-lg bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center font-bold text-[10px] uppercase">
             {{ current_user.username[0] }}
           </span>
-          <span class="font-bold text-white text-xs truncate max-w-[120px]">{{ current_user.username }}</span>
-          <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">5.0 GB Tier</span>
+          <span class="font-bold text-[#202124] text-xs truncate max-w-[120px]">{{ current_user.username }}</span>
+          <span class="text-[9px] px-1.5 py-0.5 rounded bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] font-semibold">5.0 GB Tier</span>
         </div>
-        <a href="{{ url_for('logout') }}" class="px-2.5 py-1 rounded-lg bg-rose-950/40 border border-rose-500/30 text-rose-300 hover:text-white text-[11px] flex items-center gap-1 font-mono">
+        <a href="{{ url_for('logout') }}" class="px-2.5 py-1 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] text-[11px] flex items-center gap-1 font-mono">
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
           <span>Sign Out</span>
         </a>
       </div>
       {% else %}
-      <div class="pt-2 border-t border-white/[0.08]">
-        <a href="{{ url_for('login') }}" class="block w-full text-center py-2 px-4 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold font-mono">
+      <div class="pt-2 border-t border-[#E9EAEC]">
+        <a href="{{ url_for('login') }}" class="block w-full text-center py-2 px-4 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-bold font-mono shadow-xs">
           Sign In to CloudVault
         </a>
       </div>
@@ -308,17 +308,17 @@
     <div class="space-y-2">
       {% for category, message in messages %}
       <div
-        class="flex items-center justify-between p-3.5 rounded-xl {% if category == 'error' %}bg-rose-950/60 border border-rose-500/30 text-rose-200{% else %}bg-violet-950/60 border border-violet-500/30 text-violet-200{% endif %} text-xs font-medium shadow-xl backdrop-blur-md"
+        class="flex items-center justify-between p-3.5 rounded-xl {% if category == 'error' %}bg-[#FFF0F2] border border-[#FECDD3] text-[#C02142]{% else %}bg-[#EAF6EF] border border-[#BEE7D5] text-[#1F7052]{% endif %} text-xs font-medium shadow-xs"
         role="alert">
         <div class="flex items-center gap-2.5">
           {% if category == 'error' %}
-          <i class="fa-solid fa-triangle-exclamation text-rose-400 text-sm"></i>
+          <i class="fa-solid fa-triangle-exclamation text-[#F0445E] text-sm"></i>
           {% else %}
-          <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+          <i class="fa-solid fa-circle-check text-[#268B65] text-sm"></i>
           {% endif %}
           <span>{{ message }}</span>
         </div>
-        <button type="button" onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white p-1"
+        <button type="button" onclick="this.parentElement.remove()" class="text-[#5F6368] hover:text-[#202124] p-1"
           aria-label="Close message">
           <i class="fa-solid fa-xmark"></i>
         </button>
@@ -335,58 +335,58 @@
   </main>
 
   <!-- Institutional Academic Project Footer -->
-  <footer class="mt-auto border-t border-white/[0.08] bg-[#080a10]/95 backdrop-blur-xl py-6 text-xs text-slate-400">
+  <footer class="mt-auto border-t border-[#E9EAEC] bg-white py-6 text-xs text-[#5F6368]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
       
       <!-- Top Row: Project Context & Cloud Status -->
-      <div class="flex flex-col md:flex-row items-center justify-between gap-3 pb-3 border-b border-white/[0.06]">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-3 pb-3 border-b border-[#E9EAEC]">
         <div class="flex items-center gap-2.5">
-          <div class="w-6 h-6 rounded-lg bg-violet-600/20 text-violet-400 border border-violet-500/30 flex items-center justify-center text-xs">
+          <div class="w-6 h-6 rounded-lg bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center text-xs">
             <i class="fa-solid fa-graduation-cap"></i>
           </div>
           <div>
-            <span class="font-bold text-white">CloudVault: Multi-Tier Cloud Document Repository</span>
-            <span class="text-slate-500 hidden sm:inline">&bull;</span>
-            <span class="text-slate-400 hidden sm:inline">Cloud Computing Laboratory Mini Project (2025–2026)</span>
+            <span class="font-bold text-[#202124]">CloudVault: Multi-Tier Cloud Document Repository</span>
+            <span class="text-[#D3D5D9] hidden sm:inline">&bull;</span>
+            <span class="text-[#5F6368] hidden sm:inline">Cloud Computing Laboratory Mini Project (2025–2026)</span>
           </div>
         </div>
 
         <!-- Quick Links -->
         <div class="flex items-center gap-4 font-mono text-[11px]">
-          <a href="{{ url_for('index') }}" class="text-slate-400 hover:text-white transition-colors">Vault</a>
-          <a href="{{ url_for('about') }}" class="text-indigo-400 hover:text-indigo-300 font-semibold underline decoration-indigo-400/40 transition-colors">Project &amp; Team Details</a>
+          <a href="{{ url_for('index') }}" class="text-[#5F6368] hover:text-[#202124] transition-colors">Vault</a>
+          <a href="{{ url_for('about') }}" class="text-[#F0445E] hover:text-[#D92D50] font-semibold underline decoration-[#FECDD3] transition-colors">Project &amp; Team Details</a>
           {% if current_user.is_authenticated %}
-          <button type="button" onclick="openAuditModal()" class="text-slate-400 hover:text-white transition-colors">Security Audit</button>
+          <button type="button" onclick="openAuditModal()" class="text-[#5F6368] hover:text-[#202124] transition-colors">Security Audit</button>
           {% endif %}
         </div>
       </div>
 
       <!-- Middle Row: Student Developers with Roll Numbers -->
       <div class="flex flex-col lg:flex-row items-center justify-between gap-3 text-[11px]">
-        <div class="flex items-center gap-2 flex-wrap text-slate-300">
-          <span class="text-slate-400 font-semibold uppercase tracking-wider font-mono text-[10px]">Student Developers:</span>
-          <span class="px-2 py-0.5 rounded-md bg-white/[0.05] border border-white/10 text-white font-medium">Ayush Todkar <strong class="text-violet-400 font-mono">(Roll #57)</strong></span>
-          <span class="px-2 py-0.5 rounded-md bg-white/[0.05] border border-white/10 text-white font-medium">Yahiya Siddiqui <strong class="text-emerald-400 font-mono">(Roll #49)</strong></span>
-          <span class="px-2 py-0.5 rounded-md bg-white/[0.05] border border-white/10 text-white font-medium">Alister Varghese K. <strong class="text-cyan-400 font-mono">(Roll #03)</strong></span>
-          <span class="px-2 py-0.5 rounded-md bg-white/[0.05] border border-white/10 text-white font-medium">Jude Rebairo <strong class="text-amber-400 font-mono">(Roll #31)</strong></span>
+        <div class="flex items-center gap-2 flex-wrap text-[#202124]">
+          <span class="text-[#5F6368] font-semibold uppercase tracking-wider font-mono text-[10px]">Student Developers:</span>
+          <span class="px-2 py-0.5 rounded-md bg-[#FAFAF9] border border-[#E9EAEC] font-medium">Ayush Todkar <strong class="text-[#F0445E] font-mono">(Roll #57)</strong></span>
+          <span class="px-2 py-0.5 rounded-md bg-[#FAFAF9] border border-[#E9EAEC] font-medium">Yahiya Siddiqui <strong class="text-[#268B65] font-mono">(Roll #49)</strong></span>
+          <span class="px-2 py-0.5 rounded-md bg-[#FAFAF9] border border-[#E9EAEC] font-medium">Alister Varghese K. <strong class="text-sky-600 font-mono">(Roll #03)</strong></span>
+          <span class="px-2 py-0.5 rounded-md bg-[#FAFAF9] border border-[#E9EAEC] font-medium">Jude Rebairo <strong class="text-amber-600 font-mono">(Roll #31)</strong></span>
         </div>
 
-        <div class="font-mono text-[11px] text-slate-400 shrink-0">
+        <div class="font-mono text-[11px] text-[#5F6368] shrink-0">
           Department of Computer Engineering
         </div>
       </div>
 
       <!-- Bottom Row: Cloud Technology Stack Chips -->
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 text-[10px] font-mono text-slate-400">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 text-[10px] font-mono text-[#5F6368]">
         <div class="flex items-center gap-3 flex-wrap">
-          <span class="flex items-center gap-1.5"><i class="fa-solid fa-server text-violet-400"></i> Azure App Service (PaaS)</span>
-          <span class="flex items-center gap-1.5"><i class="fa-solid fa-database text-emerald-400"></i> Azure SQL (DBaaS)</span>
-          <span class="flex items-center gap-1.5"><i class="fa-solid fa-cloud text-cyan-400"></i> Azure Blob Storage (SaaS)</span>
-          <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-rose-400"></i> Scrypt SECaaS</span>
-          <span class="flex items-center gap-1.5"><i class="fa-solid fa-network-wired text-amber-400"></i> Azure VM (IaaS)</span>
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-server text-[#F0445E]"></i> Azure App Service (PaaS)</span>
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-database text-[#268B65]"></i> Azure SQL (DBaaS)</span>
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-cloud text-sky-600"></i> Azure Blob Storage (SaaS)</span>
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-[#D92D50]"></i> Scrypt SECaaS</span>
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-network-wired text-amber-600"></i> Azure VM (IaaS)</span>
         </div>
-        <div class="text-slate-400">
-          Allocated Storage: <strong class="text-white">5.0 GB Guaranteed</strong> / Account (Azure Free Tier)
+        <div class="text-[#5F6368]">
+          Allocated Storage: <strong class="text-[#202124]">5.0 GB Guaranteed</strong> / Account (Azure Free Tier)
         </div>
       </div>
 
@@ -395,38 +395,38 @@
 
   <!-- Universal In-App Document Preview Modal (<dialog>) -->
   <dialog id="previewModal"
-    class="rounded-2xl quartz-surface text-slate-100 p-0 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+    class="rounded-2xl bg-white text-[#202124] border border-[#E9EAEC] p-0 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
     <div class="flex flex-col h-full max-h-[90vh]">
 
       <!-- Modal Header -->
-      <div class="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08] bg-[#0f111a]">
+      <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#E9EAEC] bg-[#FAFAF9]">
         <div class="flex items-center gap-3 overflow-hidden">
           <div id="modalTypeIcon"
-            class="w-8 h-8 rounded-lg bg-violet-500/15 border border-violet-500/30 text-violet-300 flex items-center justify-center shrink-0">
+            class="w-8 h-8 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center shrink-0">
             <i class="fa-solid fa-file text-sm"></i>
           </div>
           <div class="overflow-hidden">
-            <h3 id="modalDocTitle" class="text-sm font-bold text-white truncate max-w-md">Document Preview</h3>
-            <p id="modalDocSubtitle" class="text-[11px] text-slate-400 truncate font-mono"></p>
+            <h3 id="modalDocTitle" class="text-sm font-bold text-[#202124] truncate max-w-md">Document Preview</h3>
+            <p id="modalDocSubtitle" class="text-[11px] text-[#5F6368] truncate font-mono"></p>
           </div>
         </div>
 
         <div class="flex items-center gap-2">
           <!-- Download Original -->
           <a id="modalDownloadLink" href="#" download
-            class="px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-white/[0.1] text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5">
-            <i class="fa-solid fa-arrow-down text-[10px]"></i>
+            class="px-3 py-1.5 rounded-lg bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-xs font-medium text-[#202124] transition-colors flex items-center gap-1.5 shadow-xs">
+            <i class="fa-solid fa-arrow-down text-[10px] text-[#5F6368]"></i>
             <span>Download</span>
           </a>
           <!-- Open in Full Window -->
           <a id="modalExternalLink" href="#" target="_blank" rel="noopener noreferrer"
-            class="px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-white/[0.1] text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5">
-            <i class="fa-solid fa-up-right-from-square text-[10px]"></i>
+            class="px-3 py-1.5 rounded-lg bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-xs font-medium text-[#202124] transition-colors flex items-center gap-1.5 shadow-xs">
+            <i class="fa-solid fa-up-right-from-square text-[10px] text-[#5F6368]"></i>
             <span>Full Tab</span>
           </a>
           <!-- Dismiss Modal -->
           <button type="button" onclick="closePreviewModal()"
-            class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center text-sm ml-1"
+            class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm ml-1"
             aria-label="Close modal">
             <i class="fa-solid fa-xmark"></i>
           </button>
@@ -434,49 +434,49 @@
       </div>
 
       <!-- Modal Canvas Body -->
-      <div class="flex-1 bg-[#090a0f]/95 p-4 min-h-[460px] flex items-center justify-center relative overflow-auto"
+      <div class="flex-1 bg-[#F4F4F5] p-4 min-h-[460px] flex items-center justify-center relative overflow-auto"
         id="modalPreviewBody">
         <iframe id="previewIframe" src="about:blank"
-          class="w-full h-full min-h-[480px] rounded-lg border border-white/[0.08] hidden bg-white"></iframe>
+          class="w-full h-full min-h-[480px] rounded-lg border border-[#E9EAEC] hidden bg-white"></iframe>
         <img id="previewImage" src="" alt="File Preview"
-          class="max-h-[500px] max-w-full rounded-lg object-contain hidden border border-white/[0.08] shadow-2xl">
+          class="max-h-[500px] max-w-full rounded-lg object-contain hidden border border-[#E9EAEC] shadow-md bg-white">
         <video id="previewVideo" controls
-          class="max-h-[500px] max-w-full rounded-lg object-contain hidden border border-white/[0.08] shadow-2xl bg-black"></video>
+          class="max-h-[500px] max-w-full rounded-lg object-contain hidden border border-[#E9EAEC] shadow-md bg-black"></video>
         <audio id="previewAudio" controls
-          class="w-full max-w-md hidden my-8 p-3 rounded-xl bg-slate-900 border border-white/10 shadow-xl"></audio>
+          class="w-full max-w-md hidden my-8 p-3 rounded-xl bg-white border border-[#E9EAEC] shadow-md"></audio>
         <div id="previewFallback" class="hidden flex flex-col items-center justify-center p-8 text-center space-y-3">
           <div id="previewFallbackIcon"
-            class="w-16 h-16 rounded-2xl bg-violet-500/15 border border-violet-500/30 text-violet-300 flex items-center justify-center text-2xl shadow-lg mx-auto">
+            class="w-16 h-16 rounded-2xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-2xl shadow-xs mx-auto">
             <i class="fa-solid fa-file"></i>
           </div>
           <div>
-            <h4 id="previewFallbackTitle" class="text-sm font-bold text-white">Document Stream Available</h4>
-            <p id="previewFallbackSubtitle" class="text-xs text-slate-400 font-mono mt-1">Direct in-app rendering not applicable for this file type.</p>
+            <h4 id="previewFallbackTitle" class="text-sm font-bold text-[#202124]">Document Stream Available</h4>
+            <p id="previewFallbackSubtitle" class="text-xs text-[#5F6368] font-mono mt-1">Direct in-app rendering not applicable for this file type.</p>
           </div>
           <div class="pt-2 flex items-center gap-2">
             <a id="previewFallbackDownload" href="#" download
-              class="px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-md flex items-center gap-1.5 font-mono">
+              class="px-4 py-2 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 font-mono">
               <i class="fa-solid fa-download text-xs"></i>
               <span>Download File</span>
             </a>
             <a id="previewFallbackExternal" href="#" target="_blank" rel="noopener noreferrer"
-              class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white text-xs font-semibold flex items-center gap-1.5 font-mono">
-              <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+              class="px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] text-xs font-semibold flex items-center gap-1.5 font-mono shadow-xs">
+              <i class="fa-solid fa-arrow-up-right-from-square text-xs text-[#5F6368]"></i>
               <span>Open in New Tab</span>
             </a>
           </div>
         </div>
-        <div id="previewLoading" class="flex flex-col items-center gap-2 text-violet-300 text-xs font-mono">
-          <i class="fa-solid fa-spinner animate-spin text-xl text-violet-400"></i>
+        <div id="previewLoading" class="flex flex-col items-center gap-2 text-[#5F6368] text-xs font-mono">
+          <i class="fa-solid fa-spinner animate-spin text-xl text-[#F0445E]"></i>
           <span>Retrieving encrypted document stream...</span>
         </div>
       </div>
 
       <!-- Modal Footer -->
       <div
-        class="px-5 py-2.5 bg-[#0f111a] border-t border-white/[0.08] flex items-center justify-between text-[11px] text-slate-400 font-mono">
+        class="px-5 py-2.5 bg-[#FAFAF9] border-t border-[#E9EAEC] flex items-center justify-between text-[11px] text-[#5F6368] font-mono">
         <span id="modalMetaInfo">Checksum: SHA-256 Verified</span>
-        <button type="button" onclick="closePreviewModal()" class="text-xs text-slate-300 hover:text-white px-2 py-1">
+        <button type="button" onclick="closePreviewModal()" class="text-xs text-[#5F6368] hover:text-[#202124] px-2 py-1">
           Dismiss (Esc)
         </button>
       </div>
@@ -486,21 +486,21 @@
 
   <!-- Upload Modal (<dialog>) -->
   <dialog id="uploadModal"
-    class="rounded-2xl quartz-surface text-slate-100 p-0 shadow-2xl w-full max-w-lg overflow-hidden">
+    class="rounded-2xl bg-white text-[#202124] border border-[#E9EAEC] p-0 shadow-2xl w-full max-w-lg overflow-hidden">
     <div class="p-6">
-      <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+      <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
         <div class="flex items-center gap-3">
           <div
-            class="w-10 h-10 rounded-xl bg-violet-600/15 border border-violet-500/30 text-violet-300 flex items-center justify-center shadow-inner">
+            class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center shadow-xs">
             <i class="fa-solid fa-arrow-up-from-bracket text-base"></i>
           </div>
           <div>
-            <h2 class="font-bold text-base text-white">Upload Credential</h2>
-            <p class="text-xs text-slate-400">Register document to encrypted storage</p>
+            <h2 class="font-bold text-base text-[#202124]">Upload Credential</h2>
+            <p class="text-xs text-[#5F6368]">Register document to encrypted storage</p>
           </div>
         </div>
         <button type="button" onclick="closeUploadModal()"
-          class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center text-sm"
+          class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm"
           aria-label="Close dialog">
           <i class="fa-solid fa-xmark"></i>
         </button>
@@ -511,40 +511,40 @@
 
         <div>
           <label for="modal_student_name"
-            class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider font-mono">
-            Student Full Name <span class="text-violet-400">*</span>
+            class="block text-xs font-semibold text-[#5F6368] mb-1.5 uppercase tracking-wider font-mono">
+            Student Full Name <span class="text-[#F0445E]">*</span>
           </label>
           <div class="relative">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#777B83] pointer-events-none">
               <i class="fa-regular fa-user text-xs"></i>
             </span>
             <input type="text" name="student_name" id="modal_student_name" required placeholder="e.g. Ayush Todkar"
-              class="quartz-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm placeholder-slate-500">
+              class="wm-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm placeholder-[#A0A4A8]">
           </div>
         </div>
 
         <div>
           <label for="modal_document_title"
-            class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider font-mono">
-            Document Title <span class="text-violet-400">*</span>
+            class="block text-xs font-semibold text-[#5F6368] mb-1.5 uppercase tracking-wider font-mono">
+            Document Title <span class="text-[#F0445E]">*</span>
           </label>
           <div class="relative">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#777B83] pointer-events-none">
               <i class="fa-solid fa-award text-xs"></i>
             </span>
             <input type="text" name="document_title" id="modal_document_title" required
               placeholder="e.g. Distributed Cloud Architecture Certificate"
-              class="quartz-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm placeholder-slate-500">
+              class="wm-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm placeholder-[#A0A4A8]">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider font-mono">
-            Certificate File <span class="text-violet-400">*</span>
+          <label class="block text-xs font-semibold text-[#5F6368] mb-1.5 uppercase tracking-wider font-mono">
+            Certificate File <span class="text-[#F0445E]">*</span>
           </label>
 
           <div id="modalDropzone"
-            class="border-2 border-dashed border-white/[0.12] hover:border-violet-500/70 rounded-xl p-5 text-center cursor-pointer transition-all bg-[#0e1019]/60 relative group"
+            class="border-2 border-dashed border-[#E9EAEC] hover:border-[#F0445E] rounded-xl p-5 text-center cursor-pointer transition-all bg-[#FAFAF9] relative group"
             onclick="document.getElementById('modalFileInput').click()">
             <input type="file" name="file" id="modalFileInput" required multiple
               accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.tex,.xls,.xlsx,.csv,.tsv,.ods,.ppt,.pptx,.odp,.png,.jpg,.jpeg,.webp,.svg,.gif,.bmp,.tiff,.ico,.mp4,.webm,.mov,.mkv,.avi,.mp3,.wav,.ogg,.m4a,.flac,.aac,.zip,.tar,.gz,.7z,.rar,.bz2,.py,.java,.c,.cpp,.cs,.js,.ts,.html,.css,.json,.xml,.sql,.yaml,.yml,.md"
@@ -552,26 +552,26 @@
 
             <div id="modalDropzonePrompt" class="space-y-1.5">
               <div
-                class="w-10 h-10 rounded-full bg-violet-950/60 text-violet-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform border border-violet-500/30">
+                class="w-10 h-10 rounded-full bg-[#FFF0F2] text-[#F0445E] flex items-center justify-center mx-auto group-hover:scale-110 transition-transform border border-[#FECDD3]">
                 <i class="fa-solid fa-cloud-arrow-up text-base"></i>
               </div>
-              <p class="text-xs font-medium text-slate-200">
-                <span class="text-violet-400 font-semibold underline decoration-violet-400/40">Browse files</span> or
+              <p class="text-xs font-medium text-[#202124]">
+                <span class="text-[#F0445E] font-semibold underline decoration-[#FECDD3]">Browse files</span> or
                 drag & drop here
               </p>
-              <p class="text-[11px] text-slate-400 font-mono">Genuine Documents, Media, Archives & Code &bull; Max 100 MB</p>
-              <p class="text-[10px] text-emerald-400 font-mono flex items-center justify-center gap-1.5 pt-0.5"><i class="fa-solid fa-shield-virus text-[11px]"></i> Deep integrity &amp; threat scanner active</p>
+              <p class="text-[11px] text-[#5F6368] font-mono">Genuine Documents, Media, Archives & Code &bull; Max 100 MB</p>
+              <p class="text-[10px] text-[#268B65] font-mono flex items-center justify-center gap-1.5 pt-0.5"><i class="fa-solid fa-shield-virus text-[11px]"></i> Deep integrity &amp; threat scanner active</p>
             </div>
 
             <div id="modalFilePreview" class="hidden text-left">
-              <div class="flex items-center gap-2 p-2.5 rounded-lg bg-violet-500/15 border border-violet-500/30">
-                <i class="fa-solid fa-file-circle-check text-violet-400 text-lg"></i>
+              <div class="flex items-center gap-2 p-2.5 rounded-lg bg-[#FFF0F2] border border-[#FECDD3]">
+                <i class="fa-solid fa-file-circle-check text-[#F0445E] text-lg"></i>
                 <div class="overflow-hidden flex-1">
-                  <p id="modalFileNameDisplay" class="text-xs font-semibold text-white truncate"></p>
-                  <p id="modalFileSizeDisplay" class="text-[10px] text-violet-300 font-mono"></p>
+                  <p id="modalFileNameDisplay" class="text-xs font-semibold text-[#202124] truncate"></p>
+                  <p id="modalFileSizeDisplay" class="text-[10px] text-[#F0445E] font-mono"></p>
                 </div>
                 <button type="button" onclick="clearModalFileSelection(event)"
-                  class="text-slate-400 hover:text-rose-400 p-1">
+                  class="text-[#5F6368] hover:text-[#F0445E] p-1">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>
@@ -581,7 +581,7 @@
 
         <div class="pt-2">
           <button type="submit" id="modalSubmitBtn"
-            class="w-full py-3 px-4 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-500 hover:from-violet-500 hover:to-indigo-500 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-600/30 border border-violet-400/30 font-mono">
+            class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-white bg-[#F0445E] hover:bg-[#D92D50] active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-xs font-mono">
             <i class="fa-solid fa-lock text-xs"></i>
             <span>Commit to Encrypted Storage</span>
           </button>
@@ -591,41 +591,41 @@
   </dialog>
 
   <!-- Edit File Metadata Modal (<dialog>) -->
-  <dialog id="editModal" class="rounded-2xl quartz-surface text-slate-100 p-0 shadow-2xl w-full max-w-md overflow-hidden">
+  <dialog id="editModal" class="rounded-2xl bg-white text-[#202124] border border-[#E9EAEC] p-0 shadow-2xl w-full max-w-md overflow-hidden">
     <div class="p-6">
-      <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+      <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-violet-600/15 border border-violet-500/30 text-violet-300 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center">
             <i class="fa-solid fa-pen-to-square text-base"></i>
           </div>
           <div>
-            <h2 class="font-bold text-base text-white">Edit Document</h2>
-            <p class="text-xs text-slate-400">Rename title or update description notes</p>
+            <h2 class="font-bold text-base text-[#202124]">Edit Document</h2>
+            <p class="text-xs text-[#5F6368]">Rename title or update description notes</p>
           </div>
         </div>
-        <button type="button" onclick="closeEditModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center text-sm">
+        <button type="button" onclick="closeEditModal()" class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
       <form id="editForm" method="POST" action="" class="mt-5 space-y-4">
         <div>
-          <label for="edit_title" class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider font-mono">
-            Document Title <span class="text-violet-400">*</span>
+          <label for="edit_title" class="block text-xs font-semibold text-[#5F6368] mb-1.5 uppercase tracking-wider font-mono">
+            Document Title <span class="text-[#F0445E]">*</span>
           </label>
-          <input type="text" name="document_title" id="edit_title" required class="quartz-input w-full px-3.5 py-2.5 rounded-xl text-sm text-white">
+          <input type="text" name="document_title" id="edit_title" required class="wm-input w-full px-3.5 py-2.5 rounded-xl text-sm text-[#202124]">
         </div>
         <div>
-          <label for="edit_desc" class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider font-mono">
+          <label for="edit_desc" class="block text-xs font-semibold text-[#5F6368] mb-1.5 uppercase tracking-wider font-mono">
             Description / Notes (Optional)
           </label>
-          <textarea name="description" id="edit_desc" rows="3" placeholder="Add optional tags, context, or notes..." class="quartz-input w-full px-3.5 py-2 rounded-xl text-xs text-white"></textarea>
+          <textarea name="description" id="edit_desc" rows="3" placeholder="Add optional tags, context, or notes..." class="wm-input w-full px-3.5 py-2 rounded-xl text-xs text-[#202124]"></textarea>
         </div>
         <div class="pt-2 flex items-center gap-2">
-          <button type="button" onclick="closeEditModal()" class="w-1/2 py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 border border-white/10 font-mono">
+          <button type="button" onclick="closeEditModal()" class="w-1/2 py-2 px-4 rounded-xl text-xs font-semibold text-[#5F6368] hover:bg-[#FAFAF9] border border-[#E9EAEC] font-mono">
             Cancel
           </button>
-          <button type="submit" class="w-1/2 py-2.5 px-4 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 shadow-md border border-violet-400/30 font-mono">
+          <button type="submit" class="w-1/2 py-2 px-4 rounded-xl font-bold text-xs text-white bg-[#F0445E] hover:bg-[#D92D50] shadow-xs font-mono">
             Save Changes
           </button>
         </div>
@@ -634,35 +634,35 @@
   </dialog>
 
   <!-- Secure Share Modal (<dialog>) -->
-  <dialog id="shareModal" class="rounded-2xl quartz-surface text-slate-100 p-0 shadow-2xl w-full max-w-md overflow-hidden">
+  <dialog id="shareModal" class="rounded-2xl bg-white text-[#202124] border border-[#E9EAEC] p-0 shadow-2xl w-full max-w-md overflow-hidden">
     <div class="p-6">
-      <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+      <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-violet-600/15 border border-violet-500/30 text-violet-300 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center">
             <i class="fa-solid fa-share-nodes text-base"></i>
           </div>
           <div>
-            <h2 class="font-bold text-base text-white">Share Document</h2>
-            <p class="text-xs text-slate-400">Generate public view & download link</p>
+            <h2 class="font-bold text-base text-[#202124]">Share Document</h2>
+            <p class="text-xs text-[#5F6368]">Generate public view & download link</p>
           </div>
         </div>
-        <button type="button" onclick="closeShareModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center text-sm">
+        <button type="button" onclick="closeShareModal()" class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
       <div class="mt-5 space-y-4">
         <div>
-          <p id="shareDocTitle" class="text-xs font-bold text-white truncate"></p>
-          <p class="text-[11px] text-slate-400 font-mono mt-0.5">Anyone with this link can view or download this document.</p>
+          <p id="shareDocTitle" class="text-xs font-bold text-[#202124] truncate"></p>
+          <p class="text-[11px] text-[#5F6368] font-mono mt-0.5">Anyone with this link can view or download this document.</p>
         </div>
         <div class="flex items-center gap-2">
-          <input type="text" id="shareUrlInput" readonly class="quartz-input w-full px-3 py-2 rounded-xl text-xs font-mono text-violet-300 select-all bg-[#0a0c14]">
-          <button type="button" id="copyShareBtn" onclick="copyShareLinkAction(this)" class="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold font-mono shrink-0 shadow-sm">
+          <input type="text" id="shareUrlInput" readonly class="wm-input w-full px-3 py-2 rounded-xl text-xs font-mono text-[#F0445E] select-all bg-[#FAFAF9]">
+          <button type="button" id="copyShareBtn" onclick="copyShareLinkAction(this)" class="px-3.5 py-2 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-bold font-mono shrink-0 shadow-xs">
             Copy
           </button>
         </div>
-        <div class="p-3 rounded-xl bg-violet-500/10 border border-violet-500/20 text-[11px] text-violet-300 flex items-center gap-2">
+        <div class="p-3 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[11px] text-[#F0445E] flex items-center gap-2">
           <i class="fa-solid fa-shield-halved text-xs"></i>
           <span>Public access token is cryptographically random and unique.</span>
         </div>
@@ -671,60 +671,60 @@
   </dialog>
 
   <!-- File Details / Inspector Modal (<dialog>) -->
-  <dialog id="infoModal" class="rounded-2xl quartz-surface text-slate-100 p-0 shadow-2xl w-full max-w-lg overflow-hidden">
+  <dialog id="infoModal" class="rounded-2xl bg-white text-[#202124] border border-[#E9EAEC] p-0 shadow-2xl w-full max-w-lg overflow-hidden">
     <div class="p-6">
-      <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+      <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
         <div class="flex items-center gap-3">
-          <div id="infoIcon" class="w-10 h-10 rounded-xl bg-violet-600/15 border border-violet-500/30 text-violet-300 flex items-center justify-center text-lg">
+          <div id="infoIcon" class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-lg">
             <i class="fa-solid fa-circle-info"></i>
           </div>
           <div class="overflow-hidden">
-            <h2 id="infoTitle" class="font-bold text-base text-white truncate">Document Details</h2>
-            <p id="infoSubtitle" class="text-xs text-slate-400 font-mono truncate"></p>
+            <h2 id="infoTitle" class="font-bold text-base text-[#202124] truncate">Document Details</h2>
+            <p id="infoSubtitle" class="text-xs text-[#5F6368] font-mono truncate"></p>
           </div>
         </div>
-        <button type="button" onclick="closeInfoModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center text-sm">
+        <button type="button" onclick="closeInfoModal()" class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
       <div class="mt-5 space-y-3 font-mono text-xs">
-        <div class="grid grid-cols-3 gap-2 py-2 border-b border-white/[0.05]">
-          <span class="text-slate-400">File Name:</span>
-          <span id="infoFileName" class="col-span-2 text-white truncate"></span>
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-[#E9EAEC]">
+          <span class="text-[#5F6368]">File Name:</span>
+          <span id="infoFileName" class="col-span-2 text-[#202124] truncate"></span>
         </div>
-        <div class="grid grid-cols-3 gap-2 py-2 border-b border-white/[0.05]">
-          <span class="text-slate-400">Author / Scholar:</span>
-          <span id="infoStudent" class="col-span-2 text-white"></span>
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-[#E9EAEC]">
+          <span class="text-[#5F6368]">Author / Scholar:</span>
+          <span id="infoStudent" class="col-span-2 text-[#202124]"></span>
         </div>
-        <div class="grid grid-cols-3 gap-2 py-2 border-b border-white/[0.05]">
-          <span class="text-slate-400">File Size:</span>
-          <span id="infoSize" class="col-span-2 text-violet-300 font-semibold"></span>
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-[#E9EAEC]">
+          <span class="text-[#5F6368]">File Size:</span>
+          <span id="infoSize" class="col-span-2 text-[#F0445E] font-semibold"></span>
         </div>
-        <div class="grid grid-cols-3 gap-2 py-2 border-b border-white/[0.05]">
-          <span class="text-slate-400">MIME Type:</span>
-          <span id="infoMime" class="col-span-2 text-slate-300 truncate"></span>
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-[#E9EAEC]">
+          <span class="text-[#5F6368]">MIME Type:</span>
+          <span id="infoMime" class="col-span-2 text-[#5F6368] truncate"></span>
         </div>
-        <div class="grid grid-cols-3 gap-2 py-2 border-b border-white/[0.05]">
-          <span class="text-slate-400">Archived Date:</span>
-          <span id="infoDate" class="col-span-2 text-slate-300"></span>
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-[#E9EAEC]">
+          <span class="text-[#5F6368]">Archived Date:</span>
+          <span id="infoDate" class="col-span-2 text-[#5F6368]"></span>
         </div>
-        <div class="grid grid-cols-3 gap-2 py-2 border-b border-white/[0.05]">
-          <span class="text-slate-400">Storage Anchor:</span>
-          <span id="infoHash" class="col-span-2 text-amber-300 truncate"></span>
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-[#E9EAEC]">
+          <span class="text-[#5F6368]">Storage Anchor:</span>
+          <span id="infoHash" class="col-span-2 text-[#268B65] truncate font-semibold"></span>
         </div>
         <div id="infoDescContainer" class="hidden pt-1">
-          <span class="text-slate-400 block mb-1">Notes:</span>
-          <p id="infoDesc" class="p-2.5 rounded-lg bg-black/40 border border-white/5 text-slate-200 text-[11px]"></p>
+          <span class="text-[#5F6368] block mb-1">Notes:</span>
+          <p id="infoDesc" class="p-2.5 rounded-lg bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] text-[11px]"></p>
         </div>
       </div>
 
       <div class="mt-6 flex items-center justify-end gap-2">
-        <a id="infoDownloadBtn" href="#" download class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold font-mono flex items-center gap-1.5 border border-white/10">
-          <i class="fa-solid fa-download text-[11px]"></i>
+        <a id="infoDownloadBtn" href="#" download class="px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] text-[#202124] text-xs font-semibold font-mono flex items-center gap-1.5 border border-[#E9EAEC] shadow-xs">
+          <i class="fa-solid fa-download text-[11px] text-[#5F6368]"></i>
           <span>Download</span>
         </a>
-        <button type="button" onclick="closeInfoModal()" class="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold font-mono">
+        <button type="button" onclick="closeInfoModal()" class="px-4 py-2 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-bold font-mono shadow-xs">
           Close
         </button>
       </div>
@@ -732,29 +732,29 @@
   </dialog>
 
   <!-- Security Audit Trail Modal (<dialog>) -->
-  <dialog id="auditModal" class="rounded-2xl quartz-surface text-slate-100 p-0 shadow-2xl w-full max-w-2xl overflow-hidden">
+  <dialog id="auditModal" class="rounded-2xl bg-white text-[#202124] border border-[#E9EAEC] p-0 shadow-2xl w-full max-w-2xl overflow-hidden">
     <div class="p-6">
-      <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+      <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-violet-600/15 border border-violet-500/30 text-violet-300 flex items-center justify-center text-lg shadow-inner">
+          <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-lg shadow-xs">
             <i class="fa-solid fa-clock-rotate-left"></i>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="font-bold text-base text-white">Security & Audit Trail</h2>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider font-semibold">
+              <h2 class="font-bold text-base text-[#202124]">Security & Audit Trail</h2>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] uppercase tracking-wider font-semibold">
                 SECaaS Layer
               </span>
             </div>
-            <p class="text-xs text-slate-400">Tamper-evident activity logs and credential access telemetry</p>
+            <p class="text-xs text-[#5F6368]">Tamper-evident activity logs and credential access telemetry</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button type="button" onclick="loadAuditLogs()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-mono flex items-center gap-1 border border-white/10" title="Refresh logs">
+          <button type="button" onclick="loadAuditLogs()" class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#FAFAF9] text-[#5F6368] hover:text-[#202124] text-xs font-mono flex items-center gap-1 border border-[#E9EAEC] shadow-xs" title="Refresh logs">
             <i class="fa-solid fa-arrows-rotate text-[11px]" id="auditSyncIcon"></i>
             <span class="hidden sm:inline">Sync</span>
           </button>
-          <button type="button" onclick="closeAuditModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center text-sm" aria-label="Close dialog">
+          <button type="button" onclick="closeAuditModal()" class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm" aria-label="Close dialog">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -762,18 +762,18 @@
 
       <!-- Audit Log Content Stream -->
       <div class="mt-4">
-        <div id="auditLogSpinner" class="hidden flex items-center justify-center py-8 text-violet-300 text-xs font-mono gap-2">
-          <i class="fa-solid fa-circle-notch animate-spin text-base text-violet-400"></i>
+        <div id="auditLogSpinner" class="hidden flex items-center justify-center py-8 text-[#5F6368] text-xs font-mono gap-2">
+          <i class="fa-solid fa-circle-notch animate-spin text-base text-[#F0445E]"></i>
           <span>Retrieving secure telemetry from SQL Server...</span>
         </div>
-        <div id="auditLogList" class="space-y-2.5 max-h-[55vh] overflow-y-auto pr-1">
+        <div id="auditLogList" class="space-y-2 max-h-[55vh] overflow-y-auto pr-1">
           <!-- Dynamically populated via loadAuditLogs() -->
         </div>
       </div>
 
-      <div class="mt-5 pt-3 border-t border-white/[0.08] flex items-center justify-between text-[11px] text-slate-400 font-mono">
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-emerald-400"></i> Azure SECaaS Audit Policy Active</span>
-        <button type="button" onclick="closeAuditModal()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono">
+      <div class="mt-5 pt-3 border-t border-[#E9EAEC] flex items-center justify-between text-[11px] text-[#5F6368] font-mono">
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-[#268B65]"></i> Azure SECaaS Audit Policy Active</span>
+        <button type="button" onclick="closeAuditModal()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] text-xs font-mono shadow-xs">
           Dismiss
         </button>
       </div>
@@ -781,36 +781,36 @@
   </dialog>
 
   <!-- Desktop Full-Screen Drag & Drop Overlay -->
-  <div id="globalDropzone" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0b10]/95 backdrop-blur-2xl border-4 border-dashed border-violet-500/80 m-4 rounded-3xl pointer-events-none opacity-0 transition-all duration-300 transform scale-98 shadow-2xl">
+  <div id="globalDropzone" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/95 backdrop-blur-md border-4 border-dashed border-[#F0445E] m-4 rounded-3xl pointer-events-none opacity-0 transition-all duration-300 transform scale-98 shadow-2xl">
     <div class="text-center p-8 max-w-md space-y-4 pointer-events-none">
-      <div class="w-20 h-20 rounded-3xl bg-violet-600/20 border border-violet-400/40 text-violet-300 flex items-center justify-center mx-auto text-3xl shadow-2xl shadow-violet-600/40 animate-bounce">
+      <div class="w-20 h-20 rounded-3xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center mx-auto text-3xl shadow-lg shadow-[#F0445E]/15 animate-bounce">
         <i class="fa-solid fa-cloud-arrow-up"></i>
       </div>
       <div>
-        <h3 class="text-xl font-extrabold text-white tracking-tight">Drop Files to Upload Instantly</h3>
-        <p class="text-xs text-violet-300 font-mono mt-1.5">Batch upload & automatic AES-256 encryption into CloudVault</p>
+        <h3 class="text-xl font-extrabold text-[#202124] tracking-tight">Drop Files to Upload Instantly</h3>
+        <p class="text-xs text-[#5F6368] font-mono mt-1.5">Batch upload & automatic AES-256 encryption into CloudVault</p>
       </div>
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.06] border border-white/10 text-[11px] text-slate-400 font-mono">
-        <i class="fa-solid fa-bolt text-amber-400"></i>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EAF6EF] border border-[#BEE7D5] text-[11px] text-[#268B65] font-mono">
+        <i class="fa-solid fa-bolt text-amber-500"></i>
         <span>Multi-file batch supported &bull; Azure Hot-Store</span>
       </div>
     </div>
   </div>
 
   <!-- Live Upload Floating Progress Notification -->
-  <div id="uploadProgressToast" class="fixed bottom-6 right-6 z-50 hidden p-4 rounded-2xl quartz-surface border border-violet-500/40 shadow-2xl max-w-sm w-full animate-fade-in backdrop-blur-2xl">
+  <div id="uploadProgressToast" class="fixed bottom-6 right-6 z-50 hidden p-4 rounded-2xl bg-white border border-[#E9EAEC] shadow-2xl max-w-sm w-full animate-fade-in">
     <div class="flex items-start gap-3">
-      <div class="w-9 h-9 rounded-xl bg-violet-600/20 text-violet-300 flex items-center justify-center shrink-0 border border-violet-500/30">
+      <div class="w-9 h-9 rounded-xl bg-[#FFF0F2] text-[#F0445E] flex items-center justify-center shrink-0 border border-[#FECDD3]">
         <i class="fa-solid fa-cloud-arrow-up text-sm animate-pulse"></i>
       </div>
       <div class="overflow-hidden flex-1">
         <div class="flex items-center justify-between">
-          <p id="uploadProgressLabel" class="text-xs font-bold text-white truncate">Uploading Files...</p>
-          <span id="uploadProgressPercent" class="text-[10px] font-mono text-violet-300 font-bold">In Progress</span>
+          <p id="uploadProgressLabel" class="text-xs font-bold text-[#202124] truncate">Uploading Files...</p>
+          <span id="uploadProgressPercent" class="text-[10px] font-mono text-[#F0445E] font-bold">In Progress</span>
         </div>
-        <p id="uploadProgressDetails" class="text-[10px] text-slate-400 font-mono truncate mt-0.5">Encrypting and dispatching blobs</p>
-        <div class="w-full bg-white/[0.08] h-1.5 rounded-full mt-2 overflow-hidden">
-          <div id="uploadProgressBar" class="h-full bg-gradient-to-r from-violet-600 via-indigo-500 to-emerald-400 rounded-full transition-all duration-300" style="width: 15%"></div>
+        <p id="uploadProgressDetails" class="text-[10px] text-[#5F6368] font-mono truncate mt-0.5">Encrypting and dispatching blobs</p>
+        <div class="w-full bg-[#FAFAF9] h-1.5 rounded-full mt-2 overflow-hidden border border-[#E9EAEC]">
+          <div id="uploadProgressBar" class="h-full bg-[#F0445E] rounded-full transition-all duration-300" style="width: 15%"></div>
         </div>
       </div>
     </div>
@@ -947,12 +947,12 @@
           if (data.success) {
             const icon = btn.querySelector('i');
             if (data.is_starred) {
-              icon.classList.remove('fa-regular', 'text-slate-500');
-              icon.classList.add('fa-solid', 'text-amber-400');
+              icon.classList.remove('fa-regular', 'text-slate-400');
+              icon.classList.add('fa-solid', 'text-amber-500');
               btn.setAttribute('data-starred', 'true');
             } else {
-              icon.classList.remove('fa-solid', 'text-amber-400');
-              icon.classList.add('fa-regular', 'text-slate-500');
+              icon.classList.remove('fa-solid', 'text-amber-500');
+              icon.classList.add('fa-regular', 'text-slate-400');
               btn.setAttribute('data-starred', 'false');
             }
             // Update row/card attribute for client filter
@@ -1010,7 +1010,7 @@
       previewFallback.classList.add('hidden');
 
       if (category === 'pdf' || ext === 'pdf') {
-        modalTypeIcon.innerHTML = '<i class="fa-solid fa-file-pdf text-rose-400"></i>';
+        modalTypeIcon.innerHTML = '<i class="fa-solid fa-file-pdf text-[#F0445E]"></i>';
         previewLoading.classList.remove('hidden');
         previewIframe.src = url;
         previewIframe.onload = () => {
@@ -1018,7 +1018,7 @@
           previewIframe.classList.remove('hidden');
         };
       } else if (category === 'image' || ['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'].includes(ext)) {
-        modalTypeIcon.innerHTML = '<i class="fa-solid fa-file-image text-cyan-400"></i>';
+        modalTypeIcon.innerHTML = '<i class="fa-solid fa-file-image text-sky-500"></i>';
         previewLoading.classList.remove('hidden');
         previewImage.src = url;
         previewImage.onload = () => {
@@ -1026,24 +1026,24 @@
           previewImage.classList.remove('hidden');
         };
         previewImage.onerror = () => {
-          previewLoading.innerHTML = '<span class="text-rose-400">Unable to render inline image preview.</span>';
+          previewLoading.innerHTML = '<span class="text-[#F0445E]">Unable to render inline image preview.</span>';
         };
       } else if (category === 'video' || ['mp4', 'webm', 'ogg', 'mov', 'mkv'].includes(ext)) {
-        modalTypeIcon.innerHTML = '<i class="fa-solid fa-file-video text-amber-400"></i>';
+        modalTypeIcon.innerHTML = '<i class="fa-solid fa-file-video text-amber-500"></i>';
         previewVideo.src = url;
         previewVideo.classList.remove('hidden');
       } else if (category === 'audio' || ['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac'].includes(ext)) {
-        modalTypeIcon.innerHTML = '<i class="fa-solid fa-file-audio text-purple-400"></i>';
+        modalTypeIcon.innerHTML = '<i class="fa-solid fa-file-audio text-purple-500"></i>';
         previewAudio.src = url;
         previewAudio.classList.remove('hidden');
       } else {
         const iconMap = {
-          'word': '<i class="fa-solid fa-file-word text-blue-400"></i>',
-          'spreadsheet': '<i class="fa-solid fa-file-excel text-emerald-400"></i>',
-          'archive': '<i class="fa-solid fa-file-zipper text-amber-400"></i>',
-          'code': '<i class="fa-solid fa-file-code text-yellow-400"></i>'
+          'word': '<i class="fa-solid fa-file-word text-blue-500"></i>',
+          'spreadsheet': '<i class="fa-solid fa-file-excel text-[#268B65]"></i>',
+          'archive': '<i class="fa-solid fa-file-zipper text-amber-500"></i>',
+          'code': '<i class="fa-solid fa-file-code text-indigo-500"></i>'
         };
-        modalTypeIcon.innerHTML = iconMap[category] || '<i class="fa-solid fa-file text-violet-400"></i>';
+        modalTypeIcon.innerHTML = iconMap[category] || '<i class="fa-solid fa-file text-[#F0445E]"></i>';
         
         const fallbackIcon = document.getElementById('previewFallbackIcon');
         if (fallbackIcon) {
@@ -1094,14 +1094,14 @@
         modalDropzone.addEventListener(name, (e) => {
           e.preventDefault();
           e.stopPropagation();
-          modalDropzone.classList.add('border-violet-500', 'bg-violet-950/30');
+          modalDropzone.classList.add('border-[#F0445E]', 'bg-[#FFF0F2]');
         });
       });
       ['dragleave', 'drop'].forEach(name => {
         modalDropzone.addEventListener(name, (e) => {
           e.preventDefault();
           e.stopPropagation();
-          modalDropzone.classList.remove('border-violet-500', 'bg-violet-950/30');
+          modalDropzone.classList.remove('border-[#F0445E]', 'bg-[#FFF0F2]');
         });
       });
       modalDropzone.addEventListener('drop', (e) => {
@@ -1184,40 +1184,40 @@
           if (syncIcon) syncIcon.classList.remove('animate-spin');
           if (!list) return;
           if (!logs || logs.length === 0) {
-            list.innerHTML = '<div class="text-center py-8 text-slate-500 font-mono text-xs">No audit logs recorded yet.</div>';
+            list.innerHTML = '<div class="text-center py-8 text-[#5F6368] font-mono text-xs">No audit logs recorded yet.</div>';
             return;
           }
           const badgeMap = {
-            'UPLOAD': 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-            'DELETE': 'bg-rose-500/15 text-rose-400 border-rose-500/30',
-            'RESTORE': 'bg-blue-500/15 text-blue-400 border-blue-500/30',
-            'STAR': 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-            'UNSTAR': 'bg-slate-500/15 text-slate-400 border-slate-500/30',
-            'SHARE': 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
-            'LOGIN': 'bg-violet-500/15 text-violet-400 border-violet-500/30',
-            'LOGOUT': 'bg-slate-500/15 text-slate-400 border-slate-500/30',
-            'SIGNUP': 'bg-purple-500/15 text-purple-400 border-purple-500/30',
-            'EDIT': 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30',
-            'BATCH_TRASH': 'bg-rose-500/15 text-rose-400 border-rose-500/30',
-            'BATCH_RESTORE': 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-            'BATCH_DELETE': 'bg-rose-600/20 text-rose-300 border-rose-500/40',
-            'BATCH_EXPORT': 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+            'UPLOAD': 'bg-[#EAF6EF] text-[#268B65] border-[#BEE7D5]',
+            'DELETE': 'bg-[#FFF0F2] text-[#F0445E] border-[#FECDD3]',
+            'RESTORE': 'bg-blue-50 text-blue-700 border-blue-200',
+            'STAR': 'bg-amber-50 text-amber-700 border-amber-200',
+            'UNSTAR': 'bg-slate-100 text-slate-600 border-slate-200',
+            'SHARE': 'bg-sky-50 text-sky-700 border-sky-200',
+            'LOGIN': 'bg-[#FFF0F2] text-[#F0445E] border-[#FECDD3]',
+            'LOGOUT': 'bg-slate-100 text-slate-600 border-slate-200',
+            'SIGNUP': 'bg-purple-50 text-purple-700 border-purple-200',
+            'EDIT': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+            'BATCH_TRASH': 'bg-[#FFF0F2] text-[#F0445E] border-[#FECDD3]',
+            'BATCH_RESTORE': 'bg-[#EAF6EF] text-[#268B65] border-[#BEE7D5]',
+            'BATCH_DELETE': 'bg-[#FFF0F2] text-[#D92D50] border-[#FECDD3]',
+            'BATCH_EXPORT': 'bg-amber-50 text-amber-700 border-amber-200',
           };
           list.innerHTML = logs.map(l => `
-            <div class="flex items-start justify-between gap-3 p-3 rounded-xl bg-[#0e1019]/80 border border-white/[0.06] hover:border-violet-500/30 transition-colors">
+            <div class="flex items-start justify-between gap-3 p-3 rounded-xl bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] transition-colors shadow-xs">
               <div class="flex items-start gap-2.5 overflow-hidden">
-                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider border shrink-0 ${badgeMap[l.action] || 'bg-slate-800 text-slate-300 border-slate-700'}">
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider border shrink-0 ${badgeMap[l.action] || 'bg-slate-100 text-slate-700 border-slate-200'}">
                   ${l.action.replace('_', ' ')}
                 </span>
                 <div class="overflow-hidden">
-                  <p class="text-xs text-white font-medium truncate">${l.details}</p>
-                  <div class="flex items-center gap-2 mt-0.5 text-[10px] text-slate-500 font-mono">
+                  <p class="text-xs text-[#202124] font-medium truncate">${l.details}</p>
+                  <div class="flex items-center gap-2 mt-0.5 text-[10px] text-[#5F6368] font-mono">
                     ${l.ip_address ? `<span><i class="fa-solid fa-network-wired text-[9px] mr-1"></i>${l.ip_address}</span> &bull;` : ''}
                     <span>${l.created_at}</span>
                   </div>
                 </div>
               </div>
-              <span class="text-[10px] font-mono text-violet-300 bg-violet-950/40 px-2 py-0.5 rounded-full border border-violet-500/20 shrink-0">
+              <span class="text-[10px] font-mono text-[#F0445E] bg-[#FFF0F2] px-2 py-0.5 rounded-full border border-[#FECDD3] shrink-0 font-medium">
                 ${l.relative_time}
               </span>
             </div>
@@ -1226,7 +1226,7 @@
         .catch(() => {
           if (spinner) spinner.classList.add('hidden');
           if (syncIcon) syncIcon.classList.remove('animate-spin');
-          if (list) list.innerHTML = '<div class="text-center py-6 text-rose-400 font-mono text-xs">Failed to load audit records.</div>';
+          if (list) list.innerHTML = '<div class="text-center py-6 text-[#F0445E] font-mono text-xs">Failed to load audit records.</div>';
         });
     }
 
@@ -1408,19 +1408,19 @@
       if (!container) return;
 
       const toast = document.createElement('div');
-      toast.className = 'pointer-events-auto p-3.5 rounded-xl quartz-surface border text-xs font-mono shadow-2xl flex items-center justify-between gap-3 transition-all duration-300 opacity-0 translate-y-3';
+      toast.className = 'pointer-events-auto p-3.5 rounded-xl bg-white border border-[#E9EAEC] text-xs font-mono shadow-xl flex items-center justify-between gap-3 transition-all duration-300 opacity-0 translate-y-3 text-[#202124]';
       
-      let borderClass = 'border-violet-500/30';
-      let iconHtml = '<i class="fa-solid fa-circle-info text-violet-400"></i>';
+      let borderClass = 'border-[#E9EAEC]';
+      let iconHtml = '<i class="fa-solid fa-circle-info text-[#F0445E]"></i>';
       if (type === 'success') {
-        borderClass = 'border-emerald-500/40 bg-emerald-950/40 text-emerald-200';
-        iconHtml = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+        borderClass = 'border-[#BEE7D5] bg-[#EAF6EF] text-[#268B65]';
+        iconHtml = '<i class="fa-solid fa-circle-check text-[#268B65]"></i>';
       } else if (type === 'error') {
-        borderClass = 'border-rose-500/40 bg-rose-950/40 text-rose-200';
-        iconHtml = '<i class="fa-solid fa-triangle-exclamation text-rose-400"></i>';
+        borderClass = 'border-[#FECDD3] bg-[#FFF0F2] text-[#F0445E]';
+        iconHtml = '<i class="fa-solid fa-triangle-exclamation text-[#F0445E]"></i>';
       } else if (type === 'warning') {
-        borderClass = 'border-amber-500/40 bg-amber-950/40 text-amber-200';
-        iconHtml = '<i class="fa-solid fa-bell text-amber-400"></i>';
+        borderClass = 'border-amber-200 bg-amber-50 text-amber-800';
+        iconHtml = '<i class="fa-solid fa-bell text-amber-600"></i>';
       }
       toast.classList.add(...borderClass.split(' '));
 
@@ -1429,7 +1429,7 @@
           ${iconHtml}
           <span class="truncate">${message}</span>
         </div>
-        <button type="button" class="text-slate-400 hover:text-white shrink-0 ml-2">
+        <button type="button" class="text-[#5F6368] hover:text-[#202124] shrink-0 ml-2">
           <i class="fa-solid fa-xmark text-[11px]"></i>
         </button>
       `;
@@ -1708,13 +1708,13 @@
       const text = document.getElementById('clusterStatusText');
       if (!navigator.onLine) {
         if (ping) ping.classList.add('hidden');
-        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-amber-400 animate-pulse';
-        if (text) text.innerHTML = '<span class="text-amber-300 font-semibold">Offline Mode (Sync Queued)</span>';
+        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-amber-500 animate-pulse';
+        if (text) text.innerHTML = '<span class="text-amber-700 font-semibold">Offline Mode (Sync Queued)</span>';
         showToast('Internet connection lost. Working in offline cached mode.', 'warning');
       } else {
         if (ping) ping.classList.remove('hidden');
-        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-emerald-500';
-        if (text) text.innerHTML = '<span class="text-emerald-400 font-medium">Cluster: Hot-Store</span>';
+        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-[#268B65]';
+        if (text) text.innerHTML = '<span class="text-[#268B65] font-semibold">Cluster: Hot-Store</span>';
       }
     }
     window.addEventListener('offline', checkNetworkConnectivity);
