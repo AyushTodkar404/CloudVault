@@ -520,72 +520,32 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Institutional Academic Project Footer -->
-  <footer class="mt-auto border-t border-[#E9EAEC] bg-white py-6 text-xs text-[#5F6368]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
-      
-      <!-- Top Row: Project Context & Cloud Status -->
-      <div class="flex flex-col md:flex-row items-center justify-between gap-3 pb-3 border-b border-[#E9EAEC]">
+  <!-- Clean Uncluttered Minimalist Footer -->
+  <footer class="mt-auto border-t border-[#E9EAEC] bg-white py-4 text-xs text-[#5F6368]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
         <div class="flex items-center gap-2.5">
-          <div class="w-6 h-6 rounded-lg bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center text-xs">
+          <div class="w-6 h-6 rounded-lg bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center text-xs shrink-0">
             <i class="fa-solid fa-graduation-cap"></i>
           </div>
           <div>
-            <span class="font-bold text-[#202124]">CloudVault: Multi-Tier Cloud Document Repository</span>
-            <span class="text-[#D3D5D9] hidden sm:inline">&bull;</span>
-            <span class="text-[#5F6368] hidden sm:inline">Cloud Computing Laboratory Mini Project (2025–2026)</span>
+            <span class="font-bold text-[#202124]">CloudVault</span>
+            <span class="text-[#D3D5D9] mx-1.5">&bull;</span>
+            <span class="text-[11px]">Cloud Computing Laboratory Mini Project (2025–2026)</span>
           </div>
         </div>
 
-        <!-- Quick Links -->
-        <div class="flex items-center gap-3 sm:gap-4 font-mono text-[11px] flex-wrap">
+        <!-- Clean Navigation Links -->
+        <div class="flex items-center gap-4 font-mono text-[11px] flex-wrap">
           <a href="{{ url_for('index') }}" class="text-[#5F6368] hover:text-[#202124] transition-colors">Vault</a>
-          <a href="{{ url_for('about') }}" class="text-[#F0445E] hover:text-[#D92D50] font-semibold underline decoration-[#FECDD3] transition-colors">Project &amp; Team Details</a>
+          <a href="{{ url_for('about') }}" class="text-[#F0445E] hover:text-[#D92D50] font-semibold transition-colors">Project &amp; Team Details</a>
           <a href="{{ url_for('privacy') }}" class="text-[#5F6368] hover:text-[#202124] transition-colors">Privacy Policy</a>
           <a href="{{ url_for('terms') }}" class="text-[#5F6368] hover:text-[#202124] transition-colors">Terms</a>
           {% if current_user.is_authenticated %}
-          <button type="button" onclick="openAuditModal()" class="text-[#5F6368] hover:text-[#202124] transition-colors">Security Audit</button>
+          <button type="button" onclick="openAuditModal()" class="text-[#5F6368] hover:text-[#202124] transition-colors cursor-pointer">Security Audit</button>
           {% endif %}
         </div>
       </div>
-
-      <!-- Middle Row: Student Developers with Roll Numbers -->
-      <div class="flex flex-col lg:flex-row items-center justify-between gap-3 text-[11px]">
-        <div class="flex items-center gap-2 flex-wrap text-[#202124]">
-          <span class="text-[#5F6368] font-semibold uppercase tracking-wider font-mono text-[10px]">Student Developers:</span>
-          <span class="px-2 py-0.5 rounded-md bg-[#FAFAF9] border border-[#E9EAEC] font-medium">Ayush Todkar <strong class="text-[#F0445E] font-mono">(Roll #57)</strong></span>
-          <span class="px-2 py-0.5 rounded-md bg-[#FAFAF9] border border-[#E9EAEC] font-medium">Yahiya Siddiqui <strong class="text-[#268B65] font-mono">(Roll #49)</strong></span>
-          <span class="px-2 py-0.5 rounded-md bg-[#FAFAF9] border border-[#E9EAEC] font-medium">Alister Varghese K. <strong class="text-sky-600 font-mono">(Roll #03)</strong></span>
-          <span class="px-2 py-0.5 rounded-md bg-[#FAFAF9] border border-[#E9EAEC] font-medium">Jude Rebairo <strong class="text-amber-600 font-mono">(Roll #31)</strong></span>
-        </div>
-
-        <div class="font-mono text-[11px] text-[#5F6368] shrink-0 flex items-center gap-3 flex-wrap">
-          <span>Dept. of Computer Engineering</span>
-          <span>&bull;</span>
-          <a href="mailto:ayush.todkar@somaiya.edu" class="hover:text-[#F0445E] transition-colors flex items-center gap-1">
-            <i class="fa-regular fa-envelope text-[#F0445E]"></i> Contact Lead
-          </a>
-          <span>&bull;</span>
-          <a href="tel:+912266449191" class="hover:text-[#268B65] transition-colors flex items-center gap-1">
-            <i class="fa-solid fa-phone text-[#268B65]"></i> Lab Line
-          </a>
-        </div>
-      </div>
-
-      <!-- Bottom Row: Cloud Technology Stack Chips -->
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 text-[10px] font-mono text-[#5F6368]">
-        <div class="flex items-center gap-3 flex-wrap">
-          <span class="flex items-center gap-1.5"><i class="fa-solid fa-server text-[#F0445E]"></i> Azure App Service (PaaS)</span>
-          <span class="flex items-center gap-1.5"><i class="fa-solid fa-database text-[#268B65]"></i> Azure SQL (DBaaS)</span>
-          <span class="flex items-center gap-1.5"><i class="fa-solid fa-cloud text-sky-600"></i> Azure Blob Storage (SaaS)</span>
-          <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-[#D92D50]"></i> Scrypt SECaaS</span>
-          <span class="flex items-center gap-1.5"><i class="fa-solid fa-network-wired text-amber-600"></i> Azure VM (IaaS)</span>
-        </div>
-        <div class="text-[#5F6368]">
-          Allocated Storage: <strong class="text-[#202124]">5.0 GB Guaranteed</strong> / Account (Azure Free Tier)
-        </div>
-      </div>
-
     </div>
   </footer>
 
