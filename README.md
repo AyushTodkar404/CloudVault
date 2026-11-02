@@ -158,7 +158,7 @@ CONTAINER_NAME="documents"
 SQL_SERVER="cloudvault-sql-$RANDOM"
 SQL_DB="cloudvaultdb"
 SQL_ADMIN="cloudadmin"
-SQL_PASSWORD="SecureVaultPassword123!"
+SQL_PASSWORD="<YourStrongPasswordHere123!>"
 APP_PLAN="plan-cloudvault"
 APP_NAME="cloudvault-portal-$RANDOM"
 

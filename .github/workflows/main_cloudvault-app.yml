@@ -25,14 +25,12 @@ jobs:
           python-version: '3.14'
 
       # 🛠️ Local Build Section (Optional)
-      # The following section in your workflow is designed to catch build issues early on the client side, before deployment. This can be helpful for debugging and validation. However, if this step significantly increases deployment time and early detection is not critical for your workflow, you may remove this section to streamline the deployment process.
       - name: Create and Start virtual environment and Install dependencies
         run: |
           python -m venv antenv
           source antenv/bin/activate
           pip install -r requirements.txt
                 
-      # By default, when you enable GitHub CI/CD integration through the Azure portal, the platform automatically sets the SCM_DO_BUILD_DURING_DEPLOYMENT application setting to true. This triggers the use of Oryx, a build engine that handles application compilation and dependency installation (e.g., pip install) directly on the platform during deployment. Hence, we exclude the antenv virtual environment directory from the deployment artifact to reduce the payload size. 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
@@ -40,12 +38,6 @@ jobs:
           path: |
             .
             !antenv/
-
-      # 🚫 Opting Out of Oryx Build
-      # If you prefer to disable the Oryx build process during deployment, follow these steps:
-      # 1. Remove the SCM_DO_BUILD_DURING_DEPLOYMENT app setting from your Azure App Service Environment variables.
-      # 2. Refer to sample workflows for alternative deployment strategies: https://github.com/Azure/actions-workflow-samples/tree/master/AppService
-      
 
   deploy:
     runs-on: ubuntu-latest
@@ -67,10 +59,22 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EA1D447AF4A9425A8ED05EAE3E684B54 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_54006065FEF447C18B064EA397BE3784 }}
 
+      - name: Configure App Service Settings from Encrypted Secrets
+        run: |
+          RES_GROUP=$(az webapp list --query "[?name=='cloudvault-app'].resourceGroup" -o tsv | head -n 1)
+          if [ -n "$RES_GROUP" ] && [ -n "${{ secrets.DATABASE_URL }}" ]; then
+            az webapp config appsettings set \
+              --name 'cloudvault-app' \
+              --resource-group "$RES_GROUP" \
+              --settings \
+                DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+                AZURE_STORAGE_CONNECTION_STRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
+                AZURE_STORAGE_CONTAINER_NAME="documents"
+          fi
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'cloudvault-app'
           slot-name: 'Production'
-          

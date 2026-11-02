@@ -1,4 +1,3 @@
-import base64
 from collections import defaultdict
 from functools import wraps
 import io
@@ -88,18 +87,8 @@ def create_app(test_config=None):
         or os.getenv("SQLAZURECONNSTR_DATABASE_URL")
         or os.getenv("SQLCONNSTR_DATABASE_URL")
         or os.getenv("CUSTOMCONNSTR_DATABASE_URL")
-        or ""
+        or "sqlite:///cloudvault.db"
     ).strip()
-
-    if not database_url and not (test_config and test_config.get("TESTING")):
-        try:
-            database_url = base64.b64decode(
-                b"bXNzcWwrcHltc3NxbDovL3NxbGFkbWluOkF5dXNoJTQwMjAwNUBzcWxzZXJ2ZXItY2xvdWR2YXVsdC14eXouZGF0YWJhc2Uud2luZG93cy5uZXQ6MTQzMy9jbG91ZHZhdWx0ZGI="
-            ).decode("utf-8")
-        except Exception:
-            database_url = "sqlite:///cloudvault.db"
-    elif not database_url:
-        database_url = "sqlite:///cloudvault.db"
 
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
