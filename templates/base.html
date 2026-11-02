@@ -897,12 +897,9 @@
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="font-bold text-base text-[#202124]">Security & Audit Trail</h2>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] uppercase tracking-wider font-semibold">
-                SECaaS Layer
-              </span>
+              <h2 class="font-bold text-base text-[#202124]">Activity &amp; Security Log</h2>
             </div>
-            <p class="text-xs text-[#5F6368]">Tamper-evident activity logs and credential access telemetry</p>
+            <p class="text-xs text-[#5F6368]">Recent file operations, authentication events, and security logs</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -958,8 +955,8 @@
             <i class="fa-solid fa-user-gear"></i>
           </div>
           <div>
-            <h2 class="font-bold text-base text-[#202124]">Account Governance &amp; Security</h2>
-            <p class="text-xs text-[#5F6368] font-mono">Sovereign identity, backups &amp; erasure controls</p>
+            <h2 class="font-bold text-base text-[#202124]">Account Settings</h2>
+            <p class="text-xs text-[#5F6368]">Manage profile, data backup, and security settings</p>
           </div>
         </div>
         <button type="button" onclick="closeAccountModal()" class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm" aria-label="Close dialog">
@@ -1025,17 +1022,16 @@
           </div>
         </div>
 
-        <!-- Sovereign Backup & Export Section (GDPR Art. 20) -->
+        <!-- Database Backup Section -->
         <div class="p-4 rounded-xl bg-white border border-[#E9EAEC] space-y-2">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-database text-[#268B65] text-sm"></i>
-              <h3 class="text-xs font-bold text-[#202124]">Database Backup &amp; Data Portability</h3>
+              <h3 class="text-xs font-bold text-[#202124]">Data Backup &amp; Export</h3>
             </div>
-            <span class="text-[10px] font-mono text-[#777B83] px-2 py-0.5 rounded bg-[#FAFAF9] border border-[#E9EAEC]">GDPR Art. 20</span>
           </div>
           <p class="text-[11px] text-[#5F6368] leading-relaxed">
-            Download a portable JSON archive of your entire account profile, all document descriptors, and full cryptographic audit trails.
+            Download a portable JSON archive of your account profile, document manifest, and activity logs.
           </p>
           <div class="pt-1 flex items-center gap-2 flex-wrap">
             <a href="{{ url_for('export_account_data') }}" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-xs font-mono text-[#202124] font-semibold flex items-center gap-1.5 shadow-xs transition-colors">
@@ -1049,14 +1045,13 @@
           </div>
         </div>
 
-        <!-- Danger Zone: Permanent Account Erasure (GDPR Art. 17) -->
+        <!-- Danger Zone: Permanent Account Deletion -->
         <div class="p-4 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] space-y-2.5">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-triangle-exclamation text-[#F0445E] text-sm"></i>
-              <h3 class="text-xs font-bold text-[#D92D50]">Danger Zone: Irreversible Account Erasure</h3>
+              <h3 class="text-xs font-bold text-[#D92D50]">Delete Account</h3>
             </div>
-            <span class="text-[10px] font-mono text-[#F0445E] font-semibold">GDPR Art. 17</span>
           </div>
           <p class="text-[11px] text-[#777B83] leading-relaxed">
             Permanently purges your account, credentials, all file descriptors, and all underlying blobs stored in Microsoft Azure.

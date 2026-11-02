@@ -461,22 +461,22 @@ def create_app(test_config=None):
                     provider="google",
                     email=user.email,
                     name=user.username,
-                    duration=3.5,
+                    duration=1.2,
                 )
             )
         return redirect(url_for("index"))
 
     @app.route("/loading")
     def loading_page():
-        """Enterprise loading transition page for authentication and workspace initialization."""
+        """Loading transition page for authentication and workspace initialization."""
         next_url = request.args.get("next", url_for("index"))
         if not next_url.startswith("/") or next_url.startswith("//"):
             next_url = url_for("index")
         provider = request.args.get("provider", "google")
         email = request.args.get("email", "")
         name = request.args.get("name", "")
-        duration = request.args.get("duration", 3.5, type=float)
-        duration = max(3.0, min(duration, 4.5))
+        duration = request.args.get("duration", 1.2, type=float)
+        duration = max(1.0, min(duration, 3.0))
         return render_template(
             "loading.html",
             next_url=next_url,
@@ -489,7 +489,7 @@ def create_app(test_config=None):
     @app.route("/login/google", methods=["GET", "POST"])
     def google_login():
         """Initiates OAuth 2.0 flow or zero-config instant Google sign-in."""
-        # Direct 1-click account selection / Emergent form submission
+        # Direct Google SSO account selection
         if request.method == "POST" or request.args.get("email"):
             email = (request.form.get("email") or request.args.get("email", "")).strip()
             name = (request.form.get("name") or request.args.get("name", "")).strip()
@@ -499,7 +499,7 @@ def create_app(test_config=None):
             return _provision_and_login_google_user(email, name)
 
         client_id = os.getenv("GOOGLE_CLIENT_ID")
-        # Standard OAuth 2.0 if real credentials configured
+        # Standard OAuth 2.0 flow
         if client_id and client_id != "your-google-client-id.apps.googleusercontent.com":
             state = secrets.token_urlsafe(16)
             session["oauth_state"] = state
@@ -517,7 +517,7 @@ def create_app(test_config=None):
             google_auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{requests.compat.urlencode(params)}"
             return redirect(google_auth_url)
 
-        # Emergent zero-config Google account picker
+        # Google account picker fallback
         return render_template("google_picker.html")
 
     @app.route("/login/google/callback")

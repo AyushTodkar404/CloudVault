@@ -3,155 +3,95 @@
 {% block content %}
 <div class="space-y-6">
 
-  <!-- Academic Welcome & Repository Header -->
+  <!-- Page Header -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#E9EAEC]">
-    <div class="space-y-1">
-      <div class="flex items-center gap-2">
-        <h1 class="text-xl font-bold text-[#202124] tracking-tight">Active Document Repository</h1>
-        <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] font-semibold">
-          Student Vault
-        </span>
-      </div>
-      <p class="text-xs text-[#5F6368]">
-        Authenticated as <strong class="text-[#202124]">{{ current_user.username }}</strong> &bull; Cloud Computing Laboratory (2025–2026) &bull; Dept of Computer Engineering
-      </p>
+    <div class="space-y-0.5">
+      <h1 class="text-xl font-bold text-[#202124] tracking-tight">All Files</h1>
+      <p class="text-xs text-[#5F6368]">Signed in as <strong class="text-[#202124]">{{ current_user.username }}</strong></p>
     </div>
-    <div class="flex items-center gap-2 font-mono text-xs shrink-0">
-      <a href="{{ url_for('about') }}" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] flex items-center gap-1.5 transition-all shadow-xs">
-        <i class="fa-solid fa-graduation-cap text-[#F0445E]"></i>
-        <span>Project &amp; Developers</span>
+    <div class="flex items-center gap-2 text-xs shrink-0">
+      <a href="{{ url_for('about') }}" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#5F6368] hover:text-[#202124] flex items-center gap-1.5 transition-all shadow-xs">
+        <i class="fa-solid fa-circle-info text-xs"></i>
+        <span>About</span>
       </a>
-      <button type="button" onclick="openUploadModal()" class="px-3.5 py-1.5 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white font-semibold flex items-center gap-1.5 shadow-xs transition-all active:scale-95">
+      <button type="button" onclick="openUploadModal()" class="px-3.5 py-1.5 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white font-semibold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer">
         <i class="fa-solid fa-plus text-xs"></i>
-        <span>New Upload</span>
+        <span>Upload File</span>
       </button>
     </div>
   </div>
 
-  <!-- Metric Highlights (Refined Human-Crafted Watermelon Panels) -->
+  <!-- Metric Overview -->
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
     
-    <!-- Metric 1: Total Documents -->
-    <div class="bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] rounded-2xl p-4 shadow-xs transition-all relative overflow-hidden group">
+    <!-- Metric 1: Total Files -->
+    <div class="bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] rounded-2xl p-4 shadow-xs transition-all">
       <div class="flex items-center justify-between text-xs text-[#5F6368] mb-1">
-        <span class="font-mono uppercase tracking-wider text-[10px] font-semibold">Active Vault Files</span>
+        <span class="text-[11px] font-medium text-[#777B83]">Total Files</span>
         <span class="w-7 h-7 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center text-[#F0445E]">
-          <i class="fa-solid fa-file-shield text-xs"></i>
+          <i class="fa-solid fa-folder-closed text-xs"></i>
         </span>
       </div>
       <div class="flex items-baseline gap-2">
-        <span class="text-2xl sm:text-3xl font-extrabold font-mono text-[#202124] tracking-tight">{{ total_docs }}</span>
-        <span class="text-[10px] sm:text-[11px] text-[#268B65] font-semibold flex items-center gap-1 font-mono">
-          <i class="fa-solid fa-star text-[9px]"></i> {{ starred_count }} Starred
+        <span class="text-2xl font-bold text-[#202124] tracking-tight">{{ total_docs }}</span>
+        <span class="text-[11px] text-[#268B65] font-medium flex items-center gap-1">
+          <i class="fa-solid fa-star text-[9px]"></i> {{ starred_count }} starred
         </span>
       </div>
-      <p class="text-[11px] text-[#5F6368] mt-1 font-mono">Indexed in Azure SQL</p>
+      <p class="text-[11px] text-[#777B83] mt-1 font-mono">Securely stored</p>
     </div>
 
-    <!-- Metric 2: Storage Quota & Capacity Meter -->
-    <div class="bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] rounded-2xl p-4 shadow-xs transition-all relative overflow-hidden group">
+    <!-- Metric 2: Storage Capacity -->
+    <div class="bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] rounded-2xl p-4 shadow-xs transition-all">
       <div class="flex items-center justify-between text-xs text-[#5F6368] mb-1">
-        <span class="font-mono uppercase tracking-wider text-[10px] font-semibold">Student Storage Quota</span>
+        <span class="text-[11px] font-medium text-[#777B83]">Storage Used</span>
         <span class="w-7 h-7 rounded-lg bg-[#EAF6EF] border border-[#BEE7D5] flex items-center justify-center text-[#268B65]">
           <i class="fa-solid fa-hard-drive text-xs"></i>
         </span>
       </div>
-      <div class="flex items-baseline gap-1.5 sm:gap-2">
-        <span class="text-xl sm:text-2xl font-extrabold font-mono text-[#202124] tracking-tight">{{ storage_used }}</span>
-        <span class="text-[10px] sm:text-[11px] text-[#5F6368] font-mono">/ {{ storage_quota }}</span>
+      <div class="flex items-baseline gap-1.5">
+        <span class="text-xl font-bold text-[#202124] tracking-tight">{{ storage_used }}</span>
+        <span class="text-[11px] text-[#777B83]">of {{ storage_quota }}</span>
       </div>
-      <!-- Multi-Segment Visual Capacity Breakdown Bar -->
-      <div class="w-full bg-[#E9EAEC] h-2 rounded-full mt-2.5 overflow-hidden flex" title="Capacity Breakdown">
-        <div class="bg-[#F0445E] h-full transition-all duration-500" style="width: {{ category_percents.get('pdf', 0) }}%" title="PDFs: {{ category_breakdown.get('pdf', '0 B') }}"></div>
-        <div class="bg-sky-500 h-full transition-all duration-500" style="width: {{ category_percents.get('image', 0) }}%" title="Images: {{ category_breakdown.get('image', '0 B') }}"></div>
-        <div class="bg-amber-500 h-full transition-all duration-500" style="width: {{ category_percents.get('media', 0) }}%" title="Media: {{ category_breakdown.get('media', '0 B') }}"></div>
-        <div class="bg-[#268B65] h-full transition-all duration-500" style="width: {{ category_percents.get('spreadsheet', 0) }}%" title="Sheets: {{ category_breakdown.get('spreadsheet', '0 B') }}"></div>
-        <div class="bg-blue-600 h-full transition-all duration-500" style="width: {{ category_percents.get('word', 0) }}%" title="Docs: {{ category_breakdown.get('word', '0 B') }}"></div>
-        <div class="bg-indigo-600 h-full transition-all duration-500" style="width: {{ category_percents.get('code', 0) + category_percents.get('archive', 0) + category_percents.get('other', 0) }}%" title="Other: {{ category_breakdown.get('other', '0 B') }}"></div>
+      <div class="w-full bg-[#E9EAEC] h-1.5 rounded-full mt-2.5 overflow-hidden">
+        <div class="bg-[#F0445E] h-full transition-all duration-500 rounded-full" style="width: {{ storage_percent }}%"></div>
       </div>
-      <div class="flex items-center justify-between mt-1.5 text-[10px] font-mono">
-        <span class="text-[#5F6368]">{{ storage_percent }}% of {{ storage_quota }} Used</span>
-        {% if storage_percent > 85 %}
-        <span class="text-[#F0445E] font-semibold flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> Low Space</span>
-        {% else %}
-        <span class="text-[#268B65] font-semibold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Standard {{ storage_quota }} Tier</span>
-        {% endif %}
-      </div>
+      <p class="text-[11px] text-[#777B83] mt-1 font-mono">{{ storage_percent }}% capacity</p>
     </div>
 
-    <!-- Metric 3: Storage Node Status -->
-    <div class="bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] rounded-2xl p-4 shadow-xs transition-all relative overflow-hidden group">
+    <!-- Metric 3: Cloud Storage Status -->
+    <div class="bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] rounded-2xl p-4 shadow-xs transition-all">
       <div class="flex items-center justify-between text-xs text-[#5F6368] mb-1">
-        <span class="font-mono uppercase tracking-wider text-[10px] font-semibold">Cloud Blob Tier</span>
+        <span class="text-[11px] font-medium text-[#777B83]">Cloud Storage</span>
         <span class="w-7 h-7 rounded-lg bg-[#EAF6EF] border border-[#BEE7D5] text-[#268B65] flex items-center justify-center">
           <i class="fa-solid fa-cloud text-xs"></i>
         </span>
       </div>
       <div class="flex items-baseline gap-2">
-        <span class="text-sm font-bold font-mono text-[#202124] truncate max-w-[140px]" title="{{ container_name }}">
-          /{{ container_name }}
+        <span class="text-base font-bold text-[#202124] truncate max-w-[140px]" title="{{ container_name }}">
+          Azure Blob
         </span>
         <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] font-bold">
           ONLINE
         </span>
       </div>
-      <p class="text-[11px] text-[#5F6368] mt-1 font-mono">Azure Blob Storage</p>
+      <p class="text-[11px] text-[#777B83] mt-1 font-mono">Encrypted container</p>
     </div>
 
     <!-- Metric 4: Security Standard -->
-    <div class="bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] rounded-2xl p-4 shadow-xs transition-all relative overflow-hidden group">
+    <div class="bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] rounded-2xl p-4 shadow-xs transition-all">
       <div class="flex items-center justify-between text-xs text-[#5F6368] mb-1">
-        <span class="font-mono uppercase tracking-wider text-[10px] font-semibold">Security Tier</span>
+        <span class="text-[11px] font-medium text-[#777B83]">Encryption</span>
         <span class="w-7 h-7 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center text-[#F0445E]">
-          <i class="fa-solid fa-fingerprint text-xs"></i>
+          <i class="fa-solid fa-lock text-xs"></i>
         </span>
       </div>
       <div class="flex items-baseline gap-2">
-        <span class="text-base font-bold font-mono text-[#F0445E]">AES-256-GCM</span>
+        <span class="text-base font-bold text-[#F0445E]">AES-256</span>
       </div>
-      <p class="text-[11px] text-[#5F6368] mt-1 font-mono">Zero-Trust SECaaS &bull; Scrypt</p>
+      <p class="text-[11px] text-[#777B83] mt-1 font-mono">End-to-end protected</p>
     </div>
 
-  </div>
-
-  <!-- Visual Storage Quota & Category Allocation Ribbon -->
-  <div class="bg-white border border-[#E9EAEC] rounded-2xl p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-sm shrink-0">
-        <i class="fa-solid fa-chart-pie"></i>
-      </div>
-      <div>
-        <h4 class="font-bold text-[#202124] text-xs">Storage Quota Allocation</h4>
-        <p class="text-[11px] text-[#5F6368] font-mono">Live distribution across Azure Blob Storage hot tier</p>
-      </div>
-    </div>
-    <!-- Category Capacity Badges with Legend -->
-    <div class="flex items-center gap-2 flex-wrap font-mono text-[11px]">
-      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E]">
-        <span class="w-2 h-2 rounded-full bg-[#F0445E]"></span>
-        <span>PDFs: <strong>{{ category_breakdown.get('pdf', '0 B') }}</strong></span>
-      </span>
-      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 border border-sky-200 text-sky-700">
-        <span class="w-2 h-2 rounded-full bg-sky-500"></span>
-        <span>Images: <strong>{{ category_breakdown.get('image', '0 B') }}</strong></span>
-      </span>
-      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700">
-        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-        <span>Media: <strong>{{ category_breakdown.get('media', '0 B') }}</strong></span>
-      </span>
-      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#EAF6EF] border border-[#BEE7D5] text-[#268B65]">
-        <span class="w-2 h-2 rounded-full bg-[#268B65]"></span>
-        <span>Sheets: <strong>{{ category_breakdown.get('spreadsheet', '0 B') }}</strong></span>
-      </span>
-      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-blue-700">
-        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-        <span>Docs: <strong>{{ category_breakdown.get('word', '0 B') }}</strong></span>
-      </span>
-      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700">
-        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-        <span>Other/Code: <strong>{{ category_breakdown.get('other', '0 B') }}</strong></span>
-      </span>
-    </div>
   </div>
 
   <!-- Main Repository Control Center -->
