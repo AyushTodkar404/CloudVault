@@ -16,6 +16,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50), default="student", nullable=False)
+    two_factor_enabled = db.Column(db.Boolean, default=False, nullable=False)
+    two_factor_secret = db.Column(db.String(64), nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     # Relationships
@@ -65,6 +67,7 @@ class User(UserMixin, db.Model):
             "role": self.role,
             "storage_used": self.formatted_storage_used,
             "storage_percent": self.storage_percentage,
+            "two_factor_enabled": self.two_factor_enabled,
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S UTC"),
         }
 

@@ -1,10 +1,14 @@
 from collections import defaultdict
 from functools import wraps
+import base64
+import hashlib
+import hmac
 import io
 import json
 import logging
 import os
 import secrets
+import struct
 import time
 import zipfile
 from datetime import datetime, timezone, timedelta
@@ -131,8 +135,51 @@ def create_app(test_config=None):
     with app.app_context():
         try:
             db.create_all()
+            from sqlalchemy import inspect, text
+            inspector = inspect(db.engine)
+            if "users" in inspector.get_table_names():
+                existing_cols = [c["name"] for c in inspector.get_columns("users")]
+                with db.engine.begin() as conn:
+                    if "two_factor_enabled" not in existing_cols:
+                        col_type = "BIT DEFAULT 0 NOT NULL" if db.engine.name == "mssql" else "BOOLEAN DEFAULT 0 NOT NULL"
+                        conn.execute(text(f"ALTER TABLE users ADD two_factor_enabled {col_type}"))
+                    if "two_factor_secret" not in existing_cols:
+                        conn.execute(text("ALTER TABLE users ADD two_factor_secret VARCHAR(64) NULL"))
         except Exception as e:
             app.logger.warning(f"Database schema initialization deferred: {e}")
+
+    def generate_totp_secret():
+        """Generates a 32-character RFC 3548 Base32 secret string using cryptographically secure random bytes."""
+        return base64.b32encode(secrets.token_bytes(20)).decode("utf-8").rstrip("=")
+
+    def get_totp_code(secret, time_step=None, step_seconds=30):
+        """Calculates standard RFC 6238 6-digit TOTP token using HMAC-SHA1."""
+        if time_step is None:
+            time_step = int(time.time() // step_seconds)
+        clean_secret = (secret or "").strip().upper().replace(" ", "")
+        pad = len(clean_secret) % 8
+        if pad:
+            clean_secret += "=" * (8 - pad)
+        key = base64.b32decode(clean_secret, casefold=True)
+        msg = struct.pack(">Q", time_step)
+        h = hmac.new(key, msg, hashlib.sha1).digest()
+        offset = h[-1] & 0x0F
+        code_int = struct.unpack(">I", h[offset : offset + 4])[0] & 0x7FFFFFFF
+        return f"{code_int % 1000000:06d}"
+
+    def verify_totp(secret, code, window=1, step_seconds=30):
+        """Verifies a 6-digit TOTP code allowing +/- 1 window for clock drift (default 30s steps)."""
+        if not secret or not code:
+            return False
+        clean_code = str(code).strip().replace(" ", "")
+        if not clean_code.isdigit() or len(clean_code) != 6:
+            return False
+        current_step = int(time.time() // step_seconds)
+        for offset in range(-window, window + 1):
+            expected = get_totp_code(secret, current_step + offset, step_seconds)
+            if hmac.compare_digest(expected, clean_code):
+                return True
+        return False
 
     def log_activity(user_id, action, details):
         """Records an immutable security/audit log event."""
@@ -301,6 +348,14 @@ def create_app(test_config=None):
                     flash("Invalid credentials. Please verify username/email and password.", "error")
                 return render_template("login.html")
 
+            # Check if user has Two-Factor Authentication enabled
+            if user.two_factor_enabled:
+                session["2fa_user_id"] = user.id
+                session["2fa_remember"] = remember
+                session["2fa_next"] = request.args.get("next") if (request.args.get("next") and request.args.get("next").startswith("/")) else ""
+                log_activity(user.id, "2FA_CHALLENGE", "Primary authentication succeeded; awaiting 2FA code")
+                return redirect(url_for("two_factor_login"))
+
             # Successful login clears failed attempt tracking
             _failed_login_cache.pop(clean_identity, None)
             login_user(user, remember=remember)
@@ -313,6 +368,58 @@ def create_app(test_config=None):
             return redirect(url_for("index"))
 
         return render_template("login.html")
+
+    @app.route("/login/2fa", methods=["GET", "POST"])
+    @rate_limit(limit=15, window=60)
+    def two_factor_login():
+        """Handles RFC 6238 TOTP secondary authentication verification."""
+        if current_user.is_authenticated:
+            return redirect(url_for("index"))
+
+        user_id = session.get("2fa_user_id")
+        if not user_id:
+            flash("No active two-factor challenge found. Please sign in.", "error")
+            return redirect(url_for("login"))
+
+        user = db.session.get(User, int(user_id))
+        if not user or not user.two_factor_enabled or not user.two_factor_secret:
+            session.pop("2fa_user_id", None)
+            flash("Two-factor authentication is not active for this account.", "error")
+            return redirect(url_for("login"))
+
+        if request.method == "POST":
+            code = request.form.get("code", "").strip()
+            attempt_key = f"2fa_{user.id}"
+            now = time.time()
+            if not app.config.get("TESTING"):
+                _failed_login_cache[attempt_key] = [t for t in _failed_login_cache[attempt_key] if now - t < 300]
+                if len(_failed_login_cache[attempt_key]) >= 5:
+                    log_activity(user.id, "2FA_LOCKOUT", f"2FA temporarily locked for 5m due to multiple failures from {request.remote_addr}")
+                    flash("Too many incorrect codes. Please wait 5 minutes before trying again.", "error")
+                    return render_template("two_factor_login.html", user=user), 429
+
+            if verify_totp(user.two_factor_secret, code):
+                _failed_login_cache.pop(attempt_key, None)
+                remember = session.pop("2fa_remember", False)
+                next_page = session.pop("2fa_next", None)
+                session.pop("2fa_user_id", None)
+                login_user(user, remember=remember)
+                log_activity(user.id, "LOGIN_2FA", "Signed in via Two-Factor Authentication")
+                flash(f"Two-factor authentication verified. Welcome back, {user.username}!", "success")
+                if next_page and next_page.startswith("/"):
+                    return redirect(next_page)
+                return redirect(url_for("index"))
+
+            if not app.config.get("TESTING"):
+                _failed_login_cache[attempt_key].append(now)
+                remaining = max(0, 5 - len(_failed_login_cache[attempt_key]))
+                log_activity(user.id, "FAILED_2FA", f"Invalid 2FA code entered ({remaining} attempts left)")
+                flash(f"Invalid 6-digit authentication code. ({remaining} attempts remaining before temporary lockout)", "error")
+            else:
+                flash("Invalid 6-digit authentication code.", "error")
+            return render_template("two_factor_login.html", user=user), 400
+
+        return render_template("two_factor_login.html", user=user)
 
     @app.route("/forgot-password", methods=["GET", "POST"])
     @rate_limit(limit=8, window=60)
@@ -444,6 +551,13 @@ def create_app(test_config=None):
             flash(f"Welcome to CloudVault, {user.username}! Signed in with Google.", "success")
         else:
             flash(f"Welcome back, {user.username}! Signed in with Google.", "success")
+
+        if user.two_factor_enabled:
+            session["2fa_user_id"] = user.id
+            session["2fa_remember"] = False
+            session["2fa_next"] = url_for("index")
+            log_activity(user.id, "2FA_CHALLENGE", "Google SSO completed; awaiting second factor verification")
+            return redirect(url_for("two_factor_login"))
 
         login_user(user)
         log_activity(user.id, "LOGIN", "Signed in via Google OAuth Single Sign-On")
@@ -1250,6 +1364,83 @@ def create_app(test_config=None):
         logout_user()
         flash(f"Account '{username}' and all associated cloud files have been permanently erased.", "success")
         return redirect(url_for("signup"))
+
+    @app.route("/account/2fa/setup", methods=["GET"])
+    @login_required
+    def two_factor_setup():
+        """Generates a new TOTP secret and QR code URI for authenticator enrollment."""
+        if current_user.two_factor_enabled:
+            return jsonify({
+                "status": "already_enabled",
+                "message": "Two-factor authentication is already active on this account."
+            })
+
+        # Retain current pending secret or generate fresh base32 secret
+        secret = session.get("pending_2fa_secret")
+        if not secret:
+            secret = generate_totp_secret()
+            session["pending_2fa_secret"] = secret
+
+        import urllib.parse
+        otpauth_url = f"otpauth://totp/CloudVault:{current_user.email}?secret={secret}&issuer=CloudVault&algorithm=SHA1&digits=6&period=30"
+        encoded_otp = urllib.parse.quote(otpauth_url)
+        qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={encoded_otp}"
+        formatted_secret = " ".join([secret[i:i+4] for i in range(0, len(secret), 4)])
+
+        return jsonify({
+            "status": "success",
+            "secret": secret,
+            "formatted_secret": formatted_secret,
+            "otpauth_url": otpauth_url,
+            "qr_url": qr_url,
+        })
+
+    @app.route("/account/2fa/verify", methods=["POST"])
+    @login_required
+    def two_factor_verify():
+        """Verifies enrollment token and permanently enables 2FA on user account."""
+        secret = session.get("pending_2fa_secret")
+        if not secret:
+            return jsonify({"success": False, "error": "No pending 2FA enrollment session found. Please re-open 2FA setup."}), 400
+
+        data = request.get_json(silent=True) or {}
+        code = request.form.get("code") or data.get("code", "")
+        code = str(code).strip()
+
+        if verify_totp(secret, code):
+            current_user.two_factor_secret = secret
+            current_user.two_factor_enabled = True
+            db.session.commit()
+            session.pop("pending_2fa_secret", None)
+            log_activity(current_user.id, "2FA_ENABLED", "Two-factor authentication successfully enabled")
+            return jsonify({
+                "success": True,
+                "message": "Two-factor authentication successfully enabled! Your account is now secured with TOTP MFA."
+            })
+
+        return jsonify({
+            "success": False,
+            "error": "Invalid 6-digit verification code. Please check your authenticator app and try again."
+        }), 400
+
+    @app.route("/account/2fa/disable", methods=["POST"])
+    @login_required
+    def two_factor_disable():
+        """Disables 2FA upon user password confirmation."""
+        data = request.get_json(silent=True) or {}
+        password = request.form.get("password") or data.get("password", "")
+
+        if not password or not current_user.check_password(password):
+            return jsonify({"success": False, "error": "Incorrect password. Cannot disable two-factor authentication."}), 400
+
+        current_user.two_factor_enabled = False
+        current_user.two_factor_secret = None
+        db.session.commit()
+        log_activity(current_user.id, "2FA_DISABLED", "Two-factor authentication disabled by user")
+        return jsonify({
+            "success": True,
+            "message": "Two-factor authentication has been disabled."
+        })
 
     @app.route("/api/analytics", methods=["GET"])
     @login_required
