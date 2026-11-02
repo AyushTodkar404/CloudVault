@@ -36,17 +36,30 @@ MAGIC_SIGNATURES = {
 MALICIOUS_BINARY_HEADERS = [
     (b"MZ", "Windows PE executable binary (MZ header) disguised as document"),
     (b"\x7fELF", "Linux ELF executable binary disguised as document"),
-    (b"\xca\xfe\xba\xbe", "Compiled Java/Mach-O binary header"),
+    (b"\xca\xfe\xba\xbe", "Compiled Java / Mach-O universal binary header"),
     (b"\xfe\xed\xfa\xce", "Mach-O 32-bit binary"),
     (b"\xfe\xed\xfa\xcf", "Mach-O 64-bit binary"),
+    (b"\xce\xfa\xed\xfe", "Mach-O 32-bit reversed binary"),
+    (b"\xcf\xfa\xed\xfe", "Mach-O 64-bit reversed binary"),
+    (b"MSCF", "Microsoft Cabinet executable installer"),
 ]
 
 # Prohibited dangerous embedded script and webshell patterns in non-code documents
 PROHIBITED_PAYLOAD_STRINGS = [
     b"<?" + b"php",
+    b"<?" + b"=",
+    b"<" + b"%",
+    b"<script",
+    b"javascript:",
+    b"vbscript:",
     b"eval(" + b"base64_decode",
+    b"eval(" + b"gzinflate",
+    b"passthru(",
+    b"shell_exec(",
+    b"system(",
     b"powershell" + b" -nop",
     b"powershell.exe" + b" -enc",
+    b"powershell",
     b"cmd.exe" + b" /c",
     b"/bin" + b"/sh",
     b"/bin" + b"/bash",
@@ -58,7 +71,9 @@ PROHIBITED_SVG_PATTERNS = [
     b"onload=",
     b"onerror=",
     b"onclick=",
+    b"onmouseover=",
     b"javascript:",
+    b"vbscript:",
     b"xlink:href=\"javascript:",
     b"xlink:href='javascript:",
 ]
@@ -91,6 +106,19 @@ class FileSecurityScanner:
         # Check for path traversal or null byte injections in filename
         if any(seq in filename for seq in ("../", "..\\", "/..", "\\..", "%2e%2e", "\x00")):
             return FileScanResult(False, "Security Violation: Path traversal or null byte injection detected in filename.")
+
+        # Double extension evasion check (e.g. document.pdf.exe, invoice.php.jpg)
+        parts = filename.lower().split(".")
+        if len(parts) > 2:
+            dangerous_exts = {
+                "exe", "bat", "cmd", "sh", "ps1", "vbs", "msi", "dll", "com", "scr",
+                "pif", "reg", "wsf", "hta", "cpl", "jar", "php", "asp", "aspx", "jsp"
+            }
+            for part in parts[1:-1]:
+                if part in dangerous_exts:
+                    return FileScanResult(
+                        False, f"Security Violation: Double extension evasion attempt detected (.{part})."
+                    )
 
         # SVG Stored XSS Script Vector Inspection
         if ext == "svg":
@@ -132,7 +160,7 @@ class FileSecurityScanner:
                     f"Corrupted or spoofed file structure: header does not match genuine .{ext.upper()} specification."
                 )
 
-        # 3. Deep Archive & Office Document Structural Health Check
+        # 3. Deep Archive & Office Document Structural Health Check (with Zip Bomb Defense)
         if ext in ("zip", "docx", "xlsx", "pptx"):
             try:
                 with zipfile.ZipFile(io.BytesIO(file_bytes), "r") as zf:
@@ -141,6 +169,14 @@ class FileSecurityScanner:
                         return FileScanResult(
                             False, f"Corrupted archive structure detected at entry: {corrupted_entry}."
                         )
+                    entries = zf.infolist()
+                    if len(entries) > 1000:
+                        return FileScanResult(False, "Security Violation: Archive contains excessive file entries (> 1000).")
+                    total_uncompressed = sum(info.file_size for info in entries)
+                    if total_uncompressed > 250 * 1024 * 1024:
+                        return FileScanResult(False, "Security Violation: Archive uncompressed size exceeds 250MB threshold.")
+                    if len(file_bytes) > 0 and (total_uncompressed / max(len(file_bytes), 1)) > 150:
+                        return FileScanResult(False, "Security Violation: Suspicious decompression ratio (> 150:1).")
             except zipfile.BadZipFile:
                 return FileScanResult(False, f"Damaged or invalid archive container for .{ext.upper()} file.")
             except Exception as e:

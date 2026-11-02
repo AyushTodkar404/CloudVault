@@ -906,6 +906,43 @@ class CloudVaultRealProductionFeaturesTestCase(unittest.TestCase):
         self.assertEqual(resp_safe.status_code, 200)
         self.assertIn(b'targetUrl = "/"', resp_safe.data)
 
+    def test_security_hardening_defenses(self):
+        """Verify advanced defense-in-depth protections: double extensions, HTML block, CSRF, and headers."""
+        self.client.post(
+            "/signup",
+            data={"username": "secuser", "email": "sec@vault.edu", "password": "password123", "confirm_password": "password123"},
+            follow_redirects=True,
+        )
+
+        # 1. Double extension evasion check
+        from scanner import scanner
+        double_ext_result = scanner.scan_file(b"%PDF-1.4 dummy", "invoice.php.pdf")
+        self.assertFalse(double_ext_result.is_clean)
+        self.assertIn("Double extension evasion", double_ext_result.reason)
+
+        # 2. Block HTML file uploads
+        html_resp = self.client.post(
+            "/upload",
+            data={"file": (io.BytesIO(b"<html><script>alert(1)</script></html>"), "exploit.html")},
+            headers={"X-Requested-With": "XMLHttpRequest"},
+        )
+        self.assertEqual(html_resp.status_code, 400)
+        self.assertIn("not a permitted genuine file type", html_resp.get_json()["error"])
+
+        # 3. CSRF origin mismatch blocks unauthorized cross-domain mutating actions
+        csrf_resp = self.client.post(
+            "/account/delete",
+            data={"password": "password123", "confirm_delete": "DELETE"},
+            headers={"Origin": "https://malicious-attacker.com"},
+        )
+        self.assertEqual(csrf_resp.status_code, 403)
+
+        # 4. Verify OWASP Level 2 Security Headers
+        head_resp = self.client.get("/login")
+        self.assertEqual(head_resp.headers.get("Cross-Origin-Opener-Policy"), "same-origin")
+        self.assertEqual(head_resp.headers.get("Cross-Origin-Resource-Policy"), "same-origin")
+        self.assertIn("preload", head_resp.headers.get("Strict-Transport-Security", ""))
+
 
 if __name__ == "__main__":
     unittest.main()

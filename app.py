@@ -60,12 +60,13 @@ ALLOWED_EXTENSIONS = {
     # Compressed Archives
     "zip", "tar", "gz", "7z", "rar", "bz2",
     # Code & Data
-    "py", "java", "c", "cpp", "cs", "js", "ts", "html", "css", "json", "xml", "sql", "yaml", "yml", "md"
+    "py", "java", "c", "cpp", "cs", "js", "ts", "css", "json", "xml", "sql", "yaml", "yml", "md"
 }
 
 # Explicit blacklist of dangerous executables and script formats
 BLOCKED_EXTENSIONS = {
-    "exe", "bat", "cmd", "sh", "ps1", "vbs", "msi", "dll", "com", "scr", "pif", "reg", "wsf", "hta", "cpl", "jar"
+    "exe", "bat", "cmd", "sh", "ps1", "vbs", "msi", "dll", "com", "scr", "pif", "reg",
+    "wsf", "hta", "cpl", "jar", "html", "htm", "xhtml", "php", "phtml", "asp", "aspx", "jsp", "cgi"
 }
 
 
@@ -78,6 +79,9 @@ def create_app(test_config=None):
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     app.config["REMEMBER_COOKIE_HTTPONLY"] = True
     app.config["REMEMBER_COOKIE_SAMESITE"] = "Lax"
+    if bool(os.getenv("WEBSITE_SITE_NAME") or os.getenv("WEBSITE_HOSTNAME") or os.getenv("FLASK_ENV") == "production"):
+        app.config["SESSION_COOKIE_SECURE"] = True
+        app.config["REMEMBER_COOKIE_SECURE"] = True
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
     app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024  # 100MB Hard Ceiling
 
@@ -209,8 +213,9 @@ def create_app(test_config=None):
                 flash("All fields are required.", "error")
                 return render_template("signup.html")
 
-            if len(username) < 3:
-                flash("Username must be at least 3 characters.", "error")
+            import re
+            if not re.match(r"^[a-zA-Z0-9_.-]{3,50}$", username):
+                flash("Username must be 3-50 alphanumeric characters (letters, numbers, _, -, .).", "error")
                 return render_template("signup.html")
 
             if "@" not in email or "." not in email:
@@ -459,7 +464,7 @@ def create_app(test_config=None):
     def loading_page():
         """Loading transition page for authentication and workspace initialization."""
         next_url = request.args.get("next", url_for("index"))
-        if not next_url.startswith("/") or next_url.startswith("//"):
+        if not next_url.startswith("/") or next_url.startswith("//") or "\\" in next_url or next_url.startswith("/\\"):
             next_url = url_for("index")
         provider = request.args.get("provider", "google")
         email = request.args.get("email", "")
@@ -782,19 +787,25 @@ def create_app(test_config=None):
                     errors.append(f"{file_obj.filename}: Empty (0-byte) files cannot be uploaded.")
                     continue
 
+                import re
+                from werkzeug.utils import secure_filename
+
+                clean_filename = secure_filename(file_obj.filename) or "document"
                 if len(valid_files) == 1 and custom_title:
-                    doc_title = custom_title
+                    doc_title = re.sub(r"[<>]", "", custom_title).strip()
                 else:
-                    clean_base = file_obj.filename.rsplit(".", 1)[0]
+                    clean_base = clean_filename.rsplit(".", 1)[0]
                     doc_title = clean_base.replace("_", " ").replace("-", " ").title()
+
+                clean_student_name = re.sub(r"[<>]", "", student_name).strip() or current_user.username
 
                 blob_url, blob_name, file_size, content_type = storage_manager.upload_file(file_obj)
 
                 new_doc = Document(
                     user_id=current_user.id,
-                    student_name=student_name,
+                    student_name=clean_student_name,
                     document_title=doc_title,
-                    file_name=file_obj.filename,
+                    file_name=clean_filename,
                     blob_url=blob_url,
                     blob_name=blob_name,
                     file_size=file_size,
@@ -939,8 +950,9 @@ def create_app(test_config=None):
         if not doc or (doc.user_id and doc.user_id != current_user.id and current_user.role != "admin"):
             flash("Access denied.", "error")
             return redirect(url_for("index"))
-        new_title = request.form.get("document_title", "").strip()
-        new_desc = request.form.get("description", "").strip()
+        import re
+        new_title = re.sub(r"[<>]", "", request.form.get("document_title", "")).strip()
+        new_desc = re.sub(r"[<>]", "", request.form.get("description", "")).strip()
         if new_title:
             doc.document_title = new_title
         doc.description = new_desc
@@ -983,12 +995,16 @@ def create_app(test_config=None):
         if not file_bytes:
             abort(404)
 
-        return send_file(
+        resp = send_file(
             io.BytesIO(file_bytes),
             mimetype=doc.content_type or "application/octet-stream",
             as_attachment=False,
             download_name=doc.file_name,
         )
+        resp.headers["X-Content-Type-Options"] = "nosniff"
+        if doc.file_extension in ("svg", "xml"):
+            resp.headers["Content-Security-Policy"] = "default-src 'none'; sandbox"
+        return resp
 
     @app.route("/document/<int:doc_id>/download")
     @login_required
@@ -1019,12 +1035,16 @@ def create_app(test_config=None):
         file_bytes = storage_manager.get_file_bytes(doc.blob_name)
         if not file_bytes:
             abort(404)
-        return send_file(
+        resp = send_file(
             io.BytesIO(file_bytes),
             mimetype=doc.content_type or "application/octet-stream",
             as_attachment=False,
             download_name=doc.file_name,
         )
+        resp.headers["X-Content-Type-Options"] = "nosniff"
+        if doc.file_extension in ("svg", "xml"):
+            resp.headers["Content-Security-Policy"] = "default-src 'none'; sandbox"
+        return resp
 
     @app.route("/share/<string:token>/download")
     def download_shared_document(token):
@@ -1124,8 +1144,14 @@ def create_app(test_config=None):
     @app.route("/uploads/<path:filename>")
     @login_required
     def local_uploads(filename):
-        """Serves files stored locally in sandbox mode."""
-        return send_from_directory(storage_manager.local_upload_dir, filename)
+        """Serves files stored locally in sandbox mode with tenant isolation."""
+        safe_name = secure_filename(filename)
+        doc = Document.query.filter_by(blob_name=safe_name, is_deleted=False).first()
+        if not doc:
+            abort(404)
+        if doc.user_id and doc.user_id != current_user.id and current_user.role != "admin":
+            abort(403)
+        return send_from_directory(storage_manager.local_upload_dir, safe_name)
 
     @app.route("/about", methods=["GET"])
     def about():
@@ -1303,6 +1329,22 @@ def create_app(test_config=None):
             error_id=incident_id,
         ), 500
 
+    @app.before_request
+    def verify_request_origin():
+        """OWASP Cross-Origin Request Forgery (CSRF) mitigation."""
+        if request.method in ("POST", "PUT", "DELETE", "PATCH"):
+            if request.endpoint in ("google_callback", "login_google", "loading_page"):
+                return
+            origin = request.headers.get("Origin") or request.headers.get("Referer")
+            if origin:
+                from urllib.parse import urlparse
+                origin_host = urlparse(origin).netloc
+                req_host = request.host
+                if origin_host and origin_host != req_host:
+                    if not (origin_host.split(":")[0] in ("localhost", "127.0.0.1") and req_host.split(":")[0] in ("localhost", "127.0.0.1")):
+                        app.logger.warning(f"CSRF attack blocked from origin: {origin} -> target: {req_host}")
+                        abort(403)
+
     @app.after_request
     def set_security_headers(response):
         """Applies comprehensive defense-in-depth security headers (OWASP Level 2 Recommended)."""
@@ -1312,7 +1354,10 @@ def create_app(test_config=None):
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
         response.headers["X-Permitted-Cross-Domain-Policies"] = "none"
-        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+        response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+        response.headers["X-DNS-Prefetch-Control"] = "off"
         
         # Comprehensive Content Security Policy (enforcing strict resource origins)
         csp_directives = [
