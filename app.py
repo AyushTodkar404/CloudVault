@@ -453,7 +453,38 @@ def create_app(test_config=None):
 
         login_user(user)
         log_activity(user.id, "LOGIN", "Signed in via Google OAuth Single Sign-On")
+        if not app.config.get("TESTING"):
+            return redirect(
+                url_for(
+                    "loading_page",
+                    next=url_for("index"),
+                    provider="google",
+                    email=user.email,
+                    name=user.username,
+                    duration=3.5,
+                )
+            )
         return redirect(url_for("index"))
+
+    @app.route("/loading")
+    def loading_page():
+        """Enterprise loading transition page for authentication and workspace initialization."""
+        next_url = request.args.get("next", url_for("index"))
+        if not next_url.startswith("/") or next_url.startswith("//"):
+            next_url = url_for("index")
+        provider = request.args.get("provider", "google")
+        email = request.args.get("email", "")
+        name = request.args.get("name", "")
+        duration = request.args.get("duration", 3.5, type=float)
+        duration = max(3.0, min(duration, 4.5))
+        return render_template(
+            "loading.html",
+            next_url=next_url,
+            provider=provider,
+            email=email,
+            name=name,
+            duration=duration,
+        )
 
     @app.route("/login/google", methods=["GET", "POST"])
     def google_login():

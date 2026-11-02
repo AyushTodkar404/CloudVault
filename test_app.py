@@ -893,6 +893,20 @@ class CloudVaultRealProductionFeaturesTestCase(unittest.TestCase):
             self.assertIsNone(User.query.filter_by(username="purge_me").first())
 
 
+    def test_loading_page_endpoint(self):
+        """Ensure /loading returns 200 with loading telemetry and duration configuration."""
+        resp = self.client.get("/loading?duration=3.5&email=ayushtodkar404@gmail.com&name=Ayush%20Todkar")
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(b"CloudVault", resp.data)
+        self.assertIn(b"3.5", resp.data)
+        self.assertIn(b"Azure Blob Storage", resp.data)
+
+        # Test open redirect sanitization
+        resp_safe = self.client.get("/loading?next=https://malicious-site.com")
+        self.assertEqual(resp_safe.status_code, 200)
+        self.assertIn(b'nextUrl = "/"', resp_safe.data)
+
+
 if __name__ == "__main__":
     unittest.main()
 

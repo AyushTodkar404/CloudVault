@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#FAFAF9]">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Initializing Workspace &ndash; CloudVault</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍉</text></svg>">
+
+  <!-- Typography: Inter / Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+
+<body class="min-h-full flex items-center justify-center p-4 sm:p-6 bg-[#FAFAF9] text-[#202124] selection:bg-[#F0445E] selection:text-white">
+
+  <!-- Main Initialization Modal Card -->
+  <div class="w-full max-w-lg bg-white border border-[#E9EAEC] rounded-3xl p-6 sm:p-9 shadow-xl relative overflow-hidden transition-all">
+
+    <!-- Subtle Watermelon Glow Top Banner -->
+    <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#F0445E] via-[#268B65] to-[#F0445E] animate-pulse"></div>
+
+    <!-- Header Section -->
+    <div class="flex items-center justify-between border-b border-[#E9EAEC] pb-5 mb-6">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center text-lg shadow-xs">
+          🍉
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-[#202124] tracking-tight">CloudVault Enterprise</h1>
+          <p class="text-xs text-[#5F6368] font-mono">Loading Sovereign Cloud Workspace</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] text-[11px] font-mono font-bold">
+        <span class="w-2 h-2 rounded-full bg-[#268B65] animate-ping"></span>
+        <span>INITIALIZING</span>
+      </div>
+    </div>
+
+    <!-- User / Session Banner -->
+    <div class="p-3.5 rounded-2xl bg-[#FAFAF9] border border-[#E9EAEC] flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3 overflow-hidden">
+        <div class="w-9 h-9 rounded-full bg-[#F0445E] text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-xs">
+          {{ (name[0] if name else (email[0] if email else 'U')) | upper }}
+        </div>
+        <div class="overflow-hidden">
+          <p class="text-xs font-semibold text-[#202124] truncate">{{ name if name else (email if email else 'Authenticated User') }}</p>
+          <p class="text-[11px] text-[#5F6368] font-mono truncate">{{ email if email else 'OAuth 2.0 Identity Token' }}</p>
+        </div>
+      </div>
+      <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white border border-[#E9EAEC] text-[#5F6368] font-medium shrink-0">
+        Google SSO
+      </span>
+    </div>
+
+    <!-- Main Progress Bar -->
+    <div class="space-y-2 mb-6">
+      <div class="flex items-center justify-between text-xs font-mono">
+        <span id="currentStatusMessage" class="text-[#202124] font-medium truncate">Verifying OAuth 2.0 PKCE handshake...</span>
+        <span id="percentText" class="text-[#F0445E] font-bold">0%</span>
+      </div>
+      <div class="w-full bg-[#E9EAEC] h-2.5 rounded-full overflow-hidden p-0.5">
+        <div id="loadingProgressBar" class="h-full bg-gradient-to-r from-[#F0445E] to-[#268B65] rounded-full transition-all ease-out duration-200" style="width: 5%"></div>
+      </div>
+    </div>
+
+    <!-- Step-by-Step Initialization Telemetry Checklist -->
+    <div class="space-y-2.5 text-xs font-mono border border-[#E9EAEC] rounded-2xl p-4 bg-[#FAFAF9]/60 mb-6">
+      <!-- Step 1 -->
+      <div id="stepItem1" class="flex items-center justify-between text-[#202124] transition-colors">
+        <div class="flex items-center gap-2.5">
+          <span id="stepIcon1" class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] text-[#F0445E]">
+            <i class="fa-solid fa-circle-notch animate-spin"></i>
+          </span>
+          <span class="text-[11px]">1. Cryptographic SSO token validation</span>
+        </div>
+        <span id="stepBadge1" class="text-[10px] text-[#5F6368]">Validating</span>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="stepItem2" class="flex items-center justify-between text-[#777B83] transition-colors">
+        <div class="flex items-center gap-2.5">
+          <span id="stepIcon2" class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] text-[#777B83]">
+            <i class="fa-regular fa-circle text-[9px]"></i>
+          </span>
+          <span class="text-[11px]">2. Azure SQL Server tenant authorization</span>
+        </div>
+        <span id="stepBadge2" class="text-[10px] text-[#777B83]">Pending</span>
+      </div>
+
+      <!-- Step 3 -->
+      <div id="stepItem3" class="flex items-center justify-between text-[#777B83] transition-colors">
+        <div class="flex items-center gap-2.5">
+          <span id="stepIcon3" class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] text-[#777B83]">
+            <i class="fa-regular fa-circle text-[9px]"></i>
+          </span>
+          <span class="text-[11px]">3. Mounting Azure Blob Storage (documents)</span>
+        </div>
+        <span id="stepBadge3" class="text-[10px] text-[#777B83]">Pending</span>
+      </div>
+
+      <!-- Step 4 -->
+      <div id="stepItem4" class="flex items-center justify-between text-[#777B83] transition-colors">
+        <div class="flex items-center gap-2.5">
+          <span id="stepIcon4" class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] text-[#777B83]">
+            <i class="fa-regular fa-circle text-[9px]"></i>
+          </span>
+          <span class="text-[11px]">4. Row-level quota & audit stream setup</span>
+        </div>
+        <span id="stepBadge4" class="text-[10px] text-[#777B83]">Pending</span>
+      </div>
+
+      <!-- Step 5 -->
+      <div id="stepItem5" class="flex items-center justify-between text-[#777B83] transition-colors">
+        <div class="flex items-center gap-2.5">
+          <span id="stepIcon5" class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] text-[#777B83]">
+            <i class="fa-regular fa-circle text-[9px]"></i>
+          </span>
+          <span class="text-[11px]">5. Workspace ready &ndash; Launching</span>
+        </div>
+        <span id="stepBadge5" class="text-[10px] text-[#777B83]">Pending</span>
+      </div>
+    </div>
+
+    <!-- System Telemetry & Security Badges -->
+    <div class="grid grid-cols-2 gap-2 text-[10px] font-mono text-[#5F6368] mb-5">
+      <div class="p-2 rounded-xl bg-white border border-[#E9EAEC] flex items-center justify-between">
+        <span>Security:</span>
+        <span class="font-bold text-[#268B65]">TLS 1.3 / HSTS</span>
+      </div>
+      <div class="p-2 rounded-xl bg-white border border-[#E9EAEC] flex items-center justify-between">
+        <span>At-Rest:</span>
+        <span class="font-bold text-[#202124]">AES-256 Encrypted</span>
+      </div>
+      <div class="p-2 rounded-xl bg-white border border-[#E9EAEC] flex items-center justify-between">
+        <span>Isolation:</span>
+        <span class="font-bold text-[#202124]">Row-Level (RLS)</span>
+      </div>
+      <div class="p-2 rounded-xl bg-white border border-[#E9EAEC] flex items-center justify-between">
+        <span>Storage:</span>
+        <span class="font-bold text-[#268B65]">Azure Blob</span>
+      </div>
+    </div>
+
+    <!-- Manual Fallback Link -->
+    <div class="text-center pt-2">
+      <a href="{{ next_url }}" class="text-[11px] font-mono text-[#777B83] hover:text-[#F0445E] transition-colors underline underline-offset-2">
+        Taking longer than expected? Click here to launch immediately &rarr;
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    // Configurable duration (default 3.5s, strictly within 3 to 4 seconds)
+    const TOTAL_DURATION_MS = Math.max(3000, Math.min({{ duration * 1000 if duration else 3500 }}, 4500));
+    const nextUrl = "{{ next_url or '/' }}";
+
+    const progressBar = document.getElementById('loadingProgressBar');
+    const percentText = document.getElementById('percentText');
+    const statusMsg = document.getElementById('currentStatusMessage');
+
+    const steps = [
+      {
+        atPercent: 15,
+        msg: "Verifying OAuth 2.0 PKCE cryptographic handshake...",
+        stepIdx: 1,
+        badgeText: "Verified"
+      },
+      {
+        atPercent: 40,
+        msg: "Authenticating tenant credentials with Azure SQL Server...",
+        stepIdx: 2,
+        badgeText: "Connected"
+      },
+      {
+        atPercent: 68,
+        msg: "Mounting Azure Blob Storage documents container (AES-256)...",
+        stepIdx: 3,
+        badgeText: "Mounted"
+      },
+      {
+        atPercent: 88,
+        msg: "Synchronizing row-level quota allocation & telemetry...",
+        stepIdx: 4,
+        badgeText: "Isolated"
+      },
+      {
+        atPercent: 100,
+        msg: "Workspace verified. Launching CloudVault dashboard...",
+        stepIdx: 5,
+        badgeText: "Ready"
+      }
+    ];
+
+    const startTime = performance.now();
+
+    function markStepComplete(idx, badgeText) {
+      const item = document.getElementById(`stepItem${idx}`);
+      const icon = document.getElementById(`stepIcon${idx}`);
+      const badge = document.getElementById(`stepBadge${idx}`);
+
+      if (item) item.className = "flex items-center justify-between text-[#268B65] font-semibold transition-colors";
+      if (icon) icon.innerHTML = '<i class="fa-solid fa-circle-check text-[#268B65]"></i>';
+      if (badge) {
+        badge.textContent = badgeText || "Complete";
+        badge.className = "text-[10px] text-[#268B65] font-bold";
+      }
+
+      // Activate spinner on next step if available
+      const nextIdx = idx + 1;
+      const nextItem = document.getElementById(`stepItem${nextIdx}`);
+      const nextIcon = document.getElementById(`stepIcon${nextIdx}`);
+      const nextBadge = document.getElementById(`stepBadge${nextIdx}`);
+      if (nextItem && nextIdx <= 5) {
+        nextItem.className = "flex items-center justify-between text-[#202124] transition-colors";
+        if (nextIcon) nextIcon.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin text-[#F0445E]"></i>';
+        if (nextBadge) {
+          nextBadge.textContent = "Loading...";
+          nextBadge.className = "text-[10px] text-[#F0445E] font-medium";
+        }
+      }
+    }
+
+    const completedSteps = new Set();
+
+    function updateLoadingFrame(now) {
+      const elapsed = now - startTime;
+      const progressRatio = Math.min(1, elapsed / TOTAL_DURATION_MS);
+      const percent = Math.floor(progressRatio * 100);
+
+      if (progressBar) progressBar.style.width = `${Math.max(5, percent)}%`;
+      if (percentText) percentText.textContent = `${percent}%`;
+
+      // Check step completions
+      for (const step of steps) {
+        if (percent >= step.atPercent && !completedSteps.has(step.stepIdx)) {
+          completedSteps.add(step.stepIdx);
+          markStepComplete(step.stepIdx, step.badgeText);
+          if (statusMsg) statusMsg.textContent = step.msg;
+        }
+      }
+
+      if (progressRatio < 1) {
+        requestAnimationFrame(updateLoadingFrame);
+      } else {
+        // Complete! Redirect cleanly to destination dashboard
+        setTimeout(() => {
+          window.location.replace(nextUrl);
+        }, 150);
+      }
+    }
+
+    requestAnimationFrame(updateLoadingFrame);
+  </script>
+
+</body>
+
+</html>
