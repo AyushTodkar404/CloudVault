@@ -7,6 +7,8 @@
   <title>{% block title %}CloudVault &mdash; Digital Credential & Document Registry{% endblock %}</title>
   <meta name="description"
     content="Secure, high-aesthetic institutional portal for digital certificate and document verification with encrypted object storage.">
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍉</text></svg>">
 
   <!-- Modern Fonts: Plus Jakarta Sans for UI + JetBrains Mono for metadata -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -78,6 +80,11 @@
 
   <style>
     /* Watermelon UI Design System Tokens */
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
     body {
       background-color: #FAFAF9;
       color: #202124;
@@ -552,8 +559,16 @@
           <span class="px-2 py-0.5 rounded-md bg-[#FAFAF9] border border-[#E9EAEC] font-medium">Jude Rebairo <strong class="text-amber-600 font-mono">(Roll #31)</strong></span>
         </div>
 
-        <div class="font-mono text-[11px] text-[#5F6368] shrink-0">
-          Department of Computer Engineering
+        <div class="font-mono text-[11px] text-[#5F6368] shrink-0 flex items-center gap-3 flex-wrap">
+          <span>Dept. of Computer Engineering</span>
+          <span>&bull;</span>
+          <a href="mailto:ayush.todkar@somaiya.edu" class="hover:text-[#F0445E] transition-colors flex items-center gap-1">
+            <i class="fa-regular fa-envelope text-[#F0445E]"></i> Contact Lead
+          </a>
+          <span>&bull;</span>
+          <a href="tel:+912266449191" class="hover:text-[#268B65] transition-colors flex items-center gap-1">
+            <i class="fa-solid fa-phone text-[#268B65]"></i> Lab Line
+          </a>
         </div>
       </div>
 

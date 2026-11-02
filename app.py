@@ -1254,6 +1254,16 @@ def create_app(test_config=None):
             error_id=incident_id,
         ), 500
 
+    @app.after_request
+    def set_security_headers(response):
+        """Applies defense-in-depth security headers (OWASP recommended)."""
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        return response
+
     @app.errorhandler(404)
     def not_found(e):
         return render_template("404.html"), 404
