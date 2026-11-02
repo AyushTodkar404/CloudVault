@@ -75,6 +75,12 @@ def create_app(test_config=None):
 
     # Base configuration
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "cloudvault-dev-secret-key-3.14")
+    app.config["SESSION_COOKIE_HTTPONLY"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    app.config["REMEMBER_COOKIE_HTTPONLY"] = True
+    app.config["REMEMBER_COOKIE_SAMESITE"] = "Lax"
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
+    app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024  # 100MB Hard Ceiling
 
     # Database connection string from environment or Azure App Service settings
     database_url = (
@@ -149,6 +155,7 @@ def create_app(test_config=None):
             db.session.rollback()
 
     _rate_limit_cache = defaultdict(list)
+    _failed_login_cache = defaultdict(list)
 
     def rate_limit(limit=10, window=60):
         """In-memory sliding window rate limiter for security-sensitive endpoints."""
@@ -272,14 +279,36 @@ def create_app(test_config=None):
                 flash("Please enter both username/email and password.", "error")
                 return render_template("login.html")
 
+            # Anti-Brute-Force Lockout check (5 failed attempts locks for 5 minutes)
+            clean_identity = identity.lower().strip()
+            now = time.time()
+            if not app.config.get("TESTING"):
+                _failed_login_cache[clean_identity] = [t for t in _failed_login_cache[clean_identity] if now - t < 300]
+                if len(_failed_login_cache[clean_identity]) >= 5:
+                    app.logger.warning(f"Account locked temporarily for 5m due to multiple failures: {clean_identity}")
+                    flash("Account temporarily locked for 5 minutes due to multiple failed authentication attempts. Please wait.", "error")
+                    return render_template("login.html")
+
             user = User.query.filter(
                 (User.username.ilike(identity)) | (User.email.ilike(identity))
             ).first()
 
             if not user or not user.check_password(password):
-                flash("Invalid credentials. Please verify username/email and password.", "error")
+                if not app.config.get("TESTING"):
+                    _failed_login_cache[clean_identity].append(now)
+                    remaining = max(0, 5 - len(_failed_login_cache[clean_identity]))
+                    if user:
+                        log_activity(user.id, "FAILED_LOGIN", f"Authentication failure from {request.remote_addr} (Remaining: {remaining})")
+                    if remaining > 0:
+                        flash(f"Invalid credentials. Please verify username/email and password ({remaining} attempts remaining before temporary lockout).", "error")
+                    else:
+                        flash("Too many failed attempts. Account temporarily locked for 5 minutes.", "error")
+                else:
+                    flash("Invalid credentials. Please verify username/email and password.", "error")
                 return render_template("login.html")
 
+            # Successful login clears failed attempt tracking
+            _failed_login_cache.pop(clean_identity, None)
             login_user(user, remember=remember)
             log_activity(user.id, "LOGIN", "Signed in via password credentials")
             flash(f"Welcome back, {user.username}!", "success")
@@ -1256,12 +1285,29 @@ def create_app(test_config=None):
 
     @app.after_request
     def set_security_headers(response):
-        """Applies defense-in-depth security headers (OWASP recommended)."""
+        """Applies comprehensive defense-in-depth security headers (OWASP Level 2 Recommended)."""
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        response.headers["X-Permitted-Cross-Domain-Policies"] = "none"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        
+        # Comprehensive Content Security Policy (enforcing strict resource origins)
+        csp_directives = [
+            "default-src 'self'",
+            "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
+            "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+            "img-src 'self' data: https: blob:",
+            "media-src 'self' blob: https:",
+            "connect-src 'self'",
+            "frame-ancestors 'none'",
+            "base-uri 'self'",
+            "form-action 'self' https://accounts.google.com",
+        ]
+        response.headers["Content-Security-Policy"] = "; ".join(csp_directives)
         return response
 
     @app.errorhandler(404)

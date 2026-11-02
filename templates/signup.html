@@ -85,6 +85,17 @@
             <i class="fa-regular fa-eye text-xs"></i>
           </button>
         </div>
+
+        <!-- Real-Time Password Strength Meter -->
+        <div class="mt-2 space-y-1">
+          <div class="flex items-center justify-between text-[11px] font-mono text-[#777B83]">
+            <span>Password Strength:</span>
+            <span id="strengthText" class="font-bold text-[#F0445E]">Enter Password</span>
+          </div>
+          <div class="w-full bg-[#E9EAEC] h-1.5 rounded-full overflow-hidden flex">
+            <div id="strengthBar" class="h-full bg-[#F0445E] rounded-full transition-all duration-300" style="width: 5%"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Confirm Password -->
@@ -167,6 +178,46 @@
       input.type = 'password';
       icon.classList.replace('fa-eye-slash', 'fa-eye');
     }
+  }
+
+  // Real-Time Password Entropy / Strength Calculation
+  const pwInput = document.getElementById('password');
+  const strengthText = document.getElementById('strengthText');
+  const strengthBar = document.getElementById('strengthBar');
+
+  if (pwInput) {
+    pwInput.addEventListener('input', () => {
+      const val = pwInput.value;
+      if (!val) {
+        strengthBar.style.width = '5%';
+        strengthBar.className = 'h-full bg-[#F0445E] rounded-full transition-all duration-300';
+        strengthText.textContent = 'Enter Password';
+        strengthText.className = 'font-bold text-[#777B83]';
+        return;
+      }
+
+      let score = 0;
+      if (val.length >= 6) score += 25;
+      if (val.length >= 8) score += 20;
+      if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score += 20;
+      if (/[0-9]/.test(val)) score += 20;
+      if (/[^A-Za-z0-9]/.test(val)) score += 15;
+
+      strengthBar.style.width = `${score}%`;
+      if (score < 40) {
+        strengthBar.className = 'h-full bg-[#F0445E] rounded-full transition-all duration-300';
+        strengthText.textContent = 'Weak';
+        strengthText.className = 'font-bold text-[#F0445E]';
+      } else if (score < 70) {
+        strengthBar.className = 'h-full bg-amber-500 rounded-full transition-all duration-300';
+        strengthText.textContent = 'Moderate';
+        strengthText.className = 'font-bold text-amber-600';
+      } else {
+        strengthBar.className = 'h-full bg-[#268B65] rounded-full transition-all duration-300';
+        strengthText.textContent = 'Strong (High Security)';
+        strengthText.className = 'font-bold text-[#268B65]';
+      }
+    });
   }
 </script>
 {% endblock %}

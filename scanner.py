@@ -52,6 +52,17 @@ PROHIBITED_PAYLOAD_STRINGS = [
     b"/bin" + b"/bash",
 ]
 
+# Prohibited dangerous script vectors in SVG images (Stored XSS mitigation)
+PROHIBITED_SVG_PATTERNS = [
+    b"<script",
+    b"onload=",
+    b"onerror=",
+    b"onclick=",
+    b"javascript:",
+    b"xlink:href=\"javascript:",
+    b"xlink:href='javascript:",
+]
+
 
 class FileScanResult:
     def __init__(self, is_clean, reason=None, signature_matched=None):
@@ -76,6 +87,20 @@ class FileSecurityScanner:
             return FileScanResult(False, "Empty (0-byte) file stream rejected.")
 
         ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+
+        # Check for path traversal or null byte injections in filename
+        if any(seq in filename for seq in ("../", "..\\", "/..", "\\..", "%2e%2e", "\x00")):
+            return FileScanResult(False, "Security Violation: Path traversal or null byte injection detected in filename.")
+
+        # SVG Stored XSS Script Vector Inspection
+        if ext == "svg":
+            lower_bytes = file_bytes.lower()
+            for pattern in PROHIBITED_SVG_PATTERNS:
+                if pattern in lower_bytes:
+                    return FileScanResult(
+                        False,
+                        f"Security Violation: Prohibited active script vector detected in SVG image ({pattern.decode('utf-8', errors='ignore')})."
+                    )
 
         # 1. Check for Disguised Executable Binaries (Polyglot / Trojan Detection)
         # Even if a file is named 'syllabus.pdf' or 'photo.png', reject if it starts with MZ or ELF
