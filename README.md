@@ -380,7 +380,6 @@ az webapp up \
 ## 🔒 Security & Best Practices Implemented
 
 - **Password Cryptography**: Passwords salted and hashed with `werkzeug.security` using modern `scrypt`.
-- **Two-Factor Authentication (MFA / 2FA)**: RFC 6238 Time-Based One-Time Passwords (TOTP) natively supported via standard authenticator apps (Google Authenticator, Microsoft Authenticator, Apple Passwords).
 - **Tenant Vault Isolation**: `@login_required` enforced on all repository data; documents are strictly filtered by `current_user.id`.
 - **Zero Credentials in Code**: Database passwords and storage keys are never committed; loaded via environment variables or encrypted secrets.
 - **Cryptographic Filenames**: Prefixed with `uuid4().hex[:10]` preventing file collision and directory traversal attacks.
