@@ -22,17 +22,17 @@
           CloudVault Document Registry
         </h1>
         <p class="text-xs sm:text-sm text-[#5F6368] max-w-2xl leading-relaxed">
-          Multi-tenant digital credential hot-store on Microsoft Azure, implementing PaaS, DBaaS, SaaS Object Storage, SECaaS, and IaaS.
+          A focused document registry for coursework and credentials, with local storage or Azure Blob Storage depending on deployment.
         </p>
       </div>
 
       <!-- Quick Metrics Strip -->
       <div class="flex items-center gap-2.5 shrink-0 font-mono text-xs">
         <div class="p-2.5 sm:p-3 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] flex items-center gap-2.5">
-          <span class="w-2.5 h-2.5 rounded-full {% if is_cloud_active %}bg-[#268B65] animate-pulse{% else %}bg-amber-500{% endif %}"></span>
+          <span class="w-2.5 h-2.5 rounded-full {% if is_cloud_active %}bg-[#268B65]{% else %}bg-amber-500{% endif %}"></span>
           <div>
-            <span class="text-[9px] text-[#5F6368] block uppercase tracking-wider">Cloud Tier</span>
-            <span class="font-bold text-[#202124] text-xs">{% if is_cloud_active %}Azure Hot-Store{% else %}Sandbox{% endif %}</span>
+            <span class="text-[9px] text-[#5F6368] block uppercase tracking-wider">Storage</span>
+            <span class="font-bold text-[#202124] text-xs">{% if is_cloud_active %}Azure Blob{% else %}Local storage{% endif %}</span>
           </div>
         </div>
         <div class="p-2.5 sm:p-3 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] flex items-center gap-2.5">
@@ -179,7 +179,7 @@
             </div>
             <p class="text-xs font-semibold text-amber-700 font-mono">Security, Access Control & QA Engineer</p>
             <p class="text-xs text-[#5F6368] leading-relaxed">
-              SECaaS security subsystem, scrypt password hashing, automated test suites (23 test vectors), and deep file integrity scanning.
+              Security, access control, scrypt password hashing, automated test suites (32 test vectors), and deep file integrity scanning.
             </p>
             <div class="flex items-center gap-1.5 flex-wrap pt-1 text-[10px] font-mono text-[#5F6368]">
               <span class="px-2 py-0.5 rounded bg-[#FAFAF9] border border-[#E9EAEC]">Audit Logging</span>
@@ -396,7 +396,7 @@
           <i class="fa-solid fa-user-shield text-[#F0445E] text-xs"></i>
         </div>
         <p class="text-xs text-[#5F6368] leading-relaxed">
-          Deep byte header scanning engine, binary malware intercept (MZ/ELF), Scrypt password hashing, and immutable SQL audit telemetry.
+          Deep byte header scanning, blocked executable formats, Scrypt password hashing, and an SQL activity log.
         </p>
         <div class="flex flex-wrap gap-1 text-[10px] font-mono text-[#5F6368]">
           <span class="px-1.5 py-0.5 rounded bg-[#FAFAF9] border border-[#E9EAEC]">Magic Bytes</span>
@@ -482,7 +482,7 @@
         </div>
         <p class="text-xl font-extrabold text-[#202124] font-mono">Zero-Byte Reject</p>
         <p class="text-xs text-[#5F6368] leading-relaxed">
-          Rejects 0-byte corrupted files, validates UTF-8 streams, and generates SHA-256 integrity anchors for tamper-proof verification.
+              Rejects empty and structurally invalid uploads, then records a unique storage identifier for each document.
         </p>
       </div>
     </div>
@@ -577,7 +577,7 @@
         <p class="text-xs text-[#5F6368]">Demonstration checklist for lab examiners and evaluators</p>
       </div>
       <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5]">
-        100% Verified
+        Review checklist
       </span>
     </div>
 

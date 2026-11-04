@@ -70,6 +70,7 @@
 
           <!-- Account 1: Ayush Todkar (ayushtodkar404@gmail.com) -->
           <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('Ayush Todkar', 'ayushtodkar404@gmail.com')">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="name" value="Ayush Todkar">
             <input type="hidden" name="email" value="ayushtodkar404@gmail.com">
             <button type="submit" class="w-full text-left px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between group cursor-pointer">
@@ -87,6 +88,7 @@
 
           <!-- Account 2: Ayush Todkar (ayushtodkar77@gmail.com) -->
           <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('Ayush Todkar', 'ayushtodkar77@gmail.com')">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="name" value="Ayush Todkar">
             <input type="hidden" name="email" value="ayushtodkar77@gmail.com">
             <button type="submit" class="w-full text-left px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between group cursor-pointer">
@@ -104,6 +106,7 @@
 
           <!-- Account 3: Ayush Todkar (ayushtodkar33@gmail.com) -->
           <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('Ayush Todkar', 'ayushtodkar33@gmail.com')">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="name" value="Ayush Todkar">
             <input type="hidden" name="email" value="ayushtodkar33@gmail.com">
             <button type="submit" class="w-full text-left px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between group cursor-pointer">
@@ -121,6 +124,7 @@
 
           <!-- Account 4: ayush TODKAR (ayushtodkar68@gmail.com) -->
           <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('ayush TODKAR', 'ayushtodkar68@gmail.com')">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="name" value="ayush TODKAR">
             <input type="hidden" name="email" value="ayushtodkar68@gmail.com">
             <button type="submit" class="w-full text-left px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between group cursor-pointer">
@@ -138,6 +142,7 @@
 
           <!-- Account 5: Vijay Todkar (vijayrtodkar411@gmail.com) -->
           <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('Vijay Todkar', 'vijayrtodkar411@gmail.com')">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="name" value="Vijay Todkar">
             <input type="hidden" name="email" value="vijayrtodkar411@gmail.com">
             <button type="submit" class="w-full text-left px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between group cursor-pointer">
@@ -172,6 +177,7 @@
               </summary>
 
               <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('Custom User', document.getElementById('customGoogleEmail').value)" class="p-5 bg-[#282a2c]/60 border-t border-[#333537] space-y-3">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <div>
                   <label class="block text-[11px] font-medium text-[#9aa0a6] mb-1.5">Email or phone</label>
                   <input type="email" id="customGoogleEmail" name="email" required placeholder="username@gmail.com" class="w-full px-3.5 py-2.5 rounded-lg text-sm bg-[#131314] border border-[#333537] text-[#e3e3e3] placeholder-[#777B83] focus:outline-none focus:border-[#4285F4] transition-colors">

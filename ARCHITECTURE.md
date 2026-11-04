@@ -29,7 +29,7 @@ The application is architected from the ground up to utilize all five primary cl
 | **Ayush Todkar** | **57** | **Lead Cloud Architect & Full-Stack Developer** &bull; PaaS deployment orchestration, WSGI pipeline, multi-tenant document isolation, Google SSO, and UI/UX design. |
 | **Yahiya Siddiqui** | **49** | **Database & Cloud Infrastructure Engineer** &bull; Azure SQL Database (DBaaS) relational schema, indexing, foreign keys, and IaaS VM uptime sentinel. |
 | **Alister Varghese K.** | **03** | **Cloud Storage & Quota Systems Engineer** &bull; Azure Blob Storage integration, UUID namespaces, 5.0 GB student quota tracking (matching Azure Free Tier), and batch drag-and-drop. |
-| **Jude Rebairo** | **31** | **Security, Access Control & QA Engineer** &bull; SECaaS security subsystem, scrypt password hashing, automated test suites (21 tests), and deep file integrity & threat scanner. |
+| **Jude Rebairo** | **31** | **Security, Access Control & QA Engineer** &bull; Security subsystem, scrypt password hashing, automated test suites (32 tests), and deep file integrity & threat scanner. |
 
 ---
 
@@ -56,7 +56,7 @@ The application is architected from the ground up to utilize all five primary cl
 │    (cloudvault-keyvault1)       │ │    (cloudvaultdb)             │ │    (cloudvault1)                 │
 │    - Hardware Security Module   │ │    - Server: sqlserver-...    │ │    - Container: documents        │
 │    - Secret: DatabaseUrl        │ │    - Relational multi-tenancy │ │    - Direct binary file store    │
-│    - Secret: StorageConnString  │ │    - Encrypted password hashes│ │    - Previews & inline streaming │
+│    - Secret: StorageConnString  │ │    - Password hashes           │ │    - Previews & inline streaming │
 │    - Zero plaintext in code     │ │    - Filtered unique indexing │ │    - 100MB universal upload size │
 └─────────────────────────────────┘ └───────────────────────────────┘ └──────────────────────────────────┘
                    │
@@ -113,7 +113,7 @@ The application is architected from the ground up to utilize all five primary cl
 * **What it does**:
   - Implements **Zero-Trust Security**: No plaintext database credentials or storage keys are stored inside git repositories or plain configuration files.
   - Secrets stored:
-    - `DatabaseUrl`: Full encrypted database connection string.
+    - `DatabaseUrl`: Database connection string stored as a deployment secret.
     - `StorageConnString`: Azure Blob Storage security token.
   - **System-Assigned Managed Identity**: `cloudvault-app` registers an Azure Active Directory (Entra ID) identity. The Key Vault assigns an Access Policy allowing only this specific identity to read keys via `@Microsoft.KeyVault(...)` syntax.
 
@@ -132,8 +132,8 @@ The application is architected from the ground up to utilize all five primary cl
 ### 1. Modern Passwordless Google Sign-In
 * Users can sign in with 1-click without creating passwords or entering credentials.
 * **Dual-Mode Authentication**:
-  1. **Emergent Zero-Config Mode**: Instant 1-click account chooser ([google_picker.html](file:///c:/CC_MINI_PROJECT/templates/google_picker.html)) allowing users to click their account card or type an institutional Google email to establish a secure authenticated session instantly.
-  2. **Live OAuth 2.0 Mode**: Automatically redirects to `accounts.google.com/o/oauth2/v2/auth` when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are supplied in production.
+  1. **Development Picker**: A local/test-only account chooser ([google_picker.html](templates/google_picker.html)) is available only under the Flask test configuration. It is not an authentication path for production.
+  2. **Live OAuth 2.0 Mode**: Redirects to `accounts.google.com/o/oauth2/v2/auth` when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are supplied.
 * Auto-provisions new users with a cryptographically randomized 256-bit password token, student role, and dedicated document vault.
 
 ### 2. Traditional Email & Password Auth
@@ -215,7 +215,7 @@ C:\CC_MINI_PROJECT\
 ├── scanner.py                    # Deep byte integrity & malware heuristic engine
 ├── startup.sh                    # Linux App Service production Gunicorn boot script
 ├── storage.py                    # Azure Blob Storage SDK driver with scanner intercept
-├── test_app.py                   # Automated test suite (21 integration & unit tests)
+├── test_app.py                   # Automated test suite (32 integration & unit tests)
 └── ARCHITECTURE.md               # This system architecture and operations manual
 ```
 
@@ -247,11 +247,11 @@ CloudVault includes 4 enterprise-grade capabilities that transition it into a co
 - **Hybrid Performance**: Instant zero-latency client-side filtering combined with server-side query parameter persistence (`?sort=...&time=...&category=...`).
 
 ### 4. Cloud Security Audit & Activity Telemetry (SECaaS)
-- **Immutable Audit Trail**: Chronological event tracking table (`ActivityLog`) in Azure SQL Database.
+- **Activity Audit Trail**: Chronological event tracking table (`ActivityLog`) in Azure SQL Database.
 - **Tracked Security Actions**:
   - `SIGNUP`: New account registrations and Google SSO provisioning.
   - `LOGIN` / `LOGOUT`: Credential verifications and session terminations.
-  - `UPLOAD`: File ingestion with byte size and integrity hash tracking.
+  - `UPLOAD`: File ingestion with byte size and storage identifier tracking.
   - `STAR` / `UNSTAR`: Bookmark and favorite state changes.
   - `SHARE`: Cryptographic public token generation.
   - `TRASH` / `RESTORE`: Recycle bin state transitions.

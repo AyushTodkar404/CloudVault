@@ -12,11 +12,12 @@
         <i class="fa-solid fa-user-plus text-base"></i>
       </div>
       <h1 class="text-xl font-bold text-[#202124] tracking-tight">Register for CloudVault</h1>
-      <p class="text-xs text-[#5F6368] font-mono">Create an account to securely store verified records</p>
+      <p class="text-xs text-[#5F6368] font-mono">Create an account to store your academic records</p>
     </div>
 
     <!-- Sign Up Form -->
     <form method="POST" action="{{ url_for('signup') }}" class="space-y-4">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       
       <!-- Username -->
       <div>

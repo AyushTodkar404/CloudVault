@@ -7,14 +7,17 @@
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#E9EAEC]">
     <div class="space-y-0.5">
       <h1 class="text-xl font-bold text-[#202124] tracking-tight">All Files</h1>
-      <p class="text-xs text-[#5F6368]">Signed in as <strong class="text-[#202124]">{{ current_user.username }}</strong></p>
+      <p class="text-xs text-[#5F6368]">Signed in as <strong class="text-[#202124]">{{ current_user.username }}</strong>
+      </p>
     </div>
     <div class="flex items-center gap-2 text-xs shrink-0">
-      <a href="{{ url_for('about') }}" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#5F6368] hover:text-[#202124] flex items-center gap-1.5 transition-all shadow-xs">
+      <a href="{{ url_for('about') }}"
+        class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#5F6368] hover:text-[#202124] flex items-center gap-1.5 transition-all shadow-xs">
         <i class="fa-solid fa-circle-info text-xs"></i>
         <span>About</span>
       </a>
-      <button type="button" onclick="openUploadModal()" class="px-3.5 py-1.5 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white font-semibold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer">
+      <button type="button" onclick="openUploadModal()"
+        class="px-3.5 py-1.5 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white font-semibold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer">
         <i class="fa-solid fa-plus text-xs"></i>
         <span>Upload File</span>
       </button>
@@ -23,12 +26,13 @@
 
   <!-- Metric Overview -->
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-    
+
     <!-- Metric 1: Total Files -->
     <div class="bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] rounded-2xl p-4 shadow-xs transition-all">
       <div class="flex items-center justify-between text-xs text-[#5F6368] mb-1">
         <span class="text-[11px] font-medium text-[#777B83]">Total Files</span>
-        <span class="w-7 h-7 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center text-[#F0445E]">
+        <span
+          class="w-7 h-7 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center text-[#F0445E]">
           <i class="fa-solid fa-folder-closed text-xs"></i>
         </span>
       </div>
@@ -38,14 +42,15 @@
           <i class="fa-solid fa-star text-[9px]"></i> {{ starred_count }} starred
         </span>
       </div>
-      <p class="text-[11px] text-[#777B83] mt-1 font-mono">Securely stored</p>
+      <p class="text-[11px] text-[#777B83] mt-1 font-mono">Active files</p>
     </div>
 
     <!-- Metric 2: Storage Capacity -->
     <div class="bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] rounded-2xl p-4 shadow-xs transition-all">
       <div class="flex items-center justify-between text-xs text-[#5F6368] mb-1">
         <span class="text-[11px] font-medium text-[#777B83]">Storage Used</span>
-        <span class="w-7 h-7 rounded-lg bg-[#EAF6EF] border border-[#BEE7D5] flex items-center justify-center text-[#268B65]">
+        <span
+          class="w-7 h-7 rounded-lg bg-[#EAF6EF] border border-[#BEE7D5] flex items-center justify-center text-[#268B65]">
           <i class="fa-solid fa-hard-drive text-xs"></i>
         </span>
       </div>
@@ -54,7 +59,8 @@
         <span class="text-[11px] text-[#777B83]">of {{ storage_quota }}</span>
       </div>
       <div class="w-full bg-[#E9EAEC] h-1.5 rounded-full mt-2.5 overflow-hidden">
-        <div class="bg-[#F0445E] h-full transition-all duration-500 rounded-full" style="width: {{ storage_percent }}%"></div>
+        <div class="bg-[#F0445E] h-full transition-all duration-500 rounded-full" style="width: {{ storage_percent }}%">
+        </div>
       </div>
       <p class="text-[11px] text-[#777B83] mt-1 font-mono">{{ storage_percent }}% capacity</p>
     </div>
@@ -63,170 +69,136 @@
     <div class="bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] rounded-2xl p-4 shadow-xs transition-all">
       <div class="flex items-center justify-between text-xs text-[#5F6368] mb-1">
         <span class="text-[11px] font-medium text-[#777B83]">Cloud Storage</span>
-        <span class="w-7 h-7 rounded-lg bg-[#EAF6EF] border border-[#BEE7D5] text-[#268B65] flex items-center justify-center">
+        <span
+          class="w-7 h-7 rounded-lg bg-[#EAF6EF] border border-[#BEE7D5] text-[#268B65] flex items-center justify-center">
           <i class="fa-solid fa-cloud text-xs"></i>
         </span>
       </div>
       <div class="flex items-baseline gap-2">
         <span class="text-base font-bold text-[#202124] truncate max-w-[140px]" title="{{ container_name }}">
-          Azure Blob
+          {% if is_cloud_active %}Azure Blob{% else %}Local storage{% endif %}
         </span>
-        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] font-bold">
-          ONLINE
+        <span
+          class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] font-bold">
+          {% if is_cloud_active %}Connected{% else %}Local mode{% endif %}
         </span>
       </div>
-      <p class="text-[11px] text-[#777B83] mt-1 font-mono">Encrypted container</p>
+      <p class="text-[11px] text-[#777B83] mt-1 font-mono">Configured storage location</p>
     </div>
 
     <!-- Metric 4: Security Standard -->
     <div class="bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] rounded-2xl p-4 shadow-xs transition-all">
       <div class="flex items-center justify-between text-xs text-[#5F6368] mb-1">
         <span class="text-[11px] font-medium text-[#777B83]">Encryption</span>
-        <span class="w-7 h-7 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center text-[#F0445E]">
+        <span
+          class="w-7 h-7 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center text-[#F0445E]">
           <i class="fa-solid fa-lock text-xs"></i>
         </span>
       </div>
       <div class="flex items-baseline gap-2">
-        <span class="text-base font-bold text-[#F0445E]">AES-256</span>
+        <span class="text-base font-bold text-[#F0445E]">Access controlled</span>
       </div>
-      <p class="text-[11px] text-[#777B83] mt-1 font-mono">End-to-end protected</p>
+      <p class="text-[11px] text-[#777B83] mt-1 font-mono">Signed-in access only</p>
     </div>
 
   </div>
 
   <!-- Main Repository Control Center -->
   <div class="bg-white border border-[#E9EAEC] rounded-2xl p-5 sm:p-6 shadow-xs space-y-5">
-    
+
     <!-- Top Action & Filter Toolbar -->
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 pb-4 border-b border-[#E9EAEC]">
-      
+
       <!-- Category Tabs (Sleek Watermelon Capsule Buttons) -->
-      <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-xs self-start overflow-x-auto max-w-full">
-        <button 
-          type="button" 
-          onclick="filterCategory('all')" 
-          id="tab-all"
-          class="tab-btn px-3 py-1.5 rounded-lg font-semibold transition-all bg-[#F0445E] text-white shadow-xs whitespace-nowrap"
-        >
+      <div
+        class="flex items-center gap-1.5 p-1 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-xs self-start overflow-x-auto max-w-full">
+        <button type="button" onclick="filterCategory('all')" id="tab-all"
+          class="tab-btn px-3 py-1.5 rounded-lg font-semibold transition-all bg-[#F0445E] text-white shadow-xs whitespace-nowrap">
           All ({{ documents|length }})
         </button>
-        <button 
-          type="button" 
-          onclick="filterCategory('starred')" 
-          id="tab-starred"
-          class="tab-btn px-3 py-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] font-medium transition-all whitespace-nowrap"
-        >
+        <button type="button" onclick="filterCategory('starred')" id="tab-starred"
+          class="tab-btn px-3 py-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] font-medium transition-all whitespace-nowrap">
           <i class="fa-solid fa-star text-amber-500 mr-1 text-[11px]"></i> Starred ({{ starred_count }})
         </button>
-        <button 
-          type="button" 
-          onclick="filterCategory('documents')" 
-          id="tab-documents"
-          class="tab-btn px-3 py-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] font-medium transition-all whitespace-nowrap"
-        >
+        <button type="button" onclick="filterCategory('documents')" id="tab-documents"
+          class="tab-btn px-3 py-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] font-medium transition-all whitespace-nowrap">
           <i class="fa-solid fa-file-lines text-[#F0445E] mr-1 text-[11px]"></i> Documents
         </button>
-        <button 
-          type="button" 
-          onclick="filterCategory('media')" 
-          id="tab-media"
-          class="tab-btn px-3 py-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] font-medium transition-all whitespace-nowrap"
-        >
+        <button type="button" onclick="filterCategory('media')" id="tab-media"
+          class="tab-btn px-3 py-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] font-medium transition-all whitespace-nowrap">
           <i class="fa-solid fa-photo-film text-amber-500 mr-1 text-[11px]"></i> Audio / Video
         </button>
-        <button 
-          type="button" 
-          onclick="filterCategory('spreadsheet')" 
-          id="tab-spreadsheet"
-          class="tab-btn px-3 py-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] font-medium transition-all whitespace-nowrap"
-        >
+        <button type="button" onclick="filterCategory('spreadsheet')" id="tab-spreadsheet"
+          class="tab-btn px-3 py-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] font-medium transition-all whitespace-nowrap">
           <i class="fa-solid fa-file-excel text-[#268B65] mr-1 text-[11px]"></i> Spreadsheets
         </button>
-        <button 
-          type="button" 
-          onclick="filterCategory('image')" 
-          id="tab-image"
-          class="tab-btn px-3 py-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] font-medium transition-all whitespace-nowrap"
-        >
+        <button type="button" onclick="filterCategory('image')" id="tab-image"
+          class="tab-btn px-3 py-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] font-medium transition-all whitespace-nowrap">
           <i class="fa-solid fa-file-image text-sky-500 mr-1 text-[11px]"></i> Images
         </button>
-        <button 
-          type="button" 
-          onclick="filterCategory('trash')" 
-          id="tab-trash"
-          class="tab-btn px-3 py-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] font-medium transition-all whitespace-nowrap"
-        >
+        <button type="button" onclick="filterCategory('trash')" id="tab-trash"
+          class="tab-btn px-3 py-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] font-medium transition-all whitespace-nowrap">
           <i class="fa-solid fa-trash-can text-[#D92D50] mr-1 text-[11px]"></i> Trash ({{ trash_count }})
         </button>
       </div>
 
       <!-- Right Toolbar: Search, Sort, View Switcher, Upload Button -->
       <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full lg:w-auto">
-        
+
         <!-- Live Instant Search Bar -->
         <div class="relative w-full sm:w-56">
           <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#777B83] pointer-events-none">
             <i class="fa-solid fa-magnifying-glass text-xs"></i>
           </span>
-          <input 
-            type="text" 
-            id="instantSearch" 
-            oninput="handleInstantSearch(this.value)"
-            placeholder="Search vault... (Ctrl+K)" 
-            class="wm-input w-full pl-8 pr-12 py-1.5 rounded-xl text-xs placeholder-[#777B83]"
-          >
-          <span class="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none text-[10px] font-mono text-[#777B83] hidden sm:inline">
+          <input type="text" id="instantSearch" oninput="handleInstantSearch(this.value)"
+            placeholder="Search files"
+            class="wm-input w-full pl-8 pr-12 py-1.5 rounded-xl text-xs placeholder-[#777B83]">
+          <span
+            class="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none text-[10px] font-mono text-[#777B83] hidden sm:inline">
             Ctrl+K
           </span>
         </div>
 
         <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
           <!-- Time Filter Select -->
-          <select id="timeFilterSelect" onchange="handleTimeFilterChange(this.value)" class="wm-input py-1.5 px-2 rounded-xl text-xs font-mono bg-white border border-[#E9EAEC] text-[#202124] flex-1 sm:flex-initial" title="Filter by date range">
-            <option value="all" {% if current_time == 'all' %}selected{% endif %}>All Time</option>
-            <option value="today" {% if current_time == 'today' %}selected{% endif %}>Today</option>
-            <option value="week" {% if current_time == 'week' %}selected{% endif %}>Past 7 Days</option>
-            <option value="month" {% if current_time == 'month' %}selected{% endif %}>Past 30 Days</option>
+          <select id="timeFilterSelect" onchange="handleTimeFilterChange(this.value)"
+            class="wm-input py-1.5 px-2 rounded-xl text-xs font-mono bg-white border border-[#E9EAEC] text-[#202124] flex-1 sm:flex-initial"
+            title="Filter by date range">
+            <option value="all" {% if current_time=='all' %}selected{% endif %}>All Time</option>
+            <option value="today" {% if current_time=='today' %}selected{% endif %}>Today</option>
+            <option value="week" {% if current_time=='week' %}selected{% endif %}>Past 7 Days</option>
+            <option value="month" {% if current_time=='month' %}selected{% endif %}>Past 30 Days</option>
           </select>
 
           <!-- Sort Select -->
-          <select id="sortSelect" onchange="handleSortChange(this.value)" class="wm-input py-1.5 px-2 rounded-xl text-xs font-mono bg-white border border-[#E9EAEC] text-[#202124] flex-1 sm:flex-initial" title="Sort files">
-            <option value="date-desc" {% if current_sort in ('newest', 'date-desc') %}selected{% endif %}>Newest</option>
-            <option value="date-asc" {% if current_sort in ('oldest', 'date-asc') %}selected{% endif %}>Oldest</option>
-            <option value="name-asc" {% if current_sort == 'name-asc' %}selected{% endif %}>Name (A-Z)</option>
-            <option value="name-desc" {% if current_sort == 'name-desc' %}selected{% endif %}>Name (Z-A)</option>
-            <option value="size-desc" {% if current_sort == 'size-desc' %}selected{% endif %}>Largest</option>
-            <option value="size-asc" {% if current_sort == 'size-asc' %}selected{% endif %}>Smallest</option>
+          <select id="sortSelect" onchange="handleSortChange(this.value)"
+            class="wm-input py-1.5 px-2 rounded-xl text-xs font-mono bg-white border border-[#E9EAEC] text-[#202124] flex-1 sm:flex-initial"
+            title="Sort files">
+            <option value="date-desc" {% if current_sort in ('newest', 'date-desc' ) %}selected{% endif %}>Newest
+            </option>
+            <option value="date-asc" {% if current_sort in ('oldest', 'date-asc' ) %}selected{% endif %}>Oldest</option>
+            <option value="name-asc" {% if current_sort=='name-asc' %}selected{% endif %}>Name (A-Z)</option>
+            <option value="name-desc" {% if current_sort=='name-desc' %}selected{% endif %}>Name (Z-A)</option>
+            <option value="size-desc" {% if current_sort=='size-desc' %}selected{% endif %}>Largest</option>
+            <option value="size-asc" {% if current_sort=='size-asc' %}selected{% endif %}>Smallest</option>
           </select>
 
           <!-- View Switcher (Table vs Grid) -->
           <div class="flex items-center p-0.5 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-xs shrink-0">
-            <button 
-              type="button" 
-              onclick="switchView('table')" 
-              id="viewTableBtn"
-              class="p-1.5 rounded-lg bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] transition-colors" 
-              title="List Table View"
-            >
+            <button type="button" onclick="switchView('table')" id="viewTableBtn"
+              class="p-1.5 rounded-lg bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] transition-colors"
+              title="List Table View">
               <i class="fa-solid fa-list text-xs"></i>
             </button>
-            <button 
-              type="button" 
-              onclick="switchView('grid')" 
-              id="viewGridBtn"
-              class="p-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] transition-colors" 
-              title="Card Grid View"
-            >
+            <button type="button" onclick="switchView('grid')" id="viewGridBtn"
+              class="p-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] transition-colors" title="Card Grid View">
               <i class="fa-solid fa-grip text-xs"></i>
             </button>
           </div>
 
           <!-- Primary Upload Trigger CTA -->
-          <button 
-            type="button" 
-            onclick="openUploadModal()" 
-            class="px-3.5 py-1.5 bg-[#F0445E] hover:bg-[#D92D50] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs whitespace-nowrap active:scale-95 shrink-0"
-          >
+          <button type="button" onclick="openUploadModal()"
+            class="px-3.5 py-1.5 bg-[#F0445E] hover:bg-[#D92D50] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs whitespace-nowrap active:scale-95 shrink-0">
             <i class="fa-solid fa-cloud-arrow-up text-[11px]"></i>
             <span class="hidden sm:inline">Upload</span>
           </button>
@@ -237,33 +209,41 @@
     </div>
 
     <!-- Multi-Select Batch Actions Bar (Floating Sticky Bar) -->
-    <div id="batchActionBar" class="hidden flex items-center justify-between p-3 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-xs shadow-md animate-fade-in">
+    <div id="batchActionBar"
+      class="hidden flex items-center justify-between p-3 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-xs shadow-md animate-fade-in">
       <div class="flex items-center gap-3">
         <span id="selectedCountDisplay" class="font-bold text-[#F0445E] font-mono">0 files selected</span>
-        <button type="button" onclick="selectAll(true)" class="text-[#202124] hover:underline text-[11px] font-mono">Select All</button>
-        <button type="button" onclick="selectAll(false)" class="text-[#5F6368] hover:underline text-[11px] font-mono">Clear</button>
+        <button type="button" onclick="selectAll(true)"
+          class="text-[#202124] hover:underline text-[11px] font-mono">Select All</button>
+        <button type="button" onclick="selectAll(false)"
+          class="text-[#5F6368] hover:underline text-[11px] font-mono">Clear</button>
       </div>
       <div class="flex items-center gap-2">
         <form id="batchForm" method="POST" action="{{ url_for('batch_action') }}" class="flex items-center gap-2">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
           <input type="hidden" name="action" id="batchActionInput" value="">
           <input type="hidden" name="doc_ids_csv" id="batchDocIdsInput" value="">
-          
-          <button type="button" onclick="submitBatch('download_zip')" class="px-3 py-1.5 rounded-lg bg-white hover:bg-[#FAFAF9] text-[#202124] font-mono font-semibold flex items-center gap-1.5 border border-[#E9EAEC] shadow-xs">
+
+          <button type="button" onclick="submitBatch('download_zip')"
+            class="px-3 py-1.5 rounded-lg bg-white hover:bg-[#FAFAF9] text-[#202124] font-mono font-semibold flex items-center gap-1.5 border border-[#E9EAEC] shadow-xs">
             <i class="fa-solid fa-file-zipper text-xs text-amber-500"></i>
             <span>Download ZIP</span>
           </button>
-          
-          <button type="button" id="batchTrashBtn" onclick="submitBatch('trash')" class="px-3 py-1.5 rounded-lg bg-[#F0445E] hover:bg-[#D92D50] text-white font-mono font-semibold flex items-center gap-1.5 shadow-xs">
+
+          <button type="button" id="batchTrashBtn" onclick="submitBatch('trash')"
+            class="px-3 py-1.5 rounded-lg bg-[#F0445E] hover:bg-[#D92D50] text-white font-mono font-semibold flex items-center gap-1.5 shadow-xs">
             <i class="fa-solid fa-trash-can text-xs"></i>
             <span>Move to Trash</span>
           </button>
 
-          <button type="button" id="batchRestoreBtn" onclick="submitBatch('restore')" class="hidden px-3 py-1.5 rounded-lg bg-[#268B65] hover:bg-[#1F7052] text-white font-mono font-semibold flex items-center gap-1.5 shadow-xs">
+          <button type="button" id="batchRestoreBtn" onclick="submitBatch('restore')"
+            class="hidden px-3 py-1.5 rounded-lg bg-[#268B65] hover:bg-[#1F7052] text-white font-mono font-semibold flex items-center gap-1.5 shadow-xs">
             <i class="fa-solid fa-rotate-left text-xs"></i>
             <span>Restore Selected</span>
           </button>
 
-          <button type="button" id="batchPurgeBtn" onclick="submitBatch('delete_permanent')" class="hidden px-3 py-1.5 rounded-lg bg-[#C02142] hover:bg-[#9F1239] text-white font-mono font-semibold flex items-center gap-1.5 shadow-xs">
+          <button type="button" id="batchPurgeBtn" onclick="submitBatch('delete_permanent')"
+            class="hidden px-3 py-1.5 rounded-lg bg-[#C02142] hover:bg-[#9F1239] text-white font-mono font-semibold flex items-center gap-1.5 shadow-xs">
             <i class="fa-solid fa-ban text-xs"></i>
             <span>Purge Permanently</span>
           </button>
@@ -272,28 +252,29 @@
     </div>
 
     <!-- Offline Staging & Sync Alert Ribbon -->
-    <div id="offlineSyncBanner" class="hidden p-3.5 rounded-xl bg-[#EAF6EF] border border-[#BEE7D5] text-[#1F7052] text-xs shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
+    <div id="offlineSyncBanner"
+      class="hidden p-3.5 rounded-xl bg-[#EAF6EF] border border-[#BEE7D5] text-[#1F7052] text-xs shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
       <div class="flex items-center gap-2.5">
-        <span class="w-8 h-8 rounded-lg bg-white border border-[#BEE7D5] text-[#268B65] flex items-center justify-center shrink-0 shadow-xs">
-          <i class="fa-solid fa-cloud-arrow-up text-sm animate-pulse"></i>
+        <span
+          class="w-8 h-8 rounded-lg bg-white border border-[#BEE7D5] text-[#268B65] flex items-center justify-center shrink-0 shadow-xs">
+            <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
         </span>
         <div>
           <div class="font-bold text-[#202124] flex items-center gap-2">
             <span>Offline Upload Queue</span>
-            <span id="offlineQueueBadge" class="px-2 py-0.5 rounded-full bg-white text-[#268B65] border border-[#BEE7D5] text-[10px] font-mono font-bold">0 Pending</span>
+            <span id="offlineQueueBadge"
+              class="px-2 py-0.5 rounded-full bg-white text-[#268B65] border border-[#BEE7D5] text-[10px] font-mono font-bold">0
+              Pending</span>
           </div>
           <p class="text-[11px] text-[#5F6368] font-mono">
-            Files stored temporarily in browser IndexedDB. You can preview, open, or delete them now. When internet reconnects, they sync automatically to Azure Cloud.
+            Files stored temporarily in browser IndexedDB. You can preview, open, or delete them now. When internet
+            reconnects, they sync automatically to Azure Cloud.
           </p>
         </div>
       </div>
       <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
-        <button 
-          type="button" 
-          onclick="window.OfflineVault && window.OfflineVault.syncAll()" 
-          id="offlineManualSyncBtn"
-          class="px-3 py-1.5 rounded-lg bg-[#268B65] hover:bg-[#1F7052] text-white font-bold text-xs font-mono flex items-center gap-1.5 shadow-xs transition-all active:scale-95"
-        >
+        <button type="button" onclick="window.OfflineVault && window.OfflineVault.syncAll()" id="offlineManualSyncBtn"
+          class="px-3 py-1.5 rounded-lg bg-[#268B65] hover:bg-[#1F7052] text-white font-bold text-xs font-mono flex items-center gap-1.5 shadow-xs transition-all active:scale-95">
           <i class="fa-solid fa-rotate text-[11px]"></i>
           <span>Sync to Cloud Now</span>
         </button>
@@ -302,16 +283,19 @@
 
     <!-- Active Documents Registry -->
     <!-- 1. Table View Container -->
-    <div id="tableViewContainer" class="overflow-x-auto {% if not documents and not trash_documents %}hidden{% endif %}">
+    <div id="tableViewContainer"
+      class="overflow-x-auto {% if not documents and not trash_documents %}hidden{% endif %}">
       <table class="w-full text-left border-collapse" id="docTable">
         <thead>
-          <tr class="border-b border-[#E9EAEC] bg-[#FAFAF9] text-[11px] font-semibold text-[#5F6368] font-mono uppercase tracking-wider">
+          <tr
+            class="border-b border-[#E9EAEC] bg-[#FAFAF9] text-[11px] font-semibold text-[#5F6368] font-mono uppercase tracking-wider">
             <th class="py-2.5 px-3 w-8">
-              <input type="checkbox" id="selectAllHeader" onchange="selectAll(this.checked)" class="rounded border-[#E9EAEC] text-[#F0445E] focus:ring-0 cursor-pointer">
+              <input type="checkbox" id="selectAllHeader" onchange="selectAll(this.checked)"
+                class="rounded border-[#E9EAEC] text-[#F0445E] focus:ring-0 cursor-pointer">
             </th>
             <th class="py-2.5 px-3">Student Name</th>
             <th class="py-2.5 px-3">Credential Title</th>
-            <th class="py-2.5 px-3 hidden md:table-cell">Integrity Hash</th>
+            <th class="py-2.5 px-3 hidden md:table-cell">Storage ID</th>
             <th class="py-2.5 px-3 hidden sm:table-cell">File Details</th>
             <th class="py-2.5 px-3 hidden lg:table-cell">Archived At</th>
             <th class="py-2.5 px-3 text-right">Actions</th>
@@ -321,104 +305,119 @@
         <tbody id="offlineTableBody" class="divide-y divide-[#BEE7D5]/40 text-xs"></tbody>
         <!-- Cloud Vault Persisted Documents -->
         <tbody class="divide-y divide-[#E9EAEC] text-xs" id="tableBody">
-            <!-- Active Documents -->
-            {% for doc in documents %}
-              <tr 
-                class="doc-row hover:bg-[#FAFAF9] transition-colors group"
-                data-type="{{ doc.category }}"
-                data-starred="{{ 'true' if doc.is_starred else 'false' }}"
-                data-ext="{{ doc.file_extension|lower }}"
-                data-name="{{ doc.document_title|lower }}"
-                data-date="{{ doc.created_at.timestamp() }}"
-                data-size="{{ doc.file_size or 0 }}"
-                data-id="{{ doc.id }}"
-                data-text="{{ doc.student_name|lower }} {{ doc.document_title|lower }} {{ doc.file_name|lower }} .{{ doc.file_extension|lower }} #{{ doc.id }}"
-              >
-                <!-- Checkbox -->
-                <td class="py-3 px-3">
-                  <input type="checkbox" value="{{ doc.id }}" onchange="handleSelectRow(this)" class="doc-checkbox rounded border-[#E9EAEC] text-[#F0445E] focus:ring-0 cursor-pointer">
-                </td>
+          <!-- Active Documents -->
+          {% for doc in documents %}
+          <tr class="doc-row hover:bg-[#FAFAF9] transition-colors group" data-type="{{ doc.category }}"
+            data-starred="{{ 'true' if doc.is_starred else 'false' }}" data-ext="{{ doc.file_extension|lower }}"
+            data-name="{{ doc.document_title|lower }}" data-date="{{ doc.created_at.timestamp() }}"
+            data-size="{{ doc.file_size or 0 }}" data-id="{{ doc.id }}"
+            data-text="{{ doc.student_name|lower }} {{ doc.document_title|lower }} {{ doc.file_name|lower }} .{{ doc.file_extension|lower }} #{{ doc.id }}">
+            <!-- Checkbox -->
+            <td class="py-3 px-3">
+              <input type="checkbox" value="{{ doc.id }}" onchange="handleSelectRow(this)"
+                class="doc-checkbox rounded border-[#E9EAEC] text-[#F0445E] focus:ring-0 cursor-pointer">
+            </td>
 
-                <!-- Student Identity & Star -->
-                <td class="py-3 px-3">
-                  <div class="flex items-center gap-2">
-                    <button type="button" onclick="toggleStar('{{ doc.id }}', this)" class="text-xs p-1 text-slate-400 hover:text-amber-500 transition-colors" title="Toggle Star / Favorite">
-                      <i class="{{ 'fa-solid text-amber-500' if doc.is_starred else 'fa-regular' }} fa-star"></i>
-                    </button>
-                    <div class="w-8 h-8 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] flex items-center justify-center font-bold text-xs font-mono shrink-0 shadow-xs">
-                      {{ doc.student_name[:2]|upper }}
-                    </div>
-                    <div class="overflow-hidden">
-                      <p class="font-bold text-[#202124] group-hover:text-[#F0445E] truncate max-w-[130px]">{{ doc.student_name }}</p>
-                      <p class="text-[10px] text-[#777B83] font-mono">UID: #{{ doc.id }}</p>
-                    </div>
-                  </div>
-                </td>
+            <!-- Student Identity & Star -->
+            <td class="py-3 px-3">
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="toggleStar('{{ doc.id }}', this)"
+                  class="text-xs p-1 text-slate-400 hover:text-amber-500 transition-colors"
+                  title="Toggle Star / Favorite">
+                  <i class="{{ 'fa-solid text-amber-500' if doc.is_starred else 'fa-regular' }} fa-star"></i>
+                </button>
+                <div
+                  class="w-8 h-8 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] flex items-center justify-center font-bold text-xs font-mono shrink-0 shadow-xs">
+                  {{ doc.student_name[:2]|upper }}
+                </div>
+                <div class="overflow-hidden">
+                  <p class="font-bold text-[#202124] group-hover:text-[#F0445E] truncate max-w-[130px]">{{
+                    doc.student_name }}</p>
+                  <p class="text-[10px] text-[#777B83] font-mono">UID: #{{ doc.id }}</p>
+                </div>
+              </div>
+            </td>
 
-                <!-- Document Title -->
-                <td class="py-3 px-3">
-                  <div class="flex items-center gap-2.5">
-                    {% if doc.is_pdf %}
-                      <span class="w-7 h-7 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-xs shrink-0" title="PDF Document">
-                        <i class="fa-solid fa-file-pdf"></i>
-                      </span>
-                    {% elif doc.is_image %}
-                      <span class="w-7 h-7 rounded-lg bg-sky-50 border border-sky-200 text-sky-600 flex items-center justify-center text-xs shrink-0" title="Image File">
-                        <i class="fa-solid fa-file-image"></i>
-                      </span>
-                    {% elif doc.is_video %}
-                      <span class="w-7 h-7 rounded-lg bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center text-xs shrink-0" title="Video File">
-                        <i class="fa-solid fa-file-video"></i>
-                      </span>
-                    {% elif doc.is_audio %}
-                      <span class="w-7 h-7 rounded-lg bg-purple-50 border border-purple-200 text-purple-600 flex items-center justify-center text-xs shrink-0" title="Audio File">
-                        <i class="fa-solid fa-file-audio"></i>
-                      </span>
-                    {% elif doc.is_spreadsheet %}
-                      <span class="w-7 h-7 rounded-lg bg-[#EAF6EF] border border-[#BEE7D5] text-[#268B65] flex items-center justify-center text-xs shrink-0" title="Spreadsheet">
-                        <i class="fa-solid fa-file-excel"></i>
-                      </span>
-                    {% elif doc.is_word %}
-                      <span class="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center text-xs shrink-0" title="Word Document">
-                        <i class="fa-solid fa-file-word"></i>
-                      </span>
-                    {% elif doc.is_code %}
-                      <span class="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center text-xs shrink-0" title="Code / Script">
-                        <i class="fa-solid fa-file-code"></i>
-                      </span>
-                    {% else %}
-                      <span class="w-7 h-7 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-xs shrink-0" title="Digital Document">
-                        <i class="fa-solid fa-file"></i>
-                      </span>
-                    {% endif %}
-                    <div class="overflow-hidden">
-                      <button 
-                        type="button" 
-                        onclick="openPreviewModal('{{ doc.view_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}', '{{ doc.download_url }}')"
-                        class="text-left font-semibold text-[#202124] hover:text-[#F0445E] transition-colors truncate max-w-[220px] block"
-                      >
-                        {{ doc.document_title }}
-                      </button>
-                      <p class="text-[10px] text-[#777B83] font-mono truncate max-w-[200px] sm:hidden">
-                        {{ doc.formatted_size }} &bull; {{ doc.created_at.strftime('%Y-%m-%d') }}
-                      </p>
-                    </div>
-                  </div>
-                </td>
-
-                <!-- Integrity Hash / Checksum (Desktop) -->
-                <td class="py-3 px-3 hidden md:table-cell font-mono">
-                  <button type="button" onclick="copyHashText('{{ doc.blob_name }}', this)" title="Click to copy SHA-256 storage anchor" class="px-2.5 py-1 rounded-md bg-[#FAFAF9] hover:bg-white border border-[#E9EAEC] text-[10px] text-[#5F6368] hover:text-[#202124] inline-flex items-center gap-1.5 font-mono shadow-xs transition-colors group/hash">
-                    <i class="fa-solid fa-shield text-[9px] text-[#268B65]"></i>
-                    <span>{{ doc.blob_name[:12] }}...</span>
-                    <i class="fa-regular fa-copy text-[8px] text-[#777B83] opacity-60 group-hover/hash:opacity-100"></i>
+            <!-- Document Title -->
+            <td class="py-3 px-3">
+              <div class="flex items-center gap-2.5">
+                {% if doc.is_pdf %}
+                <span
+                  class="w-7 h-7 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-xs shrink-0"
+                  title="PDF Document">
+                  <i class="fa-solid fa-file-pdf"></i>
+                </span>
+                {% elif doc.is_image %}
+                <span
+                  class="w-7 h-7 rounded-lg bg-sky-50 border border-sky-200 text-sky-600 flex items-center justify-center text-xs shrink-0"
+                  title="Image File">
+                  <i class="fa-solid fa-file-image"></i>
+                </span>
+                {% elif doc.is_video %}
+                <span
+                  class="w-7 h-7 rounded-lg bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center text-xs shrink-0"
+                  title="Video File">
+                  <i class="fa-solid fa-file-video"></i>
+                </span>
+                {% elif doc.is_audio %}
+                <span
+                  class="w-7 h-7 rounded-lg bg-purple-50 border border-purple-200 text-purple-600 flex items-center justify-center text-xs shrink-0"
+                  title="Audio File">
+                  <i class="fa-solid fa-file-audio"></i>
+                </span>
+                {% elif doc.is_spreadsheet %}
+                <span
+                  class="w-7 h-7 rounded-lg bg-[#EAF6EF] border border-[#BEE7D5] text-[#268B65] flex items-center justify-center text-xs shrink-0"
+                  title="Spreadsheet">
+                  <i class="fa-solid fa-file-excel"></i>
+                </span>
+                {% elif doc.is_word %}
+                <span
+                  class="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center text-xs shrink-0"
+                  title="Word Document">
+                  <i class="fa-solid fa-file-word"></i>
+                </span>
+                {% elif doc.is_code %}
+                <span
+                  class="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center text-xs shrink-0"
+                  title="Code / Script">
+                  <i class="fa-solid fa-file-code"></i>
+                </span>
+                {% else %}
+                <span
+                  class="w-7 h-7 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-xs shrink-0"
+                  title="Digital Document">
+                  <i class="fa-solid fa-file"></i>
+                </span>
+                {% endif %}
+                <div class="overflow-hidden">
+                  <button type="button"
+                    onclick="openPreviewModal('{{ doc.view_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}', '{{ doc.download_url }}')"
+                    class="text-left font-semibold text-[#202124] hover:text-[#F0445E] transition-colors truncate max-w-[220px] block">
+                    {{ doc.document_title }}
                   </button>
-                </td>
+                  <p class="text-[10px] text-[#777B83] font-mono truncate max-w-[200px] sm:hidden">
+                    {{ doc.formatted_size }} &bull; {{ doc.created_at.strftime('%Y-%m-%d') }}
+                  </p>
+                </div>
+              </div>
+            </td>
 
-                <!-- File Details (Desktop) -->
-                <td class="py-3 px-3 hidden sm:table-cell">
-                  <div class="flex items-center gap-1.5">
-                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase
+            <!-- Storage identifier (Desktop) -->
+            <td class="py-3 px-3 hidden md:table-cell font-mono">
+              <button type="button" onclick="copyHashText('{{ doc.blob_name }}', this)"
+                title="Copy storage identifier"
+                class="px-2.5 py-1 rounded-md bg-[#FAFAF9] hover:bg-white border border-[#E9EAEC] text-[10px] text-[#5F6368] hover:text-[#202124] inline-flex items-center gap-1.5 font-mono shadow-xs transition-colors group/hash">
+                <i class="fa-solid fa-shield text-[9px] text-[#268B65]"></i>
+                <span>{{ doc.blob_name[:12] }}...</span>
+                <i class="fa-regular fa-copy text-[8px] text-[#777B83] opacity-60 group-hover/hash:opacity-100"></i>
+              </button>
+            </td>
+
+            <!-- File Details (Desktop) -->
+            <td class="py-3 px-3 hidden sm:table-cell">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase
                       {% if doc.is_pdf %}bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3]
                       {% elif doc.is_spreadsheet %}bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5]
                       {% elif doc.is_audio %}bg-purple-50 text-purple-700 border border-purple-200
@@ -427,202 +426,190 @@
                       {% elif doc.is_word %}bg-blue-50 text-blue-700 border border-blue-200
                       {% else %}bg-slate-100 text-slate-700 border border-slate-200
                       {% endif %}">
-                      .{{ doc.file_extension|upper }}
-                    </span>
-                    <p class="text-[#202124] font-mono text-[11px] truncate max-w-[130px]" title="{{ doc.file_name }}">
-                      {{ doc.file_name }}
-                    </p>
-                  </div>
-                  <p class="text-[10px] text-[#5F6368] font-mono mt-0.5">
-                    {{ doc.formatted_size }}
-                  </p>
-                </td>
+                  .{{ doc.file_extension|upper }}
+                </span>
+                <p class="text-[#202124] font-mono text-[11px] truncate max-w-[130px]" title="{{ doc.file_name }}">
+                  {{ doc.file_name }}
+                </p>
+              </div>
+              <p class="text-[10px] text-[#5F6368] font-mono mt-0.5">
+                {{ doc.formatted_size }}
+              </p>
+            </td>
 
-                <!-- Timestamp -->
-                <td class="py-3 px-3 hidden lg:table-cell font-mono text-[#5F6368] text-[11px] whitespace-nowrap">
-                  {{ doc.created_at.strftime('%Y-%m-%d %H:%M') }}
-                </td>
+            <!-- Timestamp -->
+            <td class="py-3 px-3 hidden lg:table-cell font-mono text-[#5F6368] text-[11px] whitespace-nowrap">
+              {{ doc.created_at.strftime('%Y-%m-%d %H:%M') }}
+            </td>
 
-                <!-- Actions -->
-                <td class="py-3 px-3 text-right whitespace-nowrap">
-                  <div class="flex items-center justify-end gap-1">
-                    
-                    <!-- Preview In In-App Modal -->
-                    <button 
-                      type="button" 
-                      onclick="openPreviewModal('{{ doc.view_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}', '{{ doc.download_url }}')"
-                      class="px-2.5 py-1 rounded-lg bg-[#FFF0F2] hover:bg-[#FFE2E6] border border-[#FECDD3] text-[#F0445E] text-xs font-semibold transition-all flex items-center gap-1 shadow-xs"
-                      title="Inspect Document Preview"
-                    >
-                      <i class="fa-regular fa-eye text-[11px]"></i>
-                      <span class="hidden sm:inline">Preview</span>
-                    </button>
+            <!-- Actions -->
+            <td class="py-3 px-3 text-right whitespace-nowrap">
+              <div class="flex items-center justify-end gap-1">
 
-                    <!-- Direct Download File -->
-                    <a 
-                      href="{{ doc.download_url }}" 
-                      download="{{ doc.file_name }}"
-                      class="p-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs transition-colors"
-                      title="Download {{ doc.file_name }}"
-                    >
-                      <i class="fa-solid fa-arrow-down text-[11px]"></i>
-                    </a>
+                <!-- Preview In In-App Modal -->
+                <button type="button"
+                  onclick="openPreviewModal('{{ doc.view_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}', '{{ doc.download_url }}')"
+                  class="px-2.5 py-1 rounded-lg bg-[#FFF0F2] hover:bg-[#FFE2E6] border border-[#FECDD3] text-[#F0445E] text-xs font-semibold transition-all flex items-center gap-1 shadow-xs"
+                  title="Inspect Document Preview">
+                  <i class="fa-regular fa-eye text-[11px]"></i>
+                  <span class="hidden sm:inline">Preview</span>
+                </button>
 
-                    <!-- Share Link -->
-                    <button 
-                      type="button" 
-                      onclick="openShareModal('{{ doc.id }}', '{{ doc.document_title|replace('\'', '\\\'') }}')" 
-                      class="p-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs transition-colors"
-                      title="Share Public Link"
-                    >
-                      <i class="fa-solid fa-share-nodes text-[11px]"></i>
-                    </button>
+                <!-- Direct Download File -->
+                <a href="{{ doc.download_url }}" download="{{ doc.file_name }}"
+                  class="p-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs transition-colors"
+                  title="Download {{ doc.file_name }}">
+                  <i class="fa-solid fa-arrow-down text-[11px]"></i>
+                </a>
 
-                    <!-- Edit Metadata -->
-                    <button 
-                      type="button" 
-                      onclick="openEditModal('{{ doc.id }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ (doc.description or '')|replace('\'', '\\\'') }}')" 
-                      class="p-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs transition-colors"
-                      title="Rename / Edit"
-                    >
-                      <i class="fa-regular fa-pen-to-square text-[11px]"></i>
-                    </button>
+                <!-- Share Link -->
+                <button type="button"
+                  onclick="openShareModal('{{ doc.id }}', '{{ doc.document_title|replace('\'', '\\\'') }}')"
+                  class="p-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs transition-colors"
+                  title="Share Public Link">
+                  <i class="fa-solid fa-share-nodes text-[11px]"></i>
+                </button>
 
-                    <!-- Info Inspector -->
-                    <button 
-                      type="button" 
-                      onclick="openInfoModal('{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_name|replace('\'', '\\\'') }}', '{{ doc.formatted_size }}', '{{ doc.content_type }}', '{{ doc.created_at.strftime('%Y-%m-%d %H:%M') }}', '{{ doc.blob_name }}', '{{ doc.download_url }}', '{{ (doc.description or '')|replace('\'', '\\\'') }}')" 
-                      class="p-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs transition-colors"
-                      title="File Details & Info"
-                    >
-                      <i class="fa-solid fa-circle-info text-[11px]"></i>
-                    </button>
+                <!-- Edit Metadata -->
+                <button type="button"
+                  onclick="openEditModal('{{ doc.id }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ (doc.description or '')|replace('\'', '\\\'') }}')"
+                  class="p-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs transition-colors"
+                  title="Rename / Edit">
+                  <i class="fa-regular fa-pen-to-square text-[11px]"></i>
+                </button>
 
-                    <!-- Move to Trash -->
-                    <form action="{{ url_for('trash_document', doc_id=doc.id) }}" method="POST" class="inline" onsubmit="return confirm('Move this document to Trash?')">
-                      <button 
-                        type="submit" 
-                        class="p-1.5 rounded-lg text-[#777B83] hover:text-[#F0445E] hover:bg-[#FFF0F2] text-xs transition-colors"
-                        title="Move to Trash"
-                      >
-                        <i class="fa-regular fa-trash-can text-[11px]"></i>
-                      </button>
-                    </form>
+                <!-- Info Inspector -->
+                <button type="button"
+                  onclick="openInfoModal('{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_name|replace('\'', '\\\'') }}', '{{ doc.formatted_size }}', '{{ doc.content_type }}', '{{ doc.created_at.strftime('%Y-%m-%d %H:%M') }}', '{{ doc.blob_name }}', '{{ doc.download_url }}', '{{ (doc.description or '')|replace('\'', '\\\'') }}')"
+                  class="p-1.5 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs transition-colors"
+                  title="File Details & Info">
+                  <i class="fa-solid fa-circle-info text-[11px]"></i>
+                </button>
 
-                  </div>
-                </td>
-              </tr>
-            {% endfor %}
-
-            <!-- Trash Documents (Hidden unless Trash tab is selected) -->
-            {% for doc in trash_documents %}
-              <tr 
-                class="doc-row hover:bg-[#FAFAF9] transition-colors group hidden opacity-75"
-                data-type="trash"
-                data-starred="false"
-                data-ext="{{ doc.file_extension|lower }}"
-                data-name="{{ doc.document_title|lower }}"
-                data-date="{{ doc.created_at.timestamp() }}"
-                data-size="{{ doc.file_size or 0 }}"
-                data-id="{{ doc.id }}"
-                data-text="{{ doc.student_name|lower }} {{ doc.document_title|lower }} {{ doc.file_name|lower }} .{{ doc.file_extension|lower }} #{{ doc.id }}"
-              >
-                <!-- Checkbox -->
-                <td class="py-3 px-3">
-                  <input type="checkbox" value="{{ doc.id }}" onchange="handleSelectRow(this)" class="doc-checkbox rounded border-[#E9EAEC] text-[#F0445E] focus:ring-0 cursor-pointer">
-                </td>
-
-                <!-- Student Identity -->
-                <td class="py-3 px-3">
-                  <div class="flex items-center gap-2">
-                    <span class="text-[#D92D50] text-xs"><i class="fa-solid fa-trash-can"></i></span>
-                    <div class="w-8 h-8 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center font-bold text-xs font-mono shrink-0">
-                      {{ doc.student_name[:2]|upper }}
-                    </div>
-                    <div class="overflow-hidden">
-                      <p class="font-bold text-[#5F6368] line-through truncate max-w-[130px]">{{ doc.student_name }}</p>
-                      <p class="text-[10px] text-[#F0445E] font-mono">In Trash</p>
-                    </div>
-                  </div>
-                </td>
-
-                <!-- Document Title -->
-                <td class="py-3 px-3">
-                  <span class="font-semibold text-[#5F6368] line-through">{{ doc.document_title }}</span>
-                </td>
-
-                <!-- Integrity Hash -->
-                <td class="py-3 px-3 hidden md:table-cell font-mono text-[10px] text-[#777B83]">
-                  {{ doc.blob_name[:12] }}...
-                </td>
-
-                <!-- File Details -->
-                <td class="py-3 px-3 hidden sm:table-cell font-mono text-[11px] text-[#5F6368]">
-                  {{ doc.file_name }} &bull; {{ doc.formatted_size }}
-                </td>
-
-                <!-- Timestamp -->
-                <td class="py-3 px-3 hidden lg:table-cell font-mono text-[#777B83] text-[11px]">
-                  {{ doc.created_at.strftime('%Y-%m-%d') }}
-                </td>
-
-                <!-- Trash Actions: Restore & Permanent Purge -->
-                <td class="py-3 px-3 text-right whitespace-nowrap">
-                  <div class="flex items-center justify-end gap-1.5">
-                    <!-- Restore -->
-                    <form action="{{ url_for('restore_document', doc_id=doc.id) }}" method="POST" class="inline">
-                      <button type="submit" class="px-2.5 py-1 rounded-lg bg-[#EAF6EF] hover:bg-[#D2EFE0] border border-[#BEE7D5] text-[#268B65] text-xs font-semibold flex items-center gap-1 font-mono transition-colors">
-                        <i class="fa-solid fa-rotate-left text-[10px]"></i>
-                        <span>Restore</span>
-                      </button>
-                    </form>
-                    <!-- Permanent Purge -->
-                    <form action="{{ url_for('delete_document', doc_id=doc.id) }}" method="POST" class="inline" onsubmit="return confirm('Permanently destroy this record? This cannot be recovered.')">
-                      <button type="submit" class="p-1.5 rounded-lg text-[#777B83] hover:text-[#C02142] hover:bg-[#FFF0F2] text-xs transition-colors" title="Purge permanently">
-                        <i class="fa-solid fa-ban text-[11px]"></i>
-                      </button>
-                    </form>
-                  </div>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 2. Grid View Container (Toggled via view switcher) -->
-      <div id="gridViewContainer" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Offline Staged Cards -->
-        <div id="offlineGridContainer" class="contents"></div>
-        <!-- Active Documents Grid -->
-        {% for doc in documents %}
-          <div 
-            class="doc-card bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] hover:shadow-md rounded-xl p-4.5 transition-all flex flex-col justify-between group relative overflow-hidden"
-            data-type="{{ doc.category }}"
-            data-starred="{{ 'true' if doc.is_starred else 'false' }}"
-            data-ext="{{ doc.file_extension|lower }}"
-            data-name="{{ doc.document_title|lower }}"
-            data-date="{{ doc.created_at.timestamp() }}"
-            data-size="{{ doc.file_size or 0 }}"
-            data-id="{{ doc.id }}"
-            data-text="{{ doc.student_name|lower }} {{ doc.document_title|lower }} {{ doc.file_name|lower }} .{{ doc.file_extension|lower }} #{{ doc.id }}"
-          >
-            <div>
-              <div class="flex items-center justify-between gap-2 pb-3 border-b border-[#E9EAEC]">
-                <div class="flex items-center gap-2">
-                  <input type="checkbox" value="{{ doc.id }}" onchange="handleSelectRow(this)" class="doc-checkbox rounded border-[#E9EAEC] text-[#F0445E] focus:ring-0 cursor-pointer">
-                  <button type="button" onclick="toggleStar('{{ doc.id }}', this)" class="text-xs p-1 text-slate-400 hover:text-amber-500 transition-colors">
-                    <i class="{{ 'fa-solid text-amber-500' if doc.is_starred else 'fa-regular' }} fa-star"></i>
+                <!-- Move to Trash -->
+                <form action="{{ url_for('trash_document', doc_id=doc.id) }}" method="POST" class="inline"
+                  onsubmit="return confirm('Move this document to Trash?')">
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit"
+                    class="p-1.5 rounded-lg text-[#777B83] hover:text-[#F0445E] hover:bg-[#FFF0F2] text-xs transition-colors"
+                    title="Move to Trash">
+                    <i class="fa-regular fa-trash-can text-[11px]"></i>
                   </button>
-                  <div class="w-7 h-7 rounded-lg bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] flex items-center justify-center font-mono font-bold text-xs">
-                    {{ doc.student_name[:2]|upper }}
-                  </div>
-                  <div>
-                    <p class="font-bold text-xs text-[#202124] truncate max-w-[110px]">{{ doc.student_name }}</p>
-                    <p class="text-[10px] text-[#777B83] font-mono">UID #{{ doc.id }}</p>
-                  </div>
+                </form>
+
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+
+          <!-- Trash Documents (Hidden unless Trash tab is selected) -->
+          {% for doc in trash_documents %}
+          <tr class="doc-row hover:bg-[#FAFAF9] transition-colors group hidden opacity-75" data-type="trash"
+            data-starred="false" data-ext="{{ doc.file_extension|lower }}" data-name="{{ doc.document_title|lower }}"
+            data-date="{{ doc.created_at.timestamp() }}" data-size="{{ doc.file_size or 0 }}" data-id="{{ doc.id }}"
+            data-text="{{ doc.student_name|lower }} {{ doc.document_title|lower }} {{ doc.file_name|lower }} .{{ doc.file_extension|lower }} #{{ doc.id }}">
+            <!-- Checkbox -->
+            <td class="py-3 px-3">
+              <input type="checkbox" value="{{ doc.id }}" onchange="handleSelectRow(this)"
+                class="doc-checkbox rounded border-[#E9EAEC] text-[#F0445E] focus:ring-0 cursor-pointer">
+            </td>
+
+            <!-- Student Identity -->
+            <td class="py-3 px-3">
+              <div class="flex items-center gap-2">
+                <span class="text-[#D92D50] text-xs"><i class="fa-solid fa-trash-can"></i></span>
+                <div
+                  class="w-8 h-8 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center font-bold text-xs font-mono shrink-0">
+                  {{ doc.student_name[:2]|upper }}
                 </div>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold uppercase
+                <div class="overflow-hidden">
+                  <p class="font-bold text-[#5F6368] line-through truncate max-w-[130px]">{{ doc.student_name }}</p>
+                  <p class="text-[10px] text-[#F0445E] font-mono">In Trash</p>
+                </div>
+              </div>
+            </td>
+
+            <!-- Document Title -->
+            <td class="py-3 px-3">
+              <span class="font-semibold text-[#5F6368] line-through">{{ doc.document_title }}</span>
+            </td>
+
+            <!-- Storage identifier -->
+            <td class="py-3 px-3 hidden md:table-cell font-mono text-[10px] text-[#777B83]">
+              {{ doc.blob_name[:12] }}...
+            </td>
+
+            <!-- File Details -->
+            <td class="py-3 px-3 hidden sm:table-cell font-mono text-[11px] text-[#5F6368]">
+              {{ doc.file_name }} &bull; {{ doc.formatted_size }}
+            </td>
+
+            <!-- Timestamp -->
+            <td class="py-3 px-3 hidden lg:table-cell font-mono text-[#777B83] text-[11px]">
+              {{ doc.created_at.strftime('%Y-%m-%d') }}
+            </td>
+
+            <!-- Trash Actions: Restore & Permanent Purge -->
+            <td class="py-3 px-3 text-right whitespace-nowrap">
+              <div class="flex items-center justify-end gap-1.5">
+                <!-- Restore -->
+                <form action="{{ url_for('restore_document', doc_id=doc.id) }}" method="POST" class="inline">
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit"
+                    class="px-2.5 py-1 rounded-lg bg-[#EAF6EF] hover:bg-[#D2EFE0] border border-[#BEE7D5] text-[#268B65] text-xs font-semibold flex items-center gap-1 font-mono transition-colors">
+                    <i class="fa-solid fa-rotate-left text-[10px]"></i>
+                    <span>Restore</span>
+                  </button>
+                </form>
+                <!-- Permanent Purge -->
+                <form action="{{ url_for('delete_document', doc_id=doc.id) }}" method="POST" class="inline"
+                  onsubmit="return confirm('Permanently destroy this record? This cannot be recovered.')">
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit"
+                    class="p-1.5 rounded-lg text-[#777B83] hover:text-[#C02142] hover:bg-[#FFF0F2] text-xs transition-colors"
+                    title="Purge permanently">
+                    <i class="fa-solid fa-ban text-[11px]"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 2. Grid View Container (Toggled via view switcher) -->
+    <div id="gridViewContainer" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Offline Staged Cards -->
+      <div id="offlineGridContainer" class="contents"></div>
+      <!-- Active Documents Grid -->
+      {% for doc in documents %}
+      <div
+        class="doc-card bg-white border border-[#E9EAEC] hover:border-[#D3D5D9] hover:shadow-md rounded-xl p-4.5 transition-all flex flex-col justify-between group relative overflow-hidden"
+        data-type="{{ doc.category }}" data-starred="{{ 'true' if doc.is_starred else 'false' }}"
+        data-ext="{{ doc.file_extension|lower }}" data-name="{{ doc.document_title|lower }}"
+        data-date="{{ doc.created_at.timestamp() }}" data-size="{{ doc.file_size or 0 }}" data-id="{{ doc.id }}"
+        data-text="{{ doc.student_name|lower }} {{ doc.document_title|lower }} {{ doc.file_name|lower }} .{{ doc.file_extension|lower }} #{{ doc.id }}">
+        <div>
+          <div class="flex items-center justify-between gap-2 pb-3 border-b border-[#E9EAEC]">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" value="{{ doc.id }}" onchange="handleSelectRow(this)"
+                class="doc-checkbox rounded border-[#E9EAEC] text-[#F0445E] focus:ring-0 cursor-pointer">
+              <button type="button" onclick="toggleStar('{{ doc.id }}', this)"
+                class="text-xs p-1 text-slate-400 hover:text-amber-500 transition-colors">
+                <i class="{{ 'fa-solid text-amber-500' if doc.is_starred else 'fa-regular' }} fa-star"></i>
+              </button>
+              <div
+                class="w-7 h-7 rounded-lg bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] flex items-center justify-center font-mono font-bold text-xs">
+                {{ doc.student_name[:2]|upper }}
+              </div>
+              <div>
+                <p class="font-bold text-xs text-[#202124] truncate max-w-[110px]">{{ doc.student_name }}</p>
+                <p class="text-[10px] text-[#777B83] font-mono">UID #{{ doc.id }}</p>
+              </div>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold uppercase
                   {% if doc.is_pdf %}bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3]
                   {% elif doc.is_spreadsheet %}bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5]
                   {% elif doc.is_audio %}bg-purple-50 text-purple-700 border border-purple-200
@@ -631,126 +618,119 @@
                   {% elif doc.is_word %}bg-blue-50 text-blue-700 border border-blue-200
                   {% else %}bg-slate-100 text-slate-700 border border-slate-200
                   {% endif %}">
-                  .{{ doc.file_extension|upper }}
-                </span>
-              </div>
-
-              <div class="py-3.5">
-                <h4 class="font-bold text-sm text-[#202124] group-hover:text-[#F0445E] transition-colors line-clamp-2">
-                  {{ doc.document_title }}
-                </h4>
-                <p class="text-[11px] text-[#5F6368] font-mono truncate mt-1">
-                  {{ doc.file_name }}
-                </p>
-                {% if doc.description %}
-                  <p class="text-[10px] text-[#777B83] italic mt-1.5 line-clamp-1">"{{ doc.description }}"</p>
-                {% endif %}
-              </div>
-            </div>
-
-            <div class="pt-3 border-t border-[#E9EAEC] flex items-center justify-between text-xs font-mono text-[#5F6368]">
-              <span>{{ doc.formatted_size }}</span>
-              <div class="flex items-center gap-1">
-                <button 
-                  type="button" 
-                  onclick="openPreviewModal('{{ doc.view_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}', '{{ doc.download_url }}')"
-                  class="px-2.5 py-1 rounded-lg bg-[#FFF0F2] hover:bg-[#FFE2E6] border border-[#FECDD3] text-[#F0445E] transition-colors text-[11px] font-semibold"
-                >
-                  Preview
-                </button>
-                <a 
-                  href="{{ doc.download_url }}" 
-                  download="{{ doc.file_name }}"
-                  class="p-1 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs"
-                  title="Download {{ doc.file_name }}"
-                >
-                  <i class="fa-solid fa-arrow-down"></i>
-                </a>
-                <button 
-                  type="button" 
-                  onclick="openShareModal('{{ doc.id }}', '{{ doc.document_title|replace('\'', '\\\'') }}')" 
-                  class="p-1 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs"
-                  title="Share link"
-                >
-                  <i class="fa-solid fa-share-nodes"></i>
-                </button>
-                <button 
-                  type="button" 
-                  onclick="openEditModal('{{ doc.id }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ (doc.description or '')|replace('\'', '\\\'') }}')" 
-                  class="p-1 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs"
-                  title="Edit title"
-                >
-                  <i class="fa-regular fa-pen-to-square"></i>
-                </button>
-              </div>
-            </div>
+              .{{ doc.file_extension|upper }}
+            </span>
           </div>
-        {% endfor %}
 
-        <!-- Trash Documents Grid -->
-        {% for doc in trash_documents %}
-          <div 
-            class="doc-card bg-white border border-[#FECDD3] rounded-xl p-4.5 transition-all flex flex-col justify-between group relative overflow-hidden hidden opacity-75"
-            data-type="trash"
-            data-starred="false"
-            data-ext="{{ doc.file_extension|lower }}"
-            data-name="{{ doc.document_title|lower }}"
-            data-date="{{ doc.created_at.timestamp() }}"
-            data-size="{{ doc.file_size or 0 }}"
-            data-id="{{ doc.id }}"
-            data-text="{{ doc.student_name|lower }} {{ doc.document_title|lower }} {{ doc.file_name|lower }} .{{ doc.file_extension|lower }} #{{ doc.id }}"
-          >
-            <div>
-              <div class="flex items-center justify-between gap-2 pb-3 border-b border-[#E9EAEC]">
-                <div class="flex items-center gap-2">
-                  <input type="checkbox" value="{{ doc.id }}" onchange="handleSelectRow(this)" class="doc-checkbox rounded border-[#E9EAEC] text-[#F0445E] focus:ring-0 cursor-pointer">
-                  <span class="text-[#D92D50] text-xs"><i class="fa-solid fa-trash-can"></i></span>
-                  <p class="font-bold text-xs text-[#5F6368] truncate max-w-[120px]">{{ doc.student_name }}</p>
-                </div>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] font-bold">
-                  TRASH
-                </span>
-              </div>
-              <div class="py-3.5">
-                <h4 class="font-bold text-sm text-[#5F6368] line-through">
-                  {{ doc.document_title }}
-                </h4>
-                <p class="text-[11px] text-[#777B83] font-mono truncate mt-1">
-                  {{ doc.file_name }} &bull; {{ doc.formatted_size }}
-                </p>
-              </div>
-            </div>
-            <div class="pt-3 border-t border-[#E9EAEC] flex items-center justify-between">
-              <form action="{{ url_for('restore_document', doc_id=doc.id) }}" method="POST" class="inline">
-                <button type="submit" class="px-2.5 py-1 rounded-lg bg-[#EAF6EF] text-[#268B65] hover:bg-[#D2EFE0] border border-[#BEE7D5] text-xs font-semibold flex items-center gap-1 font-mono">
-                  <i class="fa-solid fa-rotate-left text-[10px]"></i>
-                  <span>Restore</span>
-                </button>
-              </form>
-              <form action="{{ url_for('delete_document', doc_id=doc.id) }}" method="POST" class="inline" onsubmit="return confirm('Purge permanently?')">
-                <button type="submit" class="p-1 rounded-lg text-[#777B83] hover:text-[#C02142] text-xs" title="Delete permanently">
-                  <i class="fa-solid fa-ban"></i>
-                </button>
-              </form>
-            </div>
+          <div class="py-3.5">
+            <h4 class="font-bold text-sm text-[#202124] group-hover:text-[#F0445E] transition-colors line-clamp-2">
+              {{ doc.document_title }}
+            </h4>
+            <p class="text-[11px] text-[#5F6368] font-mono truncate mt-1">
+              {{ doc.file_name }}
+            </p>
+            {% if doc.description %}
+            <p class="text-[10px] text-[#777B83] italic mt-1.5 line-clamp-1">"{{ doc.description }}"</p>
+            {% endif %}
           </div>
-        {% endfor %}
-      </div>
-
-      <!-- No Matching Results Feedback during search/filter -->
-      <div id="noMatchMessage" class="hidden py-12 text-center space-y-3">
-        <div class="w-12 h-12 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] flex items-center justify-center mx-auto text-[#777B83]">
-          <i class="fa-solid fa-filter-circle-xmark text-lg"></i>
         </div>
-        <p class="text-xs text-[#5F6368]">No documents match the current filter or search criteria.</p>
-        <button type="button" onclick="resetFilters()" class="text-xs text-[#F0445E] hover:underline font-mono">
-          Reset Filter & Search
-        </button>
+
+        <div class="pt-3 border-t border-[#E9EAEC] flex items-center justify-between text-xs font-mono text-[#5F6368]">
+          <span>{{ doc.formatted_size }}</span>
+          <div class="flex items-center gap-1">
+            <button type="button"
+              onclick="openPreviewModal('{{ doc.view_url }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ doc.student_name|replace('\'', '\\\'') }}', '{{ doc.file_extension|lower }}', '{{ doc.category }}', '{{ doc.id }}', '{{ doc.download_url }}')"
+              class="px-2.5 py-1 rounded-lg bg-[#FFF0F2] hover:bg-[#FFE2E6] border border-[#FECDD3] text-[#F0445E] transition-colors text-[11px] font-semibold">
+              Preview
+            </button>
+            <a href="{{ doc.download_url }}" download="{{ doc.file_name }}"
+              class="p-1 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs"
+              title="Download {{ doc.file_name }}">
+              <i class="fa-solid fa-arrow-down"></i>
+            </a>
+            <button type="button"
+              onclick="openShareModal('{{ doc.id }}', '{{ doc.document_title|replace('\'', '\\\'') }}')"
+              class="p-1 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs" title="Share link">
+              <i class="fa-solid fa-share-nodes"></i>
+            </button>
+            <button type="button"
+              onclick="openEditModal('{{ doc.id }}', '{{ doc.document_title|replace('\'', '\\\'') }}', '{{ (doc.description or '')|replace('\'', '\\\'') }}')"
+              class="p-1 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] text-xs" title="Edit title">
+              <i class="fa-regular fa-pen-to-square"></i>
+            </button>
+          </div>
+        </div>
       </div>
+      {% endfor %}
+
+      <!-- Trash Documents Grid -->
+      {% for doc in trash_documents %}
+      <div
+        class="doc-card bg-white border border-[#FECDD3] rounded-xl p-4.5 transition-all flex flex-col justify-between group relative overflow-hidden hidden opacity-75"
+        data-type="trash" data-starred="false" data-ext="{{ doc.file_extension|lower }}"
+        data-name="{{ doc.document_title|lower }}" data-date="{{ doc.created_at.timestamp() }}"
+        data-size="{{ doc.file_size or 0 }}" data-id="{{ doc.id }}"
+        data-text="{{ doc.student_name|lower }} {{ doc.document_title|lower }} {{ doc.file_name|lower }} .{{ doc.file_extension|lower }} #{{ doc.id }}">
+        <div>
+          <div class="flex items-center justify-between gap-2 pb-3 border-b border-[#E9EAEC]">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" value="{{ doc.id }}" onchange="handleSelectRow(this)"
+                class="doc-checkbox rounded border-[#E9EAEC] text-[#F0445E] focus:ring-0 cursor-pointer">
+              <span class="text-[#D92D50] text-xs"><i class="fa-solid fa-trash-can"></i></span>
+              <p class="font-bold text-xs text-[#5F6368] truncate max-w-[120px]">{{ doc.student_name }}</p>
+            </div>
+            <span
+              class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] font-bold">
+              TRASH
+            </span>
+          </div>
+          <div class="py-3.5">
+            <h4 class="font-bold text-sm text-[#5F6368] line-through">
+              {{ doc.document_title }}
+            </h4>
+            <p class="text-[11px] text-[#777B83] font-mono truncate mt-1">
+              {{ doc.file_name }} &bull; {{ doc.formatted_size }}
+            </p>
+          </div>
+        </div>
+        <div class="pt-3 border-t border-[#E9EAEC] flex items-center justify-between">
+          <form action="{{ url_for('restore_document', doc_id=doc.id) }}" method="POST" class="inline">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <button type="submit"
+              class="px-2.5 py-1 rounded-lg bg-[#EAF6EF] text-[#268B65] hover:bg-[#D2EFE0] border border-[#BEE7D5] text-xs font-semibold flex items-center gap-1 font-mono">
+              <i class="fa-solid fa-rotate-left text-[10px]"></i>
+              <span>Restore</span>
+            </button>
+          </form>
+          <form action="{{ url_for('delete_document', doc_id=doc.id) }}" method="POST" class="inline"
+            onsubmit="return confirm('Purge permanently?')">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="p-1 rounded-lg text-[#777B83] hover:text-[#C02142] text-xs"
+              title="Delete permanently">
+              <i class="fa-solid fa-ban"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- No Matching Results Feedback during search/filter -->
+    <div id="noMatchMessage" class="hidden py-12 text-center space-y-3">
+      <div
+        class="w-12 h-12 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] flex items-center justify-center mx-auto text-[#777B83]">
+        <i class="fa-solid fa-filter-circle-xmark text-lg"></i>
+      </div>
+      <p class="text-xs text-[#5F6368]">No documents match the current filter or search criteria.</p>
+      <button type="button" onclick="resetFilters()" class="text-xs text-[#F0445E] hover:underline font-mono">
+        Reset Filter & Search
+      </button>
+    </div>
 
     <!-- Empty Repository State -->
     <div id="emptyRepoState" class="py-16 text-center space-y-4 {% if documents or trash_documents %}hidden{% endif %}">
-      <div class="w-16 h-16 rounded-2xl bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center mx-auto text-[#F0445E] text-2xl shadow-xs">
+      <div
+        class="w-16 h-16 rounded-2xl bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center mx-auto text-[#F0445E] text-2xl shadow-xs">
         <i class="fa-solid fa-vault"></i>
       </div>
       <div class="space-y-1">
@@ -760,11 +740,8 @@
         </p>
       </div>
       <div>
-        <button 
-          type="button" 
-          onclick="openUploadModal()" 
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-semibold shadow-xs transition-all font-mono"
-        >
+        <button type="button" onclick="openUploadModal()"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-semibold shadow-xs transition-all font-mono">
           <i class="fa-solid fa-plus text-[11px]"></i>
           <span>Register First Document</span>
         </button>
@@ -784,7 +761,7 @@
   // Tab Filtering
   function filterCategory(category) {
     currentCategory = category;
-    
+
     // Update tab button styles
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.classList.remove('bg-[#F0445E]', 'text-white', 'shadow-xs', 'font-semibold');
@@ -1037,7 +1014,7 @@
       const originalHtml = button.innerHTML;
       button.innerHTML = '<i class="fa-solid fa-check text-[#268B65] text-[11px]"></i>';
       if (typeof showToast === 'function') {
-        showToast('Direct file link copied to clipboard!', 'success');
+        showToast('Direct file link copied to clipboard.', 'success');
       }
       setTimeout(() => {
         button.innerHTML = originalHtml;
@@ -1047,19 +1024,19 @@
     });
   }
 
-  // Copy SHA-256 Hash with visual feedback & Toast
+  // Copy storage identifier with visual feedback & Toast
   function copyHashText(hashText, button) {
     navigator.clipboard.writeText(hashText).then(() => {
       const originalHtml = button.innerHTML;
       button.innerHTML = '<i class="fa-solid fa-check text-[#268B65] text-[10px]"></i>';
       if (typeof showToast === 'function') {
-        showToast('SHA-256 hash copied to clipboard!', 'success');
+        showToast('Storage identifier copied to clipboard.', 'success');
       }
       setTimeout(() => {
         button.innerHTML = originalHtml;
       }, 1500);
     }).catch(() => {
-      if (typeof showToast === 'function') showToast('Could not copy hash.', 'error');
+      if (typeof showToast === 'function') showToast('Could not copy storage ID.', 'error');
     });
   }
 
@@ -1075,8 +1052,8 @@
   // Offline Document Staging & Cache Controller
   function escapeHtml(str) {
     if (!str) return '';
-    return String(str).replace(/[&<>"']/g, function(m) {
-      return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[m];
+    return String(str).replace(/[&<>"']/g, function (m) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
     });
   }
 
@@ -1119,7 +1096,7 @@
       if (badge) badge.textContent = `${items.length} Pending`;
     }
     if (emptyRepoState) emptyRepoState.classList.add('hidden');
-    
+
     // Ensure appropriate view container is visible
     const isGridViewActive = gridViewContainer && !gridViewContainer.classList.contains('hidden');
     if (!isGridViewActive && tableViewContainer) {
@@ -1131,7 +1108,7 @@
       offlineTableBody.innerHTML = items.map(item => `
         <tr class="offline-doc-row bg-[#EAF6EF]/40 hover:bg-[#EAF6EF] transition-colors group border-b border-[#BEE7D5]/40" id="offline-row-${item.id}">
           <td class="py-3 px-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-[#268B65] inline-block animate-pulse" title="Pending Sync"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-[#268B65] inline-block" title="Pending sync"></span>
           </td>
           <td class="py-3 px-3">
             <div class="flex items-center gap-2">
@@ -1145,7 +1122,7 @@
             <div class="flex items-center gap-2">
               <span class="font-semibold text-[#202124]">${escapeHtml(item.documentTitle)}</span>
               <span class="px-2 py-0.5 rounded-full bg-white text-[#268B65] border border-[#BEE7D5] text-[10px] font-mono font-bold inline-flex items-center gap-1 shadow-xs">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#268B65] animate-ping"></span> Pending Sync
+                <span class="w-1.5 h-1.5 rounded-full bg-[#268B65]"></span> Pending sync
               </span>
             </div>
           </td>
@@ -1219,7 +1196,7 @@
               </p>
               <div class="pt-1">
                 <span class="px-2 py-0.5 rounded-full bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] text-[10px] font-mono font-bold inline-flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#268B65] animate-ping"></span> Pending Sync
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#268B65]"></span> Pending sync
                 </span>
               </div>
             </div>

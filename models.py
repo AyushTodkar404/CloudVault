@@ -25,11 +25,16 @@ class User(UserMixin, db.Model):
     @property
     def storage_used_bytes(self):
         """Calculates total active (non-deleted) storage used by this user in bytes."""
-        return sum(d.file_size or 0 for d in self.documents if not d.is_deleted)
+        return (
+            db.session.query(db.func.coalesce(db.func.sum(Document.file_size), 0))
+            .filter(Document.user_id == self.id, Document.is_deleted.is_(False))
+            .scalar()
+            or 0
+        )
 
     @property
     def storage_quota_bytes(self):
-        """Standard student quota: 5.0 GB (5,368,709,120 bytes) matching Microsoft Azure Free Tier Blob allowance."""
+        """Returns the configured per-user document quota."""
         quota_gb = float(os.getenv("USER_STORAGE_QUOTA_GB", "5.0"))
         return int(quota_gb * 1024 * 1024 * 1024)
 

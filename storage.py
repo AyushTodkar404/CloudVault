@@ -78,7 +78,7 @@ class CloudStorageManager:
         Returns tuple: (blob_url, unique_blob_name, file_size, content_type)
         """
         original_filename = secure_filename(file_storage.filename) or "unnamed_document"
-        unique_prefix = uuid.uuid4().hex[:10]
+        unique_prefix = uuid.uuid4().hex
         blob_name = f"{unique_prefix}_{original_filename}"
         content_type = file_storage.content_type
         if not content_type or content_type == "application/octet-stream":
@@ -126,7 +126,9 @@ class CloudStorageManager:
                     container=self.container_name, blob=blob_name
                 )
                 return blob_client.download_blob().readall()
-            except Exception:
+            except Exception as storage_err:
+                if self.app:
+                    self.app.logger.warning(f"Could not read stored file '{blob_name}': {storage_err}")
                 return None
         local_path = os.path.join(self.local_upload_dir, blob_name)
         if os.path.exists(local_path):

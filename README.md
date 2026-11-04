@@ -1,6 +1,6 @@
 # CloudVault: Digital Document & Certificate Portal
 
-A secure, responsive, production-grade cloud portal designed for a University Cloud Computing Lab. **CloudVault** enables students and faculty to upload digital documents, diplomas, certificates, and lab reports, securely storing binaries in **Azure Blob Storage** while managing relational metadata in **Azure SQL Database** (or local SQLite/PostgreSQL) via **SQLAlchemy**.
+A responsive document portal for a University Cloud Computing Lab. **CloudVault** enables students and faculty to upload digital documents, diplomas, certificates, and lab reports, storing binaries in **Azure Blob Storage** while managing relational metadata in **Azure SQL Database** (or local SQLite/PostgreSQL) via **SQLAlchemy**.
 
 > [!IMPORTANT]
 > ### 🔑 Cloud Prerequisite: Active Microsoft Azure Account Required
@@ -31,7 +31,7 @@ CloudVault directly demonstrates and validates five essential Cloud Computing se
 | **SaaS**<br>*(Software as a Service)* | **CloudVault Web Application & Portal** | Azure Blob Storage & Watermelon UI | End-user document vault, direct in-browser PDF/image/media preview, 1-click downloads, 5.0 GB per-user quota allocation, and offline queueing with IndexedDB auto-sync. |
 | **PaaS**<br>*(Platform as a Service)* | **Managed Web Compute Runtime** | Azure App Service (Linux B1 Plan, Central India) | Containerized Python 3.12 / Flask / Gunicorn WSGI pipeline, automatic TLS 1.3 termination, zero server patching, automated CI/CD via GitHub Actions. |
 | **DBaaS**<br>*(Database as a Service)* | **Relational Metadata Store** | Azure SQL Database (`cloudvaultdb`) | Fully managed relational database, ACID transactions, foreign keys (`users.id` -> `documents.user_id`), automated daily backups, auto-indexing. |
-| **SECaaS**<br>*(Security as a Service)* | **Zero-Trust Security & Threat Scanner** | Custom `scanner.py` + Scrypt / Key Vault | Deep magic-byte inspection (blocking disguised executables, webshells, corrupt archives), per-user data isolation, SHA-256 integrity anchors, security audit trail. |
+| **SECaaS**<br>*(Security as a Service)* | **File Validation & Access Controls** | Custom `scanner.py` + Werkzeug password hashing | Magic-byte inspection, blocked executable formats, per-user data isolation, storage identifiers, and an activity audit trail. |
 | **IaaS**<br>*(Infrastructure as a Service)* | **Virtual Network Linux Sentinel** | Azure Ubuntu Linux VM (`cloudvault1-vm`) | Dedicated Ubuntu Linux VM inside a private Virtual Network (VNet) with custom Network Security Group (NSG) firewall rules polling `/health`. |
 
 ---
@@ -145,7 +145,7 @@ When running CloudVault locally on your computer or deploying it to your own clo
 ---
 
 ### 6. Identity & Google SSO (Optional 6th Service)
-* **Zero-Config Instant Chooser**: CloudVault includes an instant Google Account Chooser UI enabled by default.
+* **Development Account Chooser**: A local/test-only account chooser is available when explicitly enabled; production uses configured Google OAuth or email/password sign-in.
 * **Live Google OAuth 2.0 Mode**:
   1. Visit [Google Cloud Console](https://console.cloud.google.com/) > **APIs & Services > Credentials**.
   2. Create an **OAuth 2.0 Web Client ID**.
@@ -172,7 +172,7 @@ c:\CC_MINI_PROJECT\
 ├── startup.sh              # Gunicorn WSGI startup script for Azure App Service Linux
 ├── .env.example            # Environment variables configuration template
 ├── .gitignore              # Ignored files (venv, .env, *.db, temporary uploads)
-├── test_app.py             # Automated test suite (29 unit & integration tests)
+├── test_app.py             # Automated test suite (32 unit & integration tests)
 ├── ARCHITECTURE.md         # Full cloud architectural specifications & operations manual
 ├── README.md               # Architecture documentation, local setup & Azure connection guide
 └── templates/
@@ -259,8 +259,7 @@ Expected response when connected:
   "app": "CloudVault",
   "cloud_storage_connected": true,
   "container": "documents",
-  "status": "healthy",
-  "storage_diag": null
+  "status": "healthy"
 }
 ```
 
@@ -269,7 +268,7 @@ Execute the complete test suite:
 ```bash
 python -m unittest test_app.py -v
 ```
-*(All 29 test vectors should pass with `OK`).*
+*(All 32 test vectors should pass with `OK`).*
 
 ---
 

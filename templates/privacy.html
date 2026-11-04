@@ -13,7 +13,7 @@
     </div>
     <h1 class="text-3xl font-extrabold text-[#202124] tracking-tight">Institutional Privacy Policy</h1>
     <p class="text-sm text-[#5F6368] font-mono leading-relaxed">
-      CloudVault is engineered with zero-knowledge data isolation, enterprise encryption, and full compliance with student data sovereignty standards.
+      CloudVault keeps account access and document ownership explicit, with storage protections determined by the configured deployment.
     </p>
     <div class="flex items-center gap-4 text-xs font-mono text-[#777B83] pt-1">
       <span>Effective Date: Academic Session 2025&ndash;2026</span>
@@ -28,8 +28,8 @@
       <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center text-sm">
         <i class="fa-solid fa-shield-halved"></i>
       </div>
-      <h3 class="font-bold text-sm text-[#202124]">AES-256 Storage</h3>
-      <p class="text-xs text-[#5F6368] leading-relaxed">All files stored on Azure Blob Storage are automatically encrypted server-side with AES-256.</p>
+      <h3 class="font-bold text-sm text-[#202124]">Storage protection</h3>
+      <p class="text-xs text-[#5F6368] leading-relaxed">Cloud deployments use the configured provider's storage protection; local deployments rely on the host filesystem and access controls.</p>
     </div>
 
     <div class="p-5 rounded-2xl bg-white border border-[#E9EAEC] shadow-xs space-y-2">
@@ -37,7 +37,7 @@
         <i class="fa-solid fa-lock"></i>
       </div>
       <h3 class="font-bold text-sm text-[#202124]">Row-Level Security</h3>
-      <p class="text-xs text-[#5F6368] leading-relaxed">Cryptographic tenant separation ensures only you and authorized links can read your documents.</p>
+      <p class="text-xs text-[#5F6368] leading-relaxed">Account-scoped access ensures only you and authorized share links can read your documents.</p>
     </div>
 
     <div class="p-5 rounded-2xl bg-white border border-[#E9EAEC] shadow-xs space-y-2">
@@ -68,7 +68,7 @@
         Cloud Storage &amp; Infrastructure Security
       </h2>
       <p class="text-xs text-[#5F6368] leading-relaxed">
-        Files uploaded to CloudVault are transmitted exclusively over encrypted HTTPS/TLS 1.3 channels and stored within Microsoft Azure Blob Storage (Central India region). Microsoft Azure maintains compliance with ISO/IEC 27001, SOC 1, SOC 2, and HIPAA. Database records are stored securely in Azure SQL with Transparent Data Encryption (TDE).
+        Files are stored using the configured storage backend. In production, deploy CloudVault behind HTTPS and apply the provider's database, object-storage, backup, and retention controls to the environment.
       </p>
     </section>
 

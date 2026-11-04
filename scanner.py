@@ -202,7 +202,8 @@ class FileSecurityScanner:
                     return FileScanResult(
                         False, "Corrupted text document: binary null flood detected in plain text stream."
                     )
-            except Exception:
+            except Exception as scan_err:
+                logger.warning("Text validation skipped after an unexpected scanner error: %s", scan_err)
                 pass
 
         logger.info(f"File '{filename}' ({len(file_bytes)} bytes) passed deep integrity and security scan.")

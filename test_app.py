@@ -90,7 +90,7 @@ class CloudVaultAuthTestCase(unittest.TestCase):
         self.assertIn(b"Welcome to CloudVault", response.data)
 
         # Log out before attempting duplicate signup
-        self.client.get("/logout")
+        self.client.post("/logout")
 
         # 2. Duplicate username check
         dup_user_resp = self.register_user("john_doe", "other@university.edu", "securepass2")
@@ -103,7 +103,7 @@ class CloudVaultAuthTestCase(unittest.TestCase):
     def test_login_and_logout_flow(self):
         """Test authentication with username or email, and logout."""
         self.register_user("janedoe", "jane@university.edu", "password123")
-        self.client.get("/logout")
+        self.client.post("/logout")
 
         # Login with email
         login_resp = self.login_user("jane@university.edu", "password123")
@@ -111,9 +111,9 @@ class CloudVaultAuthTestCase(unittest.TestCase):
         self.assertIn(b"Welcome back", login_resp.data)
 
         # Logout
-        logout_resp = self.client.get("/logout", follow_redirects=True)
+        logout_resp = self.client.post("/logout", follow_redirects=True)
         self.assertEqual(logout_resp.status_code, 200)
-        self.assertIn(b"signed out securely", logout_resp.data)
+        self.assertIn(b"signed out", logout_resp.data)
 
         # Invalid credentials check
         bad_login = self.login_user("janedoe", "wrongpass")
@@ -147,7 +147,7 @@ class CloudVaultAuthTestCase(unittest.TestCase):
             doc_id = doc.id
 
         # Switch to User B
-        self.client.get("/logout")
+        self.client.post("/logout")
         self.register_user("student_b", "student_b@edu.com", "pass123")
 
         # User B dashboard should NOT show User A's document
@@ -159,7 +159,7 @@ class CloudVaultAuthTestCase(unittest.TestCase):
         self.assertIn(b"Access denied", del_attempt.data)
 
         # Switch back to User A and delete
-        self.client.get("/logout")
+        self.client.post("/logout")
         self.login_user("student_a", "pass123")
         del_success = self.client.post(f"/delete/{doc_id}", follow_redirects=True)
         self.assertIn(b"deleted successfully", del_success.data)
@@ -250,7 +250,7 @@ class CloudVaultAuthTestCase(unittest.TestCase):
         token = share_data["share_token"]
 
         # Public share page accessible without login
-        self.client.get("/logout")
+        self.client.post("/logout")
         pub_page = self.client.get(f"/share/{token}")
         self.assertEqual(pub_page.status_code, 200)
         self.assertIn(b"Renamed Specification", pub_page.data)
@@ -351,7 +351,7 @@ class CloudVaultAuthTestCase(unittest.TestCase):
             self.assertEqual(user.email, "ayushtodkar404@gmail.com")
 
         # 4. Subsequent Google sign-in logs back in cleanly
-        self.client.get("/logout")
+        self.client.post("/logout")
         relogin_resp = self.client.post(
             "/login/google",
             data={"name": "Ayush Todkar", "email": "ayushtodkar404@gmail.com"},
@@ -359,6 +359,16 @@ class CloudVaultAuthTestCase(unittest.TestCase):
         )
         self.assertEqual(relogin_resp.status_code, 200)
         self.assertIn(b"Welcome back", relogin_resp.data)
+
+        # The development picker is not available when the app is not in testing mode.
+        previous_testing = self.app.config["TESTING"]
+        self.app.config["TESTING"] = False
+        try:
+            production_resp = self.client.get("/login/google", follow_redirects=False)
+            self.assertEqual(production_resp.status_code, 302)
+            self.assertIn("/login", production_resp.headers["Location"])
+        finally:
+            self.app.config["TESTING"] = previous_testing
 
 
 class CloudVaultProfessionalFeaturesTestCase(unittest.TestCase):
@@ -740,7 +750,7 @@ class CloudVaultProfessionalFeaturesTestCase(unittest.TestCase):
         self.assertIn("Resume.pdf", down_resp.headers.get("Content-Disposition", ""))
 
         # 3. Public Share Preview and Download (unauthenticated)
-        self.client.get("/logout", follow_redirects=True)
+        self.client.post("/logout", follow_redirects=True)
         
         # Unauthenticated direct access to /document/<id>/view redirects to login
         unauth_resp = self.client.get(f"/document/{doc_id}/view")
@@ -786,7 +796,7 @@ class CloudVaultRealProductionFeaturesTestCase(unittest.TestCase):
         p_resp = self.client.get("/privacy")
         self.assertEqual(p_resp.status_code, 200)
         self.assertIn(b"Institutional Privacy Policy", p_resp.data)
-        self.assertIn(b"AES-256", p_resp.data)
+        self.assertIn(b"Storage protection", p_resp.data)
 
         t_resp = self.client.get("/terms")
         self.assertEqual(t_resp.status_code, 200)
@@ -942,6 +952,26 @@ class CloudVaultRealProductionFeaturesTestCase(unittest.TestCase):
         self.assertEqual(head_resp.headers.get("Cross-Origin-Opener-Policy"), "same-origin")
         self.assertEqual(head_resp.headers.get("Cross-Origin-Resource-Policy"), "same-origin")
         self.assertIn("preload", head_resp.headers.get("Strict-Transport-Security", ""))
+
+    def test_csrf_token_required_when_enabled(self):
+        """Mutating requests require the session token when CSRF protection is enabled."""
+        previous_setting = self.app.config.get("WTF_CSRF_ENABLED")
+        self.app.config["WTF_CSRF_ENABLED"] = True
+        try:
+            self.client.get("/login")
+            response = self.client.post(
+                "/login",
+                data={"identity": "nobody", "password": "invalid"},
+            )
+            self.assertEqual(response.status_code, 403)
+        finally:
+            self.app.config["WTF_CSRF_ENABLED"] = previous_setting
+
+    def test_production_requires_explicit_secret_key(self):
+        """Production app creation refuses to use the development session secret."""
+        with mock.patch.dict("os.environ", {"FLASK_ENV": "production"}, clear=True):
+            with self.assertRaises(RuntimeError):
+                create_app()
 
 
 if __name__ == "__main__":

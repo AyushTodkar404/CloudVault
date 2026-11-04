@@ -1,5 +1,6 @@
 from collections import defaultdict
 from functools import wraps
+import hmac
 import io
 import json
 import logging
@@ -74,17 +75,23 @@ def create_app(test_config=None):
     app = Flask(__name__)
 
     # Base configuration
-    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "cloudvault-dev-secret-key-3.14")
+    secret_key = os.getenv("SECRET_KEY")
+    production_mode = bool(
+        os.getenv("WEBSITE_SITE_NAME")
+        or os.getenv("WEBSITE_HOSTNAME")
+        or os.getenv("FLASK_ENV", "development").lower() == "production"
+    )
+    if production_mode and not secret_key and not test_config:
+        raise RuntimeError("SECRET_KEY must be configured in production.")
+    app.config["SECRET_KEY"] = secret_key or secrets.token_hex(32)
     app.config["SESSION_COOKIE_HTTPONLY"] = True
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     app.config["REMEMBER_COOKIE_HTTPONLY"] = True
     app.config["REMEMBER_COOKIE_SAMESITE"] = "Lax"
-    if bool(os.getenv("WEBSITE_SITE_NAME") or os.getenv("WEBSITE_HOSTNAME") or os.getenv("FLASK_ENV") == "production"):
+    if production_mode:
         app.config["SESSION_COOKIE_SECURE"] = True
         app.config["REMEMBER_COOKIE_SECURE"] = True
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
-    app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024  # 100MB Hard Ceiling
-
     # Database connection string from environment or Azure App Service settings
     database_url = (
         os.getenv("DATABASE_URL")
@@ -120,7 +127,7 @@ def create_app(test_config=None):
     # Initialize Flask-Login
     login_manager = LoginManager()
     login_manager.login_view = "login"
-    login_manager.login_message = "Please sign in to access your secure CloudVault repository."
+    login_manager.login_message = "Please sign in to access your CloudVault repository."
     login_manager.login_message_category = "error"
     login_manager.init_app(app)
 
@@ -135,11 +142,9 @@ def create_app(test_config=None):
             app.logger.warning(f"Database schema initialization deferred: {e}")
 
     def log_activity(user_id, action, details):
-        """Records an immutable security/audit log event."""
+        """Records a security and activity log event."""
         try:
-            client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
-            if client_ip and "," in client_ip:
-                client_ip = client_ip.split(",")[0].strip()
+            client_ip = request.remote_addr
             entry = ActivityLog(user_id=user_id, action=action, details=details, ip_address=client_ip)
             db.session.add(entry)
             db.session.commit()
@@ -157,9 +162,7 @@ def create_app(test_config=None):
             def decorated_function(*args, **kwargs):
                 if app.config.get("TESTING"):
                     return f(*args, **kwargs)
-                client_ip = request.headers.get("X-Forwarded-For", request.remote_addr) or "127.0.0.1"
-                if "," in client_ip:
-                    client_ip = client_ip.split(",")[0].strip()
+                client_ip = request.remote_addr or "unknown"
                 key = (client_ip, f.__name__)
                 now = time.time()
                 _rate_limit_cache[key] = [t for t in _rate_limit_cache[key] if now - t < window]
@@ -181,6 +184,15 @@ def create_app(test_config=None):
     def get_timed_serializer():
         """Returns serializer for cryptographic, time-limited tokens."""
         return URLSafeTimedSerializer(app.config["SECRET_KEY"])
+
+    def get_csrf_token():
+        token = session.get("csrf_token")
+        if not token:
+            token = secrets.token_urlsafe(32)
+            session["csrf_token"] = token
+        return token
+
+    app.jinja_env.globals["csrf_token"] = get_csrf_token
 
     def allowed_file(filename):
         """Validates that filename has a legitimate genuine extension and is not a dangerous binary/script."""
@@ -252,7 +264,7 @@ def create_app(test_config=None):
 
             # Auto-login upon registration
             login_user(new_user)
-            flash(f"Welcome to CloudVault, {new_user.username}! Your account has been registered.", "success")
+            flash(f"Welcome to CloudVault, {new_user.username}. Your account has been registered.", "success")
             return redirect(url_for("index"))
 
         return render_template("signup.html")
@@ -305,7 +317,7 @@ def create_app(test_config=None):
             _failed_login_cache.pop(clean_identity, None)
             login_user(user, remember=remember)
             log_activity(user.id, "LOGIN", "Signed in via password credentials")
-            flash(f"Welcome back, {user.username}!", "success")
+            flash(f"Welcome back, {user.username}.", "success")
 
             next_page = request.args.get("next")
             if next_page and next_page.startswith("/"):
@@ -340,7 +352,7 @@ def create_app(test_config=None):
             reset_url = url_for("reset_password", token=token, _external=True)
             log_activity(user.id, "PASSWORD_RESET_REQ", f"Requested password reset authorization for {user.email}")
             flash(
-                f"Password reset authorization link generated! Click to set new credentials: <a href='{reset_url}' class='underline font-bold font-mono ml-1 text-[#F0445E]'>Reset Password Now &rarr;</a>",
+                f"Password reset authorization link generated. <a href='{reset_url}' class='underline font-bold font-mono ml-1 text-[#F0445E]'>Reset password &rarr;</a>",
                 "info",
             )
             return render_template("forgot_password.html")
@@ -398,7 +410,7 @@ def create_app(test_config=None):
         if request.is_json:
             return jsonify({"success": True, "verify_url": verify_url, "message": "Verification link generated."})
         flash(
-            f"Email verification link generated! <a href='{verify_url}' class='underline font-bold font-mono ml-1 text-[#268B65]'>Click here to verify email &rarr;</a>",
+            f"Email verification link generated. <a href='{verify_url}' class='underline font-bold font-mono ml-1 text-[#268B65]'>Verify email &rarr;</a>",
             "info",
         )
         return redirect(url_for("index"))
@@ -416,7 +428,7 @@ def create_app(test_config=None):
         user = db.session.get(User, data.get("user_id"))
         if user:
             log_activity(user.id, "EMAIL_VERIFIED", f"Email address {user.email} verified successfully")
-            flash("Your email has been verified! Your account status is now officially Verified.", "success")
+            flash("Your email has been verified.", "success")
         return redirect(url_for("index"))
 
     def _provision_and_login_google_user(email, name_seed=None):
@@ -441,9 +453,9 @@ def create_app(test_config=None):
             db.session.add(user)
             db.session.commit()
             log_activity(user.id, "SIGNUP", f"Google SSO account provisioned for {user.email}")
-            flash(f"Welcome to CloudVault, {user.username}! Signed in with Google.", "success")
+            flash(f"Welcome to CloudVault, {user.username}. Signed in with Google.", "success")
         else:
-            flash(f"Welcome back, {user.username}! Signed in with Google.", "success")
+            flash(f"Welcome back, {user.username}. Signed in with Google.", "success")
 
         login_user(user)
         log_activity(user.id, "LOGIN", "Signed in via Google OAuth Single Sign-On")
@@ -482,9 +494,12 @@ def create_app(test_config=None):
 
     @app.route("/login/google", methods=["GET", "POST"])
     def google_login():
-        """Initiates OAuth 2.0 flow or zero-config instant Google sign-in."""
-        # Direct Google SSO account selection
-        if request.method == "POST" or request.args.get("email"):
+        """Initiates Google OAuth, with a test-only account picker."""
+        client_id = os.getenv("GOOGLE_CLIENT_ID")
+        demo_google = bool(app.config.get("TESTING"))
+
+        # The picker is only a local/test convenience, never production authentication.
+        if demo_google and (request.method == "POST" or request.args.get("email")):
             email = (request.form.get("email") or request.args.get("email", "")).strip()
             name = (request.form.get("name") or request.args.get("name", "")).strip()
             if not email or "@" not in email:
@@ -492,7 +507,6 @@ def create_app(test_config=None):
                 return render_template("google_picker.html")
             return _provision_and_login_google_user(email, name)
 
-        client_id = os.getenv("GOOGLE_CLIENT_ID")
         # Standard OAuth 2.0 flow
         if client_id and client_id != "your-google-client-id.apps.googleusercontent.com":
             state = secrets.token_urlsafe(16)
@@ -511,8 +525,8 @@ def create_app(test_config=None):
             google_auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{requests.compat.urlencode(params)}"
             return redirect(google_auth_url)
 
-        # Google account picker fallback
-        return render_template("google_picker.html")
+        flash("Google sign-in is not configured for this deployment.", "error")
+        return redirect(url_for("login"))
 
     @app.route("/login/google/callback")
     def google_callback():
@@ -559,6 +573,9 @@ def create_app(test_config=None):
                 timeout=10,
             )
             user_data = userinfo_resp.json()
+            if user_data.get("email_verified") is False:
+                flash("Google returned an unverified email address.", "error")
+                return redirect(url_for("login"))
             email = user_data.get("email", "").lower().strip()
             if not email:
                 flash("Unable to obtain email from Google profile.", "error")
@@ -572,14 +589,14 @@ def create_app(test_config=None):
             flash(f"Google sign-in error: {str(e)}", "error")
             return redirect(url_for("login"))
 
-    @app.route("/logout")
+    @app.route("/logout", methods=["POST"])
     @login_required
     def logout():
         """Clears user session."""
         if current_user.is_authenticated:
             log_activity(current_user.id, "LOGOUT", "Signed out of CloudVault")
         logout_user()
-        flash("You have been signed out securely.", "success")
+        flash("You have been signed out.", "success")
         return redirect(url_for("login"))
 
     # --------------------------------------------------------------------------
@@ -774,6 +791,7 @@ def create_app(test_config=None):
 
         saved_docs = []
         errors = []
+        pending_bytes = 0
         if rejected_files:
             errors.extend([f"{fn}: Blocked (unsupported or non-genuine file format)" for fn in rejected_files])
 
@@ -785,6 +803,11 @@ def create_app(test_config=None):
                 file_obj.seek(0)
                 if file_length == 0:
                     errors.append(f"{file_obj.filename}: Empty (0-byte) files cannot be uploaded.")
+                    continue
+                if current_used + pending_bytes + file_length > quota_bytes:
+                    errors.append(
+                        f"{file_obj.filename}: Upload would exceed your {format_size(quota_bytes)} storage quota."
+                    )
                     continue
 
                 import re
@@ -814,6 +837,7 @@ def create_app(test_config=None):
                 db.session.add(new_doc)
                 db.session.commit()
                 saved_docs.append(new_doc)
+                pending_bytes += file_size
 
                 log_activity(
                     current_user.id,
@@ -848,12 +872,12 @@ def create_app(test_config=None):
         if saved_docs:
             if len(saved_docs) == 1:
                 flash(
-                    f"Successfully registered '{saved_docs[0].document_title}' for {student_name} in encrypted vault!",
+                    f"Successfully registered '{saved_docs[0].document_title}' for {student_name} in the document registry.",
                     "success",
                 )
             else:
                 flash(
-                    f"Successfully uploaded {len(saved_docs)} document(s) to encrypted vault!",
+                    f"Successfully uploaded {len(saved_docs)} document(s) to the document registry.",
                     "success",
                 )
         if errors:
@@ -969,7 +993,7 @@ def create_app(test_config=None):
         if not doc or (doc.user_id and doc.user_id != current_user.id and current_user.role != "admin"):
             return jsonify({"error": "Unauthorized"}), 403
         if not doc.share_token:
-            doc.share_token = secrets.token_urlsafe(16)
+            doc.share_token = secrets.token_urlsafe(32)
             db.session.commit()
         share_url = url_for("public_share", token=doc.share_token, _external=True)
         log_activity(current_user.id, "SHARE", f"Created public share link for '{doc.document_title}'")
@@ -1108,8 +1132,8 @@ def create_app(test_config=None):
                         storage_manager.blob_service_client.get_blob_client(
                             container=storage_manager.container_name, blob=d.blob_name
                         ).delete_blob()
-                    except Exception:
-                        pass
+                    except Exception as blob_err:
+                        app.logger.warning(f"Could not delete account blob '{d.blob_name}': {blob_err}")
                 db.session.delete(d)
             db.session.commit()
             log_activity(current_user.id, "BATCH_DELETE", f"Permanently deleted {len(authorized_docs)} item(s)")
@@ -1177,7 +1201,6 @@ def create_app(test_config=None):
                 "app": "CloudVault",
                 "cloud_storage_connected": storage_manager.is_cloud_active,
                 "container": storage_manager.container_name,
-                "storage_diag": getattr(storage_manager, "last_error", None),
             }
         ), 200
 
@@ -1234,8 +1257,8 @@ def create_app(test_config=None):
                     storage_manager.blob_service_client.get_blob_client(
                         container=storage_manager.container_name, blob=d.blob_name
                     ).delete_blob()
-                except Exception:
-                    pass
+                except Exception as blob_err:
+                    app.logger.warning(f"Could not delete account blob '{d.blob_name}': {blob_err}")
             db.session.delete(d)
 
         # Delete user activities
@@ -1279,8 +1302,8 @@ def create_app(test_config=None):
             "categories": dict(category_counts),
             "category_bytes": dict(category_bytes),
             "recent_events": [a.to_dict() for a in recent_activities],
-            "cloud_tier": "Microsoft Azure Hot-Store (Central India)",
-            "encryption": "Server-side AES-256",
+            "cloud_tier": "Azure Blob Storage" if storage_manager.is_cloud_active else "Local storage",
+            "encryption": "Provider-managed encryption" if storage_manager.is_cloud_active else "Filesystem permissions",
         })
 
     @app.route("/privacy", methods=["GET"])
@@ -1325,25 +1348,32 @@ def create_app(test_config=None):
             "404.html",
             error_code=500,
             error_title="Internal Cloud Service Error",
-            error_desc="An unexpected error occurred during request execution. The telemetry subsystem has registered this incident.",
+            error_desc="An unexpected error occurred during request execution. The server log has recorded this incident.",
             error_id=incident_id,
         ), 500
 
     @app.before_request
     def verify_request_origin():
-        """OWASP Cross-Origin Request Forgery (CSRF) mitigation."""
-        if request.method in ("POST", "PUT", "DELETE", "PATCH"):
-            if request.endpoint in ("google_callback", "login_google", "loading_page"):
-                return
-            origin = request.headers.get("Origin") or request.headers.get("Referer")
-            if origin:
-                from urllib.parse import urlparse
-                origin_host = urlparse(origin).netloc
-                req_host = request.host
-                if origin_host and origin_host != req_host:
-                    if not (origin_host.split(":")[0] in ("localhost", "127.0.0.1") and req_host.split(":")[0] in ("localhost", "127.0.0.1")):
-                        app.logger.warning(f"CSRF attack blocked from origin: {origin} -> target: {req_host}")
-                        abort(403)
+        """Require a session-bound token and reject cross-origin mutations."""
+        if not session.get("csrf_token"):
+            get_csrf_token()
+        if request.method not in ("POST", "PUT", "DELETE", "PATCH"):
+            return
+        if not app.config.get("WTF_CSRF_ENABLED", True):
+            return
+
+        submitted_token = request.form.get("_csrf_token") or request.headers.get("X-CSRF-Token")
+        expected_token = session.get("csrf_token")
+        if not submitted_token or not expected_token or not hmac.compare_digest(submitted_token, expected_token):
+            abort(403)
+
+        origin = request.headers.get("Origin") or request.headers.get("Referer")
+        if origin:
+            from urllib.parse import urlparse
+            origin_host = urlparse(origin).netloc
+            if origin_host and origin_host != request.host:
+                app.logger.warning(f"CSRF attack blocked from origin: {origin} -> target: {request.host}")
+                abort(403)
 
     @app.after_request
     def set_security_headers(response):
@@ -1386,5 +1416,5 @@ app = create_app()
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
-    debug = os.getenv("FLASK_ENV", "development").lower() == "development"
+    debug = os.getenv("FLASK_DEBUG", "false").lower() in ("1", "true", "yes")
     app.run(host="0.0.0.0", port=port, debug=debug)
