@@ -156,6 +156,30 @@ def create_app(test_config=None):
             else:
                 app.logger.warning(f"Database schema initialization deferred: {e}")
 
+        # Self-healing schema migration: ensure all columns exist across database upgrades
+        try:
+            from sqlalchemy import inspect as sa_inspect
+            inspector = sa_inspect(db.engine)
+            if "documents" in inspector.get_table_names():
+                existing_cols = {c["name"].lower() for c in inspector.get_columns("documents")}
+                dialect = db.engine.dialect.name
+                missing_defs = [
+                    ("user_id", "INTEGER"),
+                    ("is_starred", "BOOLEAN DEFAULT 0" if dialect != "mssql" else "BIT DEFAULT 0"),
+                    ("is_deleted", "BOOLEAN DEFAULT 0" if dialect != "mssql" else "BIT DEFAULT 0"),
+                    ("deleted_at", "DATETIME"),
+                    ("share_token", "VARCHAR(64)"),
+                    ("description", "VARCHAR(500)"),
+                ]
+                for col_name, col_type in missing_defs:
+                    if col_name.lower() not in existing_cols:
+                        kw = "ADD COLUMN" if dialect in ("sqlite", "postgresql") else "ADD"
+                        db.session.execute(db.text(f"ALTER TABLE documents {kw} {col_name} {col_type}"))
+                db.session.commit()
+        except Exception as mig_err:
+            app.logger.warning(f"Schema compatibility check deferred: {mig_err}")
+            db.session.rollback()
+
     def log_activity(user_id, action, details):
         """Records a security and activity log event."""
         try:
@@ -1201,8 +1225,17 @@ def create_app(test_config=None):
     def about():
         """About the CloudVault Project, Developers, and Cloud Architecture."""
         default_quota = int(float(os.getenv("USER_STORAGE_QUOTA_GB", "5.0")) * 1024 * 1024 * 1024)
-        quota_bytes = current_user.storage_quota_bytes if current_user.is_authenticated and hasattr(current_user, "storage_quota_bytes") else default_quota
-        used_bytes = current_user.storage_used_bytes if current_user.is_authenticated and hasattr(current_user, "storage_used_bytes") else 0
+        quota_bytes = default_quota
+        used_bytes = 0
+        if current_user.is_authenticated:
+            try:
+                quota_bytes = getattr(current_user, "storage_quota_bytes", default_quota)
+                used_bytes = getattr(current_user, "storage_used_bytes", 0)
+            except Exception as e:
+                app.logger.warning(f"Could not load storage metrics for about page: {e}")
+                quota_bytes = default_quota
+                used_bytes = 0
+
         return render_template(
             "about.html",
             is_cloud_active=storage_manager.is_cloud_active,

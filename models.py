@@ -25,12 +25,15 @@ class User(UserMixin, db.Model):
     @property
     def storage_used_bytes(self):
         """Calculates total active (non-deleted) storage used by this user in bytes."""
-        return (
-            db.session.query(db.func.coalesce(db.func.sum(Document.file_size), 0))
-            .filter(Document.user_id == self.id, Document.is_deleted.is_(False))
-            .scalar()
-            or 0
-        )
+        try:
+            return (
+                db.session.query(db.func.coalesce(db.func.sum(Document.file_size), 0))
+                .filter(Document.user_id == self.id, Document.is_deleted.is_(False))
+                .scalar()
+                or 0
+            )
+        except Exception:
+            return 0
 
     @property
     def storage_quota_bytes(self):
