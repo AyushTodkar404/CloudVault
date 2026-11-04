@@ -3,16 +3,16 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Sign in &ndash; Google Accounts</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%234285F4' d='M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.14z'/><path fill='%2334A853' d='M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z'/><path fill='%23FBBC05' d='M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z'/><path fill='%23EA4335' d='M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z'/></svg>">
 
-  <!-- Typography: Google Sans / Inter Style -->
+  <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS CDN & FontAwesome -->
+  <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -25,15 +25,15 @@
   </style>
 </head>
 
-<body class="min-h-full flex flex-col justify-between p-4 sm:p-6 md:p-10 selection:bg-[#4285F4] selection:text-white">
+<body class="min-h-full flex flex-col justify-between p-3 sm:p-6 md:p-10 selection:bg-[#4285F4] selection:text-white">
 
   <!-- Spacer Top -->
   <div></div>
 
-  <!-- Centered Google Account Chooser Card (Matches Google Dark Theme) -->
-  <div class="w-full max-w-[960px] mx-auto bg-[#1e1f20] border border-[#333537] rounded-[28px] sm:rounded-[32px] p-6 sm:p-10 md:p-12 shadow-2xl relative overflow-hidden transition-all">
+  <!-- Adaptive Google Account Card -->
+  <div class="w-full max-w-[960px] mx-auto bg-[#1e1f20] border border-[#333537] rounded-2xl sm:rounded-[32px] p-5 sm:p-10 md:p-12 shadow-2xl relative overflow-hidden transition-all">
 
-    <!-- Active Loading Transition Overlay (Hidden by default, activated on account selection) -->
+    <!-- Active Loading Transition Overlay -->
     <div id="googleLoadingOverlay" class="hidden absolute inset-0 bg-[#1e1f20]/95 backdrop-blur-xs z-50 flex flex-col items-center justify-center p-6 text-center space-y-4">
       <div class="w-12 h-12 rounded-full border-3 border-[#333537] border-t-[#4285F4] animate-spin"></div>
       <div class="space-y-1">
@@ -42,10 +42,10 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 md:gap-12 items-start">
 
       <!-- Left Column: Google Multi-Color Brand & Heading -->
-      <div class="md:col-span-5 flex flex-col justify-start space-y-4">
+      <div class="md:col-span-5 flex flex-col justify-start space-y-3 sm:space-y-4">
         <!-- Official Google Multi-color Logo -->
         <svg class="w-10 h-10 shrink-0" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.14z"/>
@@ -55,113 +55,73 @@
         </svg>
 
         <div>
-          <h1 class="text-3xl sm:text-4xl font-normal text-[#e3e3e3] tracking-tight leading-tight">
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-normal text-[#e3e3e3] tracking-tight leading-tight">
             Choose an account
           </h1>
-          <p class="text-xs sm:text-sm text-[#9aa0a6] mt-2 leading-relaxed">
+          <p class="text-xs sm:text-sm text-[#9aa0a6] mt-1 sm:mt-2 leading-relaxed">
             to continue to <span class="text-[#e3e3e3] font-medium">CloudVault</span>
           </p>
         </div>
+
+        <!-- Detected Device Indicator -->
+        <div class="pt-1">
+          <span id="deviceBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono text-[#9aa0a6] bg-[#282a2c] border border-[#333537]">
+            <i id="deviceIcon" class="fa-solid fa-laptop text-[10px] text-[#4285F4]"></i>
+            <span id="deviceText">Checking device...</span>
+          </span>
+        </div>
       </div>
 
-      <!-- Right Column: Authentic Accounts List (Matches Screenshot) -->
+      <!-- Right Column: Device-Specific Accounts List -->
       <div class="md:col-span-7">
-        <div class="rounded-[20px] bg-[#1e1f20] border border-[#333537] overflow-hidden divide-y divide-[#333537]">
+        <div class="rounded-[20px] bg-[#1e1f20] border border-[#333537] overflow-hidden">
 
-          <!-- Account 1: Ayush Todkar (ayushtodkar404@gmail.com) -->
-          <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('Ayush Todkar', 'ayushtodkar404@gmail.com')">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="name" value="Ayush Todkar">
-            <input type="hidden" name="email" value="ayushtodkar404@gmail.com">
-            <button type="submit" class="w-full text-left px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between group cursor-pointer">
-              <div class="flex items-center gap-3.5">
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#1e8e3e] text-white font-medium flex items-center justify-center text-sm shrink-0">
-                  A
+          <!-- Device Accounts List (Hydrated dynamically per device) -->
+          <div id="deviceAccountsList" class="divide-y divide-[#333537]">
+            
+            <!-- Default Server Rendered Block (Ensures tests and non-JS clients work) -->
+            <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('Ayush Todkar', 'ayushtodkar404@gmail.com')">
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="name" value="Ayush Todkar">
+              <input type="hidden" name="email" value="ayushtodkar404@gmail.com">
+              <button type="submit" class="w-full text-left px-4 sm:px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between group cursor-pointer">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#1e8e3e] text-white font-medium flex items-center justify-center text-sm shrink-0">
+                    A
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-[#e3e3e3] group-hover:text-white transition-colors">Ayush Todkar</p>
+                    <p class="text-xs text-[#9aa0a6] font-normal">ayushtodkar404@gmail.com</p>
+                  </div>
                 </div>
-                <div>
-                  <p class="text-sm font-medium text-[#e3e3e3] group-hover:text-white transition-colors">Ayush Todkar</p>
-                  <p class="text-xs text-[#9aa0a6] font-normal">ayushtodkar404@gmail.com</p>
-                </div>
-              </div>
-            </button>
-          </form>
+                <span class="text-[10px] font-mono text-[#9aa0a6] px-2 py-0.5 rounded bg-[#282a2c] border border-[#333537] hidden group-hover:inline-block">Select</span>
+              </button>
+            </form>
 
-          <!-- Account 2: Ayush Todkar (ayushtodkar77@gmail.com) -->
-          <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('Ayush Todkar', 'ayushtodkar77@gmail.com')">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="name" value="Ayush Todkar">
-            <input type="hidden" name="email" value="ayushtodkar77@gmail.com">
-            <button type="submit" class="w-full text-left px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between group cursor-pointer">
-              <div class="flex items-center gap-3.5">
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#8c5a2b] text-white font-medium flex items-center justify-center text-sm shrink-0">
-                  A
+            <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('Ayush Todkar', 'ayushtodkar77@gmail.com')">
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="name" value="Ayush Todkar">
+              <input type="hidden" name="email" value="ayushtodkar77@gmail.com">
+              <button type="submit" class="w-full text-left px-4 sm:px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between group cursor-pointer">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#8c5a2b] text-white font-medium flex items-center justify-center text-sm shrink-0">
+                    A
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-[#e3e3e3] group-hover:text-white transition-colors">Ayush Todkar</p>
+                    <p class="text-xs text-[#9aa0a6] font-normal">ayushtodkar77@gmail.com</p>
+                  </div>
                 </div>
-                <div>
-                  <p class="text-sm font-medium text-[#e3e3e3] group-hover:text-white transition-colors">Ayush Todkar</p>
-                  <p class="text-xs text-[#9aa0a6] font-normal">ayushtodkar77@gmail.com</p>
-                </div>
-              </div>
-            </button>
-          </form>
+                <span class="text-[10px] font-mono text-[#9aa0a6] px-2 py-0.5 rounded bg-[#282a2c] border border-[#333537] hidden group-hover:inline-block">Select</span>
+              </button>
+            </form>
 
-          <!-- Account 3: Ayush Todkar (ayushtodkar33@gmail.com) -->
-          <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('Ayush Todkar', 'ayushtodkar33@gmail.com')">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="name" value="Ayush Todkar">
-            <input type="hidden" name="email" value="ayushtodkar33@gmail.com">
-            <button type="submit" class="w-full text-left px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between group cursor-pointer">
-              <div class="flex items-center gap-3.5">
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#8c5a2b] text-white font-medium flex items-center justify-center text-sm shrink-0">
-                  A
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-[#e3e3e3] group-hover:text-white transition-colors">Ayush Todkar</p>
-                  <p class="text-xs text-[#9aa0a6] font-normal">ayushtodkar33@gmail.com</p>
-                </div>
-              </div>
-            </button>
-          </form>
+          </div>
 
-          <!-- Account 4: ayush TODKAR (ayushtodkar68@gmail.com) -->
-          <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('ayush TODKAR', 'ayushtodkar68@gmail.com')">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="name" value="ayush TODKAR">
-            <input type="hidden" name="email" value="ayushtodkar68@gmail.com">
-            <button type="submit" class="w-full text-left px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between group cursor-pointer">
-              <div class="flex items-center gap-3.5">
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#5c6bc0] text-white font-medium flex items-center justify-center text-sm shrink-0">
-                  a
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-[#e3e3e3] group-hover:text-white transition-colors">ayush TODKAR</p>
-                  <p class="text-xs text-[#9aa0a6] font-normal">ayushtodkar68@gmail.com</p>
-                </div>
-              </div>
-            </button>
-          </form>
-
-          <!-- Account 5: Vijay Todkar (vijayrtodkar411@gmail.com) -->
-          <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('Vijay Todkar', 'vijayrtodkar411@gmail.com')">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="name" value="Vijay Todkar">
-            <input type="hidden" name="email" value="vijayrtodkar411@gmail.com">
-            <button type="submit" class="w-full text-left px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between group cursor-pointer">
-              <div class="flex items-center gap-3.5">
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#1b5e20] text-white font-medium flex items-center justify-center text-sm shrink-0">
-                  V
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-[#e3e3e3] group-hover:text-white transition-colors">Vijay Todkar</p>
-                  <p class="text-xs text-[#9aa0a6] font-normal">vijayrtodkar411@gmail.com</p>
-                </div>
-              </div>
-            </button>
-          </form>
-
-          <!-- Account 6: Use another account -->
-          <div>
+          <!-- "Use another account on this device" Accordion -->
+          <div class="border-t border-[#333537]">
             <details class="group" id="useAnotherAccountDetails">
-              <summary class="list-none text-left px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between cursor-pointer">
+              <summary class="list-none text-left px-4 sm:px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between cursor-pointer">
                 <div class="flex items-center gap-3.5">
                   <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-[#5f6368] flex items-center justify-center text-[#9aa0a6] shrink-0">
                     <svg class="w-4 h-4 text-[#9aa0a6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -171,12 +131,13 @@
                   </div>
                   <div>
                     <p class="text-sm font-medium text-[#e3e3e3] group-hover:text-white transition-colors">Use another account</p>
+                    <p class="text-[11px] text-[#9aa0a6]">Add an account to this device</p>
                   </div>
                 </div>
                 <i class="fa-solid fa-chevron-down text-xs text-[#9aa0a6] group-open:rotate-180 transition-transform"></i>
               </summary>
 
-              <form method="POST" action="{{ url_for('google_login') }}" onsubmit="startGoogleLoading('Custom User', document.getElementById('customGoogleEmail').value)" class="p-5 bg-[#282a2c]/60 border-t border-[#333537] space-y-3">
+              <form method="POST" action="{{ url_for('google_login') }}" onsubmit="handleAccountSubmission(event, this)" class="p-4 sm:p-5 bg-[#282a2c]/60 border-t border-[#333537] space-y-3">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <div>
                   <label class="block text-[11px] font-medium text-[#9aa0a6] mb-1.5">Email or phone</label>
@@ -184,9 +145,10 @@
                 </div>
                 <div>
                   <label class="block text-[11px] font-medium text-[#9aa0a6] mb-1.5">Full name (Optional)</label>
-                  <input type="text" name="name" placeholder="e.g. Ayush Todkar" class="w-full px-3.5 py-2.5 rounded-lg text-sm bg-[#131314] border border-[#333537] text-[#e3e3e3] placeholder-[#777B83] focus:outline-none focus:border-[#4285F4] transition-colors">
+                  <input type="text" id="customGoogleName" name="name" placeholder="e.g. Ayush Todkar" class="w-full px-3.5 py-2.5 rounded-lg text-sm bg-[#131314] border border-[#333537] text-[#e3e3e3] placeholder-[#777B83] focus:outline-none focus:border-[#4285F4] transition-colors">
                 </div>
-                <div class="flex items-center justify-end gap-3 pt-1">
+                <div class="flex items-center justify-between pt-1">
+                  <span class="text-[10px] text-[#9aa0a6] font-mono">Will be saved to this device</span>
                   <button type="submit" class="px-5 py-2 rounded-full bg-[#8ab4f8] hover:bg-[#a8c7fa] text-[#041e49] font-medium text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs">
                     <span>Next</span>
                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -203,7 +165,7 @@
 
   </div>
 
-  <!-- Footer (Matches Google Accounts Footer in Screenshot) -->
+  <!-- Footer -->
   <div class="w-full max-w-[960px] mx-auto mt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-[#9aa0a6] gap-3 px-2">
     <div class="flex items-center gap-1.5 hover:text-[#e3e3e3] transition-colors cursor-pointer">
       <span>English (United Kingdom)</span>
@@ -216,13 +178,170 @@
     </div>
   </div>
 
+  <!-- Client-side Device Adaptation & LocalStorage Account Engine -->
   <script>
+    const STORAGE_KEY = 'cloudvault_google_device_accounts';
+    const csrfToken = "{{ csrf_token() }}";
+    const submitUrl = "{{ url_for('google_login') }}";
+
+    // 1. Detect Device Details
+    function detectDevice() {
+      const ua = navigator.userAgent;
+      let label = 'Desktop';
+      let icon = 'fa-laptop';
+
+      if (/iPhone/i.test(ua)) {
+        label = 'iPhone';
+        icon = 'fa-mobile-screen-button';
+      } else if (/iPad/i.test(ua)) {
+        label = 'iPad';
+        icon = 'fa-tablet-screen-button';
+      } else if (/Android/i.test(ua)) {
+        label = /Mobile/i.test(ua) ? 'Android Phone' : 'Android Tablet';
+        icon = 'fa-mobile-screen';
+      } else if (/Macintosh|Mac OS X/i.test(ua)) {
+        label = 'MacBook / Mac';
+        icon = 'fa-laptop';
+      } else if (/Windows/i.test(ua)) {
+        label = 'Windows PC';
+        icon = 'fa-desktop';
+      } else if (/Linux/i.test(ua)) {
+        label = 'Linux';
+        icon = 'fa-terminal';
+      }
+
+      const badge = document.getElementById('deviceText');
+      const badgeIcon = document.getElementById('deviceIcon');
+      if (badge) badge.textContent = `${label}`;
+      if (badgeIcon) badgeIcon.className = `fa-solid ${icon} text-[10px] text-[#4285F4]`;
+      return label;
+    }
+
+    // 2. Fetch Accounts Stored on THIS Device
+    function getDeviceAccounts() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {
+        console.warn('Storage read error:', e);
+      }
+      return null;
+    }
+
+    // 3. Save Account to THIS Device
+    function rememberDeviceAccount(name, email) {
+      try {
+        let accounts = getDeviceAccounts() || [];
+        accounts = accounts.filter(a => a.email.toLowerCase() !== email.toLowerCase());
+        const colors = ['#1e8e3e', '#8c5a2b', '#5c6bc0', '#1b5e20', '#c2185b', '#0097a7'];
+        const chosenColor = colors[Math.abs(email.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)) % colors.length];
+        
+        accounts.unshift({
+          name: name || email.split('@')[0],
+          email: email.toLowerCase().trim(),
+          color: chosenColor
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(accounts.slice(0, 10)));
+      } catch (e) {
+        console.warn('Storage write error:', e);
+      }
+    }
+
+    // 4. Remove Account from THIS Device
+    function forgetAccount(email, event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      try {
+        let accounts = getDeviceAccounts() || [];
+        accounts = accounts.filter(a => a.email.toLowerCase() !== email.toLowerCase());
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(accounts));
+        renderDeviceAccounts();
+      } catch (e) {
+        console.warn('Storage removal error:', e);
+      }
+    }
+
+    // 5. Render Accounts for THIS Specific Device
+    function renderDeviceAccounts() {
+      const container = document.getElementById('deviceAccountsList');
+      if (!container) return;
+
+      const deviceAccounts = getDeviceAccounts();
+      if (!deviceAccounts || deviceAccounts.length === 0) {
+        // If this device has no saved accounts yet, keep the initial picker or auto-expand entry
+        const details = document.getElementById('useAnotherAccountDetails');
+        if (details && window.innerWidth <= 640) {
+          details.open = true;
+        }
+        return;
+      }
+
+      // Render accounts specific to this device
+      container.innerHTML = deviceAccounts.map(acc => {
+        const initial = (acc.name || acc.email || 'G').charAt(0).toUpperCase();
+        const safeName = escapeHtml(acc.name);
+        const safeEmail = escapeHtml(acc.email);
+        return `
+          <form method="POST" action="${submitUrl}" onsubmit="rememberDeviceAccount('${safeName}', '${safeEmail}'); startGoogleLoading('${safeName}', '${safeEmail}')">
+            <input type="hidden" name="_csrf_token" value="${csrfToken}">
+            <input type="hidden" name="name" value="${safeName}">
+            <input type="hidden" name="email" value="${safeEmail}">
+            <div class="w-full text-left px-4 sm:px-5 py-3.5 hover:bg-[#282a2c] active:bg-[#333537] transition-colors flex items-center justify-between group cursor-pointer" onclick="this.closest('form').submit()">
+              <div class="flex items-center gap-3.5 overflow-hidden">
+                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full text-white font-medium flex items-center justify-center text-sm shrink-0" style="background-color: ${acc.color || '#1e8e3e'}">
+                  ${initial}
+                </div>
+                <div class="overflow-hidden">
+                  <p class="text-sm font-medium text-[#e3e3e3] group-hover:text-white transition-colors truncate">${safeName}</p>
+                  <p class="text-xs text-[#9aa0a6] font-normal truncate">${safeEmail}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-mono text-[#9aa0a6] px-2 py-0.5 rounded bg-[#282a2c] border border-[#333537] hidden group-hover:inline-block">This device</span>
+                <button type="button" onclick="forgetAccount('${safeEmail}', event)" class="w-6 h-6 rounded-full hover:bg-[#333537] text-[#9aa0a6] hover:text-[#EA4335] flex items-center justify-center text-xs transition-colors" title="Remove from this device">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function handleAccountSubmission(event, form) {
+      const email = document.getElementById('customGoogleEmail').value;
+      const name = document.getElementById('customGoogleName').value;
+      rememberDeviceAccount(name, email);
+      startGoogleLoading(name || email, email);
+    }
+
     function startGoogleLoading(name, email) {
       const overlay = document.getElementById('googleLoadingOverlay');
       const text = document.getElementById('loadingAccountName');
       if (overlay) overlay.classList.remove('hidden');
       if (text) text.textContent = `Signing in as ${name}...`;
     }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      detectDevice();
+      renderDeviceAccounts();
+    });
   </script>
 
 </body>
