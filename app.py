@@ -507,6 +507,13 @@ def create_app(test_config=None):
             duration=duration,
         )
 
+    def get_google_redirect_uri():
+        """Generates canonical OAuth redirect URI, ensuring HTTPS behind reverse proxies."""
+        uri = url_for("google_callback", _external=True)
+        if (request.headers.get("X-Forwarded-Proto") == "https" or request.is_secure) and uri.startswith("http://"):
+            uri = "https://" + uri[7:]
+        return uri
+
     @app.route("/login/google", methods=["GET", "POST"])
     def google_login():
         """Initiates Google OAuth or dev account chooser when testing without credentials."""
@@ -517,7 +524,7 @@ def create_app(test_config=None):
         if is_configured:
             state = secrets.token_urlsafe(16)
             session["oauth_state"] = state
-            redirect_uri = url_for("google_callback", _external=True)
+            redirect_uri = get_google_redirect_uri()
 
             params = {
                 "client_id": client_id,
@@ -557,7 +564,7 @@ def create_app(test_config=None):
 
         client_id = os.getenv("GOOGLE_CLIENT_ID")
         client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
-        redirect_uri = url_for("google_callback", _external=True)
+        redirect_uri = get_google_redirect_uri()
 
         try:
             token_resp = requests.post(
