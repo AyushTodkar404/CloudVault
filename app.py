@@ -137,9 +137,24 @@ def create_app(test_config=None):
 
     with app.app_context():
         try:
+            db.session.execute(db.text("SELECT 1"))
             db.create_all()
         except Exception as e:
-            app.logger.warning(f"Database schema initialization deferred: {e}")
+            if not database_url.startswith("sqlite"):
+                app.logger.warning(
+                    f"Configured database unreachable ({e}). Falling back to local SQLite instance."
+                )
+                db.session.remove()
+                instance_dir = os.path.join(app.root_path, "instance")
+                os.makedirs(instance_dir, exist_ok=True)
+                sqlite_file = os.path.join(instance_dir, "cloudvault.db").replace("\\", "/")
+                app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{sqlite_file}"
+                if "sqlalchemy" in app.extensions:
+                    del app.extensions["sqlalchemy"]
+                db.init_app(app)
+                db.create_all()
+            else:
+                app.logger.warning(f"Database schema initialization deferred: {e}")
 
     def log_activity(user_id, action, details):
         """Records a security and activity log event."""
@@ -494,21 +509,12 @@ def create_app(test_config=None):
 
     @app.route("/login/google", methods=["GET", "POST"])
     def google_login():
-        """Initiates Google OAuth, with a test-only account picker."""
+        """Initiates Google OAuth or dev account chooser when testing without credentials."""
         client_id = os.getenv("GOOGLE_CLIENT_ID")
-        demo_google = bool(app.config.get("TESTING"))
+        is_configured = bool(client_id and client_id != "your-google-client-id.apps.googleusercontent.com")
 
-        # The picker is only a local/test convenience, never production authentication.
-        if demo_google and (request.method == "POST" or request.args.get("email")):
-            email = (request.form.get("email") or request.args.get("email", "")).strip()
-            name = (request.form.get("name") or request.args.get("name", "")).strip()
-            if not email or "@" not in email:
-                flash("Please provide a valid Google email address.", "error")
-                return render_template("google_picker.html")
-            return _provision_and_login_google_user(email, name)
-
-        # Standard OAuth 2.0 flow
-        if client_id and client_id != "your-google-client-id.apps.googleusercontent.com":
+        # 1. If Google OAuth is configured, redirect to Google accounts
+        if is_configured:
             state = secrets.token_urlsafe(16)
             session["oauth_state"] = state
             redirect_uri = url_for("google_callback", _external=True)
@@ -525,6 +531,18 @@ def create_app(test_config=None):
             google_auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{requests.compat.urlencode(params)}"
             return redirect(google_auth_url)
 
+        # 2. If unconfigured but in TESTING mode, provide the local mock picker
+        if app.config.get("TESTING"):
+            if request.method == "POST" or request.args.get("email"):
+                email = (request.form.get("email") or request.args.get("email", "")).strip()
+                name = (request.form.get("name") or request.args.get("name", "")).strip()
+                if not email or "@" not in email:
+                    flash("Please provide a valid Google email address.", "error")
+                    return render_template("google_picker.html")
+                return _provision_and_login_google_user(email, name)
+            return render_template("google_picker.html")
+
+        # 3. Otherwise (unconfigured and not testing), redirect to login
         flash("Google sign-in is not configured for this deployment.", "error")
         return redirect(url_for("login"))
 
@@ -1207,12 +1225,17 @@ def create_app(test_config=None):
     @app.route("/account/backup", methods=["GET"])
     @login_required
     def export_account_data():
-        """Generates a complete sovereign data archive in JSON format (GDPR Art. 20 Data Portability)."""
+        """Generates an account data archive in JSON format."""
         docs = Document.query.filter_by(user_id=current_user.id).all()
         activities = ActivityLog.query.filter_by(user_id=current_user.id).all()
+        provider_name = (
+            f"Microsoft Azure Blob Storage ({storage_manager.container_name})"
+            if storage_manager.is_cloud_active
+            else "Local Server Storage"
+        )
         payload = {
-            "schema_version": "2.4",
-            "cloud_provider": "Microsoft Azure (Central India)",
+            "version": "1.0",
+            "storage_provider": provider_name,
             "export_timestamp": datetime.now(timezone.utc).isoformat(),
             "user_profile": current_user.to_dict(),
             "storage_metrics": {
@@ -1359,14 +1382,8 @@ def create_app(test_config=None):
             get_csrf_token()
         if request.method not in ("POST", "PUT", "DELETE", "PATCH"):
             return
-        if not app.config.get("WTF_CSRF_ENABLED", True):
-            return
 
-        submitted_token = request.form.get("_csrf_token") or request.headers.get("X-CSRF-Token")
-        expected_token = session.get("csrf_token")
-        if not submitted_token or not expected_token or not hmac.compare_digest(submitted_token, expected_token):
-            abort(403)
-
+        # Always block unauthorized cross-origin mutations
         origin = request.headers.get("Origin") or request.headers.get("Referer")
         if origin:
             from urllib.parse import urlparse
@@ -1374,6 +1391,14 @@ def create_app(test_config=None):
             if origin_host and origin_host != request.host:
                 app.logger.warning(f"CSRF attack blocked from origin: {origin} -> target: {request.host}")
                 abort(403)
+
+        if not app.config.get("WTF_CSRF_ENABLED", True):
+            return
+
+        submitted_token = request.form.get("_csrf_token") or request.headers.get("X-CSRF-Token")
+        expected_token = session.get("csrf_token")
+        if not submitted_token or not expected_token or not hmac.compare_digest(submitted_token, expected_token):
+            abort(403)
 
     @app.after_request
     def set_security_headers(response):

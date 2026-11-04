@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-[#FAFAF9] text-[#202124] antialiased selection:bg-[#F0445E] selection:text-white">
+<html lang="en" class="h-full bg-[#FAFAF9] text-[#1C1917] antialiased selection:bg-[#9F1239] selection:text-white">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>{% block title %}CloudVault &mdash; Digital Credential & Document Registry{% endblock %}</title>
-  <meta name="description"
-    content="A private document and credential registry for university teams.">
+  <title>{% block title %}CloudVault &mdash; Document & Credential Registry{% endblock %}</title>
+  <meta name="description" content="A private document and credential registry for academic teams.">
   <link rel="icon" type="image/svg+xml"
-    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍉</text></svg>">
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239F1239' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='18' height='18' x='3' y='3' rx='2'/><circle cx='12' cy='12' r='3'/><path d='m14.5 9.5 2-2'/><path d='m9.5 14.5-2 2'/></svg>">
 
-  <!-- Modern Fonts: Plus Jakarta Sans for UI + JetBrains Mono for metadata -->
+  <!-- Typography: Plus Jakarta Sans for UI + JetBrains Mono for figures -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
     rel="stylesheet">
 
-  <!-- Dark Mode Theme Bootstrapper (FOUC prevention) -->
+  <!-- Dark Mode Bootstrapper -->
   <script>
     (function () {
       const savedTheme = localStorage.getItem('cloudvault-theme');
@@ -42,33 +41,13 @@
             mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
           },
           colors: {
-            watermelon: {
-              50: '#FFF0F2',
-              100: '#FFE2E6',
-              200: '#FECDD3',
-              300: '#FDA4AF',
-              400: '#FB7185',
-              500: '#F0445E',
-              600: '#D92D50',
-              700: '#C02142',
-              800: '#9F1239',
-              900: '#881337',
-            },
-            freshgreen: {
-              50: '#EAF6EF',
-              100: '#D2EFE0',
-              200: '#BEE7D5',
-              500: '#268B65',
-              600: '#1F7052',
-              700: '#185740',
-            },
-            canvas: '#FAFAF9',
-            surface: '#FFFFFF',
-            border: '#E9EAEC',
-            ink: {
-              primary: '#202124',
-              secondary: '#5F6368',
-              muted: '#777B83',
+            vault: {
+              50: '#FDF2F4',
+              100: '#FCE7EA',
+              200: '#F8D0D6',
+              500: '#9F1239',
+              600: '#881337',
+              700: '#701A31',
             }
           }
         }
@@ -80,292 +59,163 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
-    /* Watermelon UI Design System Tokens */
+    :root {
+      --cv-canvas: #FAFAF9;
+      --cv-surface: #FFFFFF;
+      --cv-raised: #F4F4F2;
+      --cv-border: #E5E7EB;
+      --cv-border-strong: #D1D5DB;
+      --cv-ink: #1C1917;
+      --cv-secondary: #57534E;
+      --cv-muted: #78716C;
+      --cv-accent: #9F1239;
+      --cv-accent-hover: #881337;
+      --cv-accent-soft: #FDF2F4;
+      --cv-accent-border: #F8D0D6;
+      --cv-positive: #166534;
+      --cv-positive-soft: #F0FDF4;
+      --cv-positive-border: #BBF7D0;
+    }
+
+    html.dark {
+      --cv-canvas: #0E0F12;
+      --cv-surface: #16171C;
+      --cv-raised: #1D1E24;
+      --cv-border: #272832;
+      --cv-border-strong: #383A48;
+      --cv-ink: #F4F4F5;
+      --cv-secondary: #A1A1AA;
+      --cv-muted: #71717A;
+      --cv-accent: #FB7185;
+      --cv-accent-hover: #FDA4AF;
+      --cv-accent-soft: rgba(159, 18, 57, 0.18);
+      --cv-accent-border: rgba(251, 113, 133, 0.35);
+      --cv-positive: #4ADE80;
+      --cv-positive-soft: rgba(22, 101, 52, 0.22);
+      --cv-positive-border: rgba(74, 222, 128, 0.35);
+    }
+
     html, body {
       max-width: 100%;
       overflow-x: hidden;
     }
 
     body {
-      background-color: #FAFAF9;
-      color: #202124;
-      transition: background-color 0.2s ease, color 0.2s ease;
+      background-color: var(--cv-canvas);
+      color: var(--cv-ink);
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+      transition: background-color 0.16s ease, color 0.16s ease;
     }
 
-    /* Clean Card Surface Token */
-    .quartz-surface, .wm-card {
-      background: #FFFFFF;
-      border: 1px solid #E9EAEC;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
-      transition: background-color 0.2s ease, border-color 0.2s ease;
+    /* Core Surface & Input Tokens */
+    .wm-card, .quartz-surface {
+      background: var(--cv-surface);
+      border: 1px solid var(--cv-border);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .quartz-surface-hover, .wm-card-hover {
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    .wm-input, .quartz-input {
+      background: var(--cv-surface);
+      border: 1px solid var(--cv-border);
+      color: var(--cv-ink);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .quartz-surface-hover:hover, .wm-card-hover:hover {
-      border-color: #D3D5D9;
-      box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.06);
-      transform: translateY(-1px);
-    }
-
-    /* Refined Inputs */
-    .quartz-input, .wm-input {
-      background: #FFFFFF;
-      border: 1px solid #E9EAEC;
-      color: #202124;
-      transition: all 0.15s ease;
-    }
-
-    .quartz-input:focus, .wm-input:focus {
-      border-color: #F0445E;
-      box-shadow: 0 0 0 3px rgba(240, 68, 94, 0.12);
+    .wm-input:focus, .quartz-input:focus {
+      border-color: var(--cv-accent);
+      box-shadow: 0 0 0 3px var(--cv-accent-border);
       outline: none;
     }
 
-    /* Native Dialog Backdrop with Gentle Diffusion */
+    /* Native Dialog Backdrop */
     dialog::backdrop {
-      background: rgba(15, 23, 42, 0.45);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
     }
 
     dialog[open] {
-      animation: wmModalEnter 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: cvModalFade 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    @keyframes wmModalEnter {
-      from {
-        opacity: 0;
-        transform: scale(0.97) translateY(8px);
-      }
-
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
+    @keyframes cvModalFade {
+      from { opacity: 0; transform: scale(0.98) translateY(4px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
-    /* Refined Subtle Scrollbars */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
+    /* Subtle Native Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--cv-border-strong); border-radius: 9999px; }
 
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #E2E4E8;
-      border-radius: 9999px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: #C4C7CE;
-    }
-
-    /* ========================================================
-       Watermelon UI Dark Mode Overrides
-       ======================================================== */
-    html.dark body {
-      background-color: #0E0F12 !important;
-      color: #F3F4F6 !important;
-    }
-
-    html.dark .bg-white {
-      background-color: #16171C !important;
-    }
-
-    html.dark .bg-\[\#FAFAF9\] {
-      background-color: #101115 !important;
-    }
-
-    html.dark .bg-\[\#F4F4F5\] {
-      background-color: #090A0D !important;
-    }
-
-    html.dark .border-\[\#E9EAEC\] {
-      border-color: #262830 !important;
-    }
-
-    html.dark .border-b-\[\#E9EAEC\] {
-      border-bottom-color: #262830 !important;
-    }
-
-    html.dark .border-t-\[\#E9EAEC\] {
-      border-top-color: #262830 !important;
-    }
-
-    html.dark .text-\[\#202124\] {
-      color: #F3F4F6 !important;
-    }
-
-    html.dark .text-\[\#5F6368\] {
-      color: #9CA3AF !important;
-    }
-
-    html.dark .text-\[\#777B83\] {
-      color: #838A95 !important;
-    }
-
-    html.dark .hover\:bg-\[\#FAFAF9\]:hover {
-      background-color: #1D1E24 !important;
-    }
-
-    html.dark .hover\:bg-white:hover {
-      background-color: #1F2128 !important;
-    }
-
-    html.dark .quartz-surface, html.dark .wm-card {
-      background: #16171C !important;
-      border-color: #262830 !important;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4) !important;
-    }
-
-    html.dark .quartz-surface-hover:hover, html.dark .wm-card-hover:hover {
-      border-color: #383B46 !important;
-      box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.6) !important;
-    }
-
-    html.dark .quartz-input, html.dark .wm-input {
-      background: #111216 !important;
-      border-color: #262830 !important;
-      color: #F3F4F6 !important;
-    }
-
-    html.dark .quartz-input:focus, html.dark .wm-input:focus {
-      border-color: #F0445E !important;
-      box-shadow: 0 0 0 3px rgba(240, 68, 94, 0.25) !important;
-    }
-
-    html.dark dialog {
-      background: #16171C !important;
-      border-color: #262830 !important;
-      color: #F3F4F6 !important;
-    }
-
-    html.dark dialog::backdrop {
-      background: rgba(0, 0, 0, 0.72) !important;
-    }
-
-    html.dark .bg-\[\#FFF0F2\] {
-      background-color: rgba(240, 68, 94, 0.14) !important;
-    }
-
-    html.dark .border-\[\#FECDD3\] {
-      border-color: rgba(240, 68, 94, 0.35) !important;
-    }
-
-    html.dark .bg-\[\#EAF6EF\] {
-      background-color: rgba(38, 139, 101, 0.16) !important;
-    }
-
-    html.dark .border-\[\#BEE7D5\] {
-      border-color: rgba(38, 139, 101, 0.35) !important;
-    }
-
-    html.dark header {
-      background-color: rgba(22, 23, 28, 0.95) !important;
-      border-color: #262830 !important;
-    }
-
-    html.dark footer {
-      background-color: #111216 !important;
-      border-color: #262830 !important;
-      color: #9CA3AF !important;
-    }
-
-    html.dark ::-webkit-scrollbar-thumb {
-      background: #343742;
-    }
-
-    html.dark ::-webkit-scrollbar-thumb:hover {
-      background: #4C5060;
-    }
-
-    :root {
-      --cv-canvas: #f7f4ee;
-      --cv-surface: #fffdf8;
-      --cv-raised: #efe9df;
-      --cv-border: #ded7ca;
-      --cv-ink: #1f1b16;
-      --cv-secondary: #5e554a;
-      --cv-muted: #7b7266;
-      --cv-accent: #9a4a2e;
-      --cv-accent-dark: #7c3922;
-      --cv-accent-soft: #f4e3d9;
-      --cv-accent-border: #e8c5b5;
-      --cv-positive: #2f7a58;
-      --cv-positive-soft: #e2f0e8;
-      --cv-positive-border: #b7d7c2;
-    }
-
-    html.dark {
-      --cv-canvas: #161513;
-      --cv-surface: #1c1a18;
-      --cv-raised: #262421;
-      --cv-border: #3a3732;
-      --cv-ink: #efe9de;
-      --cv-secondary: #aaa398;
-      --cv-muted: #8a847a;
-      --cv-accent: #e39a78;
-      --cv-accent-dark: #f0b39a;
-      --cv-accent-soft: rgba(154, 74, 46, 0.2);
-      --cv-accent-border: rgba(227, 154, 120, 0.4);
-      --cv-positive: #7dc8a2;
-      --cv-positive-soft: rgba(47, 122, 88, 0.2);
-      --cv-positive-border: rgba(125, 200, 162, 0.35);
-    }
-
-    body { background: var(--cv-canvas); color: var(--cv-ink); }
-    .shadow-xs { box-shadow: 0 1px 2px rgba(31, 27, 22, 0.05); }
-    .shadow-xl, .shadow-2xl { box-shadow: 0 12px 30px rgba(31, 27, 22, 0.10); }
-    .rounded-3xl { border-radius: 18px; }
-    .uppercase { text-transform: none !important; letter-spacing: normal !important; }
-    .p-4\.5 { padding: 1rem; }
-    .scale-98 { transform: scale(0.98); }
-    .backdrop-blur-xs { backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
-    .border-3 { border-width: 3px; }
-    .animate-fade-in { animation: cvFadeIn 180ms cubic-bezier(0.22, 1, 0.36, 1); }
-    @keyframes cvFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
+    /* Map Palette Classes to Quiet Neutral & Accent System */
     .bg-\[\#FAFAF9\] { background-color: var(--cv-canvas) !important; }
     .bg-white { background-color: var(--cv-surface) !important; }
     .bg-\[\#F4F4F5\] { background-color: var(--cv-raised) !important; }
     .border-\[\#E9EAEC\] { border-color: var(--cv-border) !important; }
+    .border-b-\[\#E9EAEC\] { border-bottom-color: var(--cv-border) !important; }
+    .border-t-\[\#E9EAEC\] { border-top-color: var(--cv-border) !important; }
     .text-\[\#202124\] { color: var(--cv-ink) !important; }
     .text-\[\#5F6368\] { color: var(--cv-secondary) !important; }
     .text-\[\#777B83\] { color: var(--cv-muted) !important; }
+
+    /* Accent Tokens */
+    .bg-\[\#F0445E\], .bg-\[\#9F1239\] { background-color: var(--cv-accent) !important; }
+    .hover\:bg-\[\#D92D50\]:hover, .hover\:bg-\[\#701A31\]:hover { background-color: var(--cv-accent-hover) !important; }
+    .text-\[\#F0445E\], .text-\[\#9F1239\] { color: var(--cv-accent) !important; }
+    .hover\:text-\[\#F0445E\]:hover { color: var(--cv-accent-hover) !important; }
     .bg-\[\#FFF0F2\] { background-color: var(--cv-accent-soft) !important; }
     .border-\[\#FECDD3\] { border-color: var(--cv-accent-border) !important; }
-    .text-\[\#F0445E\] { color: var(--cv-accent) !important; }
-    .bg-\[\#F0445E\] { background-color: var(--cv-accent) !important; }
-    .hover\:bg-\[\#D92D50\]:hover { background-color: var(--cv-accent-dark) !important; }
-    .hover\:text-\[\#F0445E\]:hover { color: var(--cv-accent) !important; }
-    .bg-\[\#EAF6EF\] { background-color: var(--cv-positive-soft) !important; }
-    .border-\[\#BEE7D5\] { border-color: var(--cv-positive-border) !important; }
-    .text-\[\#268B65\] { color: var(--cv-positive) !important; }
-    .bg-\[\#268B65\] { background-color: var(--cv-positive) !important; }
-    .hover\:bg-\[\#D2EFE0\]:hover { background-color: var(--cv-positive-soft) !important; }
-    .bg-sky-50, .bg-blue-50, .bg-purple-50, .bg-indigo-50, .bg-amber-50, .bg-slate-100 { background-color: var(--cv-raised) !important; }
-    .border-sky-200, .border-blue-200, .border-purple-200, .border-indigo-200, .border-amber-200, .border-slate-200 { border-color: var(--cv-border) !important; }
-    .text-sky-600, .text-blue-600, .text-purple-600, .text-indigo-600, .text-amber-600, .text-slate-700 { color: var(--cv-secondary) !important; }
-    html.dark body { background-color: var(--cv-canvas) !important; color: var(--cv-ink) !important; }
-    html.dark .bg-white { background-color: var(--cv-surface) !important; }
-    html.dark .bg-\[\#FAFAF9\] { background-color: var(--cv-canvas) !important; }
-    html.dark .bg-\[\#F4F4F5\] { background-color: var(--cv-raised) !important; }
-    html.dark .border-\[\#E9EAEC\] { border-color: var(--cv-border) !important; }
-    html.dark .text-\[\#202124\] { color: var(--cv-ink) !important; }
-    html.dark .text-\[\#5F6368\] { color: var(--cv-secondary) !important; }
-    html.dark .text-\[\#777B83\] { color: var(--cv-muted) !important; }
-    .font-extrabold { font-weight: 600; }
-    .font-bold { font-weight: 600; }
-    .transition-all { transition-property: color, background-color, border-color, opacity, transform, box-shadow; }
-    button, a, input, select { transition-duration: 160ms; transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+
+    /* Positive / Clean Tokens */
+    .bg-\[\#268B65\], .bg-\[\#166534\] { background-color: var(--cv-positive) !important; }
+    .text-\[\#268B65\], .text-\[\#166534\] { color: var(--cv-positive) !important; }
+    .bg-\[\#EAF6EF\], .bg-\[\#F0FDF4\] { background-color: var(--cv-positive-soft) !important; }
+    .border-\[\#BEE7D5\], .border-\[\#BBF7D0\] { border-color: var(--cv-positive-border) !important; }
+
+    /* Quiet neutral badges for file types */
+    .bg-sky-50, .bg-blue-50, .bg-purple-50, .bg-indigo-50, .bg-amber-50, .bg-slate-100 {
+      background-color: var(--cv-raised) !important;
+    }
+    .border-sky-200, .border-blue-200, .border-purple-200, .border-indigo-200, .border-amber-200, .border-slate-200 {
+      border-color: var(--cv-border) !important;
+    }
+    .text-sky-600, .text-blue-600, .text-purple-600, .text-indigo-600, .text-amber-600, .text-slate-700 {
+      color: var(--cv-secondary) !important;
+    }
+
+    dialog {
+      background: var(--cv-surface) !important;
+      color: var(--cv-ink) !important;
+      border-color: var(--cv-border) !important;
+    }
+
+    header {
+      background-color: var(--cv-surface) !important;
+      border-color: var(--cv-border) !important;
+    }
+
+    footer {
+      background-color: var(--cv-surface) !important;
+      border-color: var(--cv-border) !important;
+      color: var(--cv-secondary) !important;
+    }
+
+    .animate-fade-in {
+      animation: cvFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes cvFadeIn {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
@@ -373,7 +223,7 @@
 <body class="h-full bg-[#FAFAF9] font-sans text-[#202124] flex flex-col min-h-screen">
 
   <!-- Top Navigation Bar -->
-  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E9EAEC]">
+  <header class="sticky top-0 z-40 bg-white/95 dark:bg-[#16171C]/95 backdrop-blur-md border-b border-[#E5E7EB] dark:border-[#272832]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16 gap-4">
 
@@ -381,42 +231,40 @@
         <div class="flex items-center gap-4">
           <a href="{{ url_for('index') }}" class="flex items-center gap-3 group">
             <div
-              class="w-10 h-10 rounded-lg bg-[#F0445E] flex items-center justify-center text-white shadow-xs">
-              <i class="fa-solid fa-vault text-white text-sm"></i>
+              class="w-9 h-9 rounded-lg bg-[#9F1239] flex items-center justify-center text-white shadow-xs">
+              <i class="fa-solid fa-vault text-white text-xs"></i>
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <span
-                  class="font-extrabold text-base tracking-tight text-[#202124] group-hover:text-[#F0445E] transition-colors">
+                <span class="font-bold text-base tracking-tight text-[#1C1917] dark:text-[#F4F4F5]">
                   CloudVault
                 </span>
-                <span
-                  class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] uppercase tracking-wider font-semibold">
-                  Student registry
+                <span class="text-[11px] text-[#78716C] dark:text-[#A1A1AA] font-mono hidden sm:inline">
+                  Registry
                 </span>
               </div>
-              <p class="text-[11px] text-[#5F6368] hidden sm:block">Dept of Computer Engineering &bull; 2026</p>
+              <p class="text-[11px] text-[#78716C] dark:text-[#A1A1AA] hidden sm:block">Department of Computer Engineering &bull; 2026</p>
             </div>
           </a>
         </div>
 
         <!-- Center Nav Links -->
-        <nav class="hidden md:flex items-center gap-1.5 font-mono text-xs">
+        <nav class="hidden md:flex items-center gap-1 text-xs font-medium">
           <a href="{{ url_for('index') }}"
-            class="px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 {% if request.endpoint == 'index' %}bg-[#FFF0F2] text-[#F0445E] font-bold border border-[#FECDD3] shadow-xs{% else %}text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9]{% endif %}">
-            <i class="fa-solid fa-folder-tree {% if request.endpoint == 'index' %}text-[#F0445E]{% else %}text-[#5F6368]{% endif %}"></i>
+            class="px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 {% if request.endpoint == 'index' %}bg-[#FDF2F4] text-[#9F1239] font-semibold dark:bg-[#9F1239]/20 dark:text-[#FB7185]{% else %}text-[#57534E] hover:text-[#1C1917] dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5] hover:bg-[#F4F4F2] dark:hover:bg-[#1D1E24]{% endif %}">
+            <i class="fa-solid fa-folder-tree text-[11px]"></i>
             <span>Vault</span>
           </a>
           <a href="{{ url_for('about') }}"
-            class="px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 {% if request.endpoint == 'about' %}bg-[#FFF0F2] text-[#F0445E] font-bold border border-[#FECDD3] shadow-xs{% else %}text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9]{% endif %}">
-            <i class="fa-solid fa-graduation-cap {% if request.endpoint == 'about' %}text-[#F0445E]{% else %}text-[#5F6368]{% endif %}"></i>
+            class="px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 {% if request.endpoint == 'about' %}bg-[#FDF2F4] text-[#9F1239] font-semibold dark:bg-[#9F1239]/20 dark:text-[#FB7185]{% else %}text-[#57534E] hover:text-[#1C1917] dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5] hover:bg-[#F4F4F2] dark:hover:bg-[#1D1E24]{% endif %}">
+            <i class="fa-solid fa-graduation-cap text-[11px]"></i>
             <span>Project & Team</span>
           </a>
           {% if current_user.is_authenticated %}
           <button type="button" onclick="openAuditModal()"
-            class="px-3 py-1.5 rounded-xl text-[#5F6368] hover:text-[#202124] hover:bg-[#FAFAF9] transition-all flex items-center gap-1.5">
-            <i class="fa-solid fa-clock-rotate-left text-[#268B65]"></i>
-            <span>Audit Trail</span>
+            class="px-3 py-1.5 rounded-lg text-[#57534E] hover:text-[#1C1917] dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5] hover:bg-[#F4F4F2] dark:hover:bg-[#1D1E24] transition-colors flex items-center gap-1.5">
+            <i class="fa-solid fa-clock-rotate-left text-[11px]"></i>
+            <span>Activity Log</span>
           </button>
           {% endif %}
         </nav>
@@ -424,74 +272,56 @@
         <!-- System Status & Action Controls -->
         <div class="flex items-center gap-2">
 
-          <!-- Storage Cluster Status Pill with Network Sentinel -->
-          <div
-            id="clusterStatusPill"
-            class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#EAF6EF] border border-[#BEE7D5] text-xs font-mono shadow-xs"
-            title="Active cloud object storage tier">
-              <span class="flex h-2 w-2 relative">
-                <span id="clusterStatusDot" class="relative inline-flex rounded-full h-2 w-2 bg-[#268B65]"></span>
-            </span>
-              <span id="clusterStatusText" class="text-[#268B65] font-semibold">Storage connected</span>
+          <!-- Storage Status Indicator -->
+          <div id="clusterStatusPill"
+            class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#F4F4F2] dark:bg-[#1D1E24] text-[11px] font-mono text-[#57534E] dark:text-[#A1A1AA]"
+            title="Active storage tier">
+            <span class="inline-flex rounded-full h-1.5 w-1.5 bg-[#166534] dark:bg-[#4ADE80]"></span>
+            <span id="clusterStatusText">Storage connected</span>
           </div>
 
           <!-- Theme Toggle (Light / Dark) -->
           <button type="button" onclick="toggleTheme()" id="themeToggleBtn"
-            class="w-8 h-8 rounded-xl bg-[#FAFAF9] hover:bg-[#FFF0F2] text-[#5F6368] hover:text-[#F0445E] border border-[#E9EAEC] hover:border-[#FECDD3] flex items-center justify-center transition-colors text-xs active:scale-95"
-            title="Toggle theme (Light / Dark)" aria-label="Toggle dark mode">
+            class="w-8 h-8 rounded-lg bg-[#FAFAF9] hover:bg-[#FDF2F4] text-[#57534E] hover:text-[#9F1239] border border-[#E5E7EB] flex items-center justify-center transition-colors text-xs"
+            title="Toggle theme" aria-label="Toggle dark mode">
             <i class="fa-solid fa-moon text-xs" id="themeToggleIcon"></i>
           </button>
 
-          <!-- Interactive Onboarding Tour Button -->
-          <button type="button" onclick="openOnboardingModal()" id="tourBtn"
-            class="w-8 h-8 rounded-xl bg-[#FAFAF9] hover:bg-[#FFF0F2] text-[#5F6368] hover:text-[#F0445E] border border-[#E9EAEC] hover:border-[#FECDD3] flex items-center justify-center transition-colors text-xs active:scale-95"
-            title="Interactive CloudVault Guide &amp; Tour" aria-label="Open walkthrough tour">
-            <i class="fa-solid fa-circle-question text-xs"></i>
-          </button>
-
           {% if current_user.is_authenticated %}
-          <!-- Upload Modal Action Button -->
+          <!-- Upload Button -->
           <button type="button" onclick="openUploadModal()"
-            class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-semibold shadow-xs hover:shadow-sm active:scale-95 transition-all"
-            title="Upload new document (Press N)">
-            <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
+            class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#9F1239] hover:bg-[#881337] text-white text-xs font-semibold shadow-xs transition-colors"
+            title="Upload document">
+            <i class="fa-solid fa-plus text-xs"></i>
             <span>Upload</span>
           </button>
 
           <!-- User Profile & Logout -->
-          <div class="hidden sm:flex items-center gap-1.5 pl-1.5 border-l border-[#E9EAEC]">
-            <!-- Clickable Profile Chip triggering Account Settings -->
-            <button type="button" onclick="openAccountModal()" title="Open Account Settings &amp; Data Governance"
-              class="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-[#FAFAF9] hover:bg-[#FFF0F2] border border-[#E9EAEC] hover:border-[#FECDD3] text-xs transition-colors">
-              <span class="w-6 h-6 rounded-lg bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center font-bold text-[11px] font-mono uppercase">
+          <div class="hidden sm:flex items-center gap-1.5 pl-1.5 border-l border-[#E5E7EB] dark:border-[#272832]">
+            <button type="button" onclick="openAccountModal()" title="Account settings"
+              class="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-[#F4F4F2] dark:hover:bg-[#1D1E24] text-xs transition-colors">
+              <span class="w-6 h-6 rounded-md bg-[#FDF2F4] text-[#9F1239] dark:bg-[#9F1239]/20 dark:text-[#FB7185] flex items-center justify-center font-bold text-[11px] font-mono uppercase">
                 {{ current_user.username[0] }}
               </span>
-              <div class="hidden md:block text-left">
-                <span class="font-bold text-[#202124] block leading-tight truncate max-w-[90px]">{{ current_user.username }}</span>
-                <span class="text-[9px] font-mono text-[#5F6368] uppercase tracking-wider block">{{ current_user.role }}</span>
-              </div>
-            </button>
-            <button type="button" onclick="openAccountModal()" title="Account Settings &amp; Data Governance"
-              class="w-8 h-8 rounded-xl bg-[#FAFAF9] hover:bg-[#FFF0F2] text-[#5F6368] hover:text-[#202124] border border-[#E9EAEC] hover:border-[#FECDD3] flex items-center justify-center transition-colors text-xs active:scale-95">
-              <i class="fa-solid fa-gear text-xs"></i>
+              <span class="font-medium text-[#1C1917] dark:text-[#F4F4F5] truncate max-w-[100px]">{{ current_user.username }}</span>
             </button>
             <form method="POST" action="{{ url_for('logout') }}">
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
               <button type="submit" title="Sign out"
-                class="w-8 h-8 rounded-xl bg-[#FAFAF9] hover:bg-[#FFF0F2] text-[#5F6368] hover:text-[#F0445E] border border-[#E9EAEC] hover:border-[#FECDD3] flex items-center justify-center transition-colors text-xs active:scale-95">
+                class="w-8 h-8 rounded-lg hover:bg-[#FDF2F4] text-[#78716C] hover:text-[#9F1239] flex items-center justify-center transition-colors text-xs">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
               </button>
             </form>
           </div>
           {% else %}
-          <a href="{{ url_for('login') }}" class="hidden sm:inline-flex px-3.5 py-1.5 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-semibold font-mono transition-colors shadow-xs">Sign In</a>
+          <a href="{{ url_for('login') }}" class="hidden sm:inline-flex px-3.5 py-1.5 rounded-lg bg-[#9F1239] hover:bg-[#881337] text-white text-xs font-medium transition-colors shadow-xs">Sign In</a>
           {% endif %}
 
           <!-- Mobile Hamburger Toggle Button -->
           <button type="button" id="mobileMenuToggle" onclick="toggleMobileMenu()"
-            class="md:hidden w-9 h-9 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] hover:bg-white flex items-center justify-center text-sm active:scale-95 transition-all"
+            class="md:hidden w-8 h-8 rounded-lg bg-[#FAFAF9] border border-[#E5E7EB] text-[#1C1917] hover:bg-white flex items-center justify-center text-xs transition-colors"
             aria-label="Open mobile navigation menu">
-            <i class="fa-solid fa-bars text-sm" id="mobileMenuIcon"></i>
+            <i class="fa-solid fa-bars" id="mobileMenuIcon"></i>
           </button>
         </div>
 
@@ -553,15 +383,12 @@
       {% endif %}
 
       <!-- Mobile Secondary Links -->
-      <div class="grid grid-cols-3 gap-2 pt-2 border-t border-[#E9EAEC] text-[11px] font-mono text-center">
-        <button type="button" onclick="openOnboardingModal(); toggleMobileMenu();" class="p-2 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#5F6368] hover:text-[#202124]">
-          <i class="fa-solid fa-circle-question text-[#F0445E] block mx-auto mb-1"></i> Tour
-        </button>
+      <div class="grid grid-cols-2 gap-2 pt-2 border-t border-[#E9EAEC] text-[11px] text-center">
         <a href="{{ url_for('privacy') }}" class="p-2 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#5F6368] hover:text-[#202124] block">
           <i class="fa-solid fa-user-shield text-[#268B65] block mx-auto mb-1"></i> Privacy
         </a>
         <a href="{{ url_for('terms') }}" class="p-2 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#5F6368] hover:text-[#202124] block">
-          <i class="fa-solid fa-scale-balanced text-amber-500 block mx-auto mb-1"></i> Terms
+          <i class="fa-solid fa-scale-balanced text-stone-500 block mx-auto mb-1"></i> Terms
         </a>
       </div>
 
@@ -647,12 +474,12 @@
       <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#E9EAEC] bg-[#FAFAF9]">
         <div class="flex items-center gap-3 overflow-hidden">
           <div id="modalTypeIcon"
-            class="w-8 h-8 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center shrink-0">
+            class="w-8 h-8 rounded-lg bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-file text-sm"></i>
           </div>
           <div class="overflow-hidden">
-            <h3 id="modalDocTitle" class="text-sm font-bold text-[#202124] truncate max-w-md">Document Preview</h3>
-            <p id="modalDocSubtitle" class="text-[11px] text-[#5F6368] truncate font-mono"></p>
+            <h3 id="modalDocTitle" class="text-sm font-semibold text-[#1C1917] truncate max-w-md">Document Preview</h3>
+            <p id="modalDocSubtitle" class="text-[11px] text-[#78716C] truncate font-mono"></p>
           </div>
         </div>
 
@@ -691,38 +518,38 @@
           class="w-full max-w-md hidden my-8 p-3 rounded-xl bg-white border border-[#E9EAEC] shadow-md"></audio>
         <div id="previewFallback" class="hidden flex flex-col items-center justify-center p-8 text-center space-y-3">
           <div id="previewFallbackIcon"
-            class="w-16 h-16 rounded-2xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-2xl shadow-xs mx-auto">
+            class="w-12 h-12 rounded-xl bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center text-xl shadow-xs mx-auto">
             <i class="fa-solid fa-file"></i>
           </div>
           <div>
-            <h4 id="previewFallbackTitle" class="text-sm font-bold text-[#202124]">Document Stream Available</h4>
-            <p id="previewFallbackSubtitle" class="text-xs text-[#5F6368] font-mono mt-1">Direct in-app rendering not applicable for this file type.</p>
+            <h4 id="previewFallbackTitle" class="text-sm font-semibold text-[#1C1917]">Document available</h4>
+            <p id="previewFallbackSubtitle" class="text-xs text-[#78716C] mt-1">Direct in-app rendering is not available for this format.</p>
           </div>
           <div class="pt-2 flex items-center gap-2">
             <a id="previewFallbackDownload" href="#" download
-              class="px-4 py-2 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 font-mono">
+              class="px-4 py-2 rounded-xl bg-[#9F1239] hover:bg-[#881337] text-white text-xs font-medium shadow-xs flex items-center gap-1.5">
               <i class="fa-solid fa-download text-xs"></i>
-              <span>Download File</span>
+              <span>Download file</span>
             </a>
             <a id="previewFallbackExternal" href="#" target="_blank" rel="noopener noreferrer"
-              class="px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] text-xs font-semibold flex items-center gap-1.5 font-mono shadow-xs">
+              class="px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] text-xs font-medium flex items-center gap-1.5 shadow-xs">
               <i class="fa-solid fa-arrow-up-right-from-square text-xs text-[#5F6368]"></i>
-              <span>Open in New Tab</span>
+              <span>Open in new tab</span>
             </a>
           </div>
         </div>
-        <div id="previewLoading" class="flex flex-col items-center gap-2 text-[#5F6368] text-xs font-mono">
-          <i class="fa-solid fa-spinner animate-spin text-xl text-[#F0445E]"></i>
-          <span>Retrieving document stream...</span>
+        <div id="previewLoading" class="flex flex-col items-center gap-2 text-[#78716C] text-xs">
+          <i class="fa-solid fa-spinner animate-spin text-lg text-[#9F1239]"></i>
+          <span>Loading preview...</span>
         </div>
       </div>
 
       <!-- Modal Footer -->
       <div
-        class="px-5 py-2.5 bg-[#FAFAF9] border-t border-[#E9EAEC] flex items-center justify-between text-[11px] text-[#5F6368] font-mono">
-        <span id="modalMetaInfo">Storage identity recorded</span>
-        <button type="button" onclick="closePreviewModal()" class="text-xs text-[#5F6368] hover:text-[#202124] px-2 py-1">
-          Dismiss (Esc)
+        class="px-5 py-2.5 bg-[#FAFAF9] border-t border-[#E9EAEC] flex items-center justify-between text-[11px] text-[#78716C]">
+        <span id="modalMetaInfo">Document record</span>
+        <button type="button" onclick="closePreviewModal()" class="text-xs text-[#57534E] hover:text-[#1C1917] px-2 py-1">
+          Close (Esc)
         </button>
       </div>
 
@@ -736,12 +563,12 @@
       <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
         <div class="flex items-center gap-3">
           <div
-            class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center shadow-xs">
-            <i class="fa-solid fa-arrow-up-from-bracket text-base"></i>
+            class="w-9 h-9 rounded-lg bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center shadow-xs">
+            <i class="fa-solid fa-arrow-up-from-bracket text-sm"></i>
           </div>
           <div>
-            <h2 class="font-bold text-base text-[#202124]">Upload Credential</h2>
-            <p class="text-xs text-[#5F6368]">Register document in storage</p>
+            <h2 class="font-semibold text-base text-[#1C1917]">Upload document</h2>
+            <p class="text-xs text-[#78716C]">Add a new file to your vault</p>
           </div>
         </div>
         <button type="button" onclick="closeUploadModal()"
@@ -757,8 +584,8 @@
 
         <div>
           <label for="modal_student_name"
-            class="block text-xs font-semibold text-[#5F6368] mb-1.5 uppercase tracking-wider font-mono">
-            Student Full Name <span class="text-[#F0445E]">*</span>
+            class="block text-xs font-medium text-stone-700 mb-1.5">
+            Student or author name <span class="text-[#9F1239]">*</span>
           </label>
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#777B83] pointer-events-none">
@@ -771,26 +598,26 @@
 
         <div>
           <label for="modal_document_title"
-            class="block text-xs font-semibold text-[#5F6368] mb-1.5 uppercase tracking-wider font-mono">
-            Document Title <span class="text-[#F0445E]">*</span>
+            class="block text-xs font-medium text-stone-700 mb-1.5">
+            Document title <span class="text-[#9F1239]">*</span>
           </label>
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#777B83] pointer-events-none">
-              <i class="fa-solid fa-award text-xs"></i>
+              <i class="fa-regular fa-file-lines text-xs"></i>
             </span>
             <input type="text" name="document_title" id="modal_document_title" required
-              placeholder="e.g. Distributed Cloud Architecture Certificate"
+              placeholder="e.g. Distributed Cloud Architecture Report"
               class="wm-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm placeholder-[#A0A4A8]">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-[#5F6368] mb-1.5 uppercase tracking-wider font-mono">
-            Certificate File <span class="text-[#F0445E]">*</span>
+          <label class="block text-xs font-medium text-stone-700 mb-1.5">
+            File <span class="text-[#9F1239]">*</span>
           </label>
 
           <div id="modalDropzone"
-            class="border-2 border-dashed border-[#E9EAEC] hover:border-[#F0445E] rounded-xl p-5 text-center cursor-pointer transition-all bg-[#FAFAF9] relative group"
+            class="border-2 border-dashed border-[#E7E5E4] hover:border-[#9F1239] rounded-xl p-5 text-center cursor-pointer transition-all bg-[#FAFAF9] relative group"
             onclick="document.getElementById('modalFileInput').click()">
             <input type="file" name="file" id="modalFileInput" required multiple
               accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.tex,.xls,.xlsx,.csv,.tsv,.ods,.ppt,.pptx,.odp,.png,.jpg,.jpeg,.webp,.svg,.gif,.bmp,.tiff,.ico,.mp4,.webm,.mov,.mkv,.avi,.mp3,.wav,.ogg,.m4a,.flac,.aac,.zip,.tar,.gz,.7z,.rar,.bz2,.py,.java,.c,.cpp,.cs,.js,.ts,.html,.css,.json,.xml,.sql,.yaml,.yml,.md"
@@ -798,26 +625,25 @@
 
             <div id="modalDropzonePrompt" class="space-y-1.5">
               <div
-                class="w-10 h-10 rounded-full bg-[#FFF0F2] text-[#F0445E] flex items-center justify-center mx-auto group-hover:scale-110 transition-transform border border-[#FECDD3]">
-                <i class="fa-solid fa-cloud-arrow-up text-base"></i>
+                class="w-9 h-9 rounded-full bg-stone-100 text-stone-600 flex items-center justify-center mx-auto border border-stone-200">
+                <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
               </div>
-              <p class="text-xs font-medium text-[#202124]">
-                <span class="text-[#F0445E] font-semibold underline decoration-[#FECDD3]">Browse files</span> or
-                drag & drop here
+              <p class="text-xs font-medium text-[#1C1917]">
+                <span class="text-[#9F1239] underline decoration-stone-300">Browse files</span> or
+                drag &amp; drop here
               </p>
-              <p class="text-[11px] text-[#5F6368] font-mono">Genuine Documents, Media, Archives & Code &bull; Max 100 MB</p>
-              <p class="text-[10px] text-[#268B65] font-mono flex items-center justify-center gap-1.5 pt-0.5"><i class="fa-solid fa-shield-virus text-[11px]"></i> Deep integrity &amp; threat scanner active</p>
+              <p class="text-[11px] text-[#78716C]">Documents, media, archives &amp; code &bull; Max 100 MB</p>
             </div>
 
             <div id="modalFilePreview" class="hidden text-left">
-              <div class="flex items-center gap-2 p-2.5 rounded-lg bg-[#FFF0F2] border border-[#FECDD3]">
-                <i class="fa-solid fa-file-circle-check text-[#F0445E] text-lg"></i>
+              <div class="flex items-center gap-2 p-2.5 rounded-lg bg-stone-50 border border-stone-200">
+                <i class="fa-solid fa-file-lines text-stone-600 text-base"></i>
                 <div class="overflow-hidden flex-1">
-                  <p id="modalFileNameDisplay" class="text-xs font-semibold text-[#202124] truncate"></p>
-                  <p id="modalFileSizeDisplay" class="text-[10px] text-[#F0445E] font-mono"></p>
+                  <p id="modalFileNameDisplay" class="text-xs font-medium text-[#1C1917] truncate"></p>
+                  <p id="modalFileSizeDisplay" class="text-[10px] text-[#78716C] font-mono"></p>
                 </div>
                 <button type="button" onclick="clearModalFileSelection(event)"
-                  class="text-[#5F6368] hover:text-[#F0445E] p-1">
+                  class="text-[#78716C] hover:text-[#1C1917] p-1">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>
@@ -827,9 +653,9 @@
 
         <div class="pt-2">
           <button type="submit" id="modalSubmitBtn"
-            class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-white bg-[#F0445E] hover:bg-[#D92D50] active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-xs font-mono">
-            <i class="fa-solid fa-lock text-xs"></i>
-            <span>Commit to storage</span>
+            class="w-full py-2.5 px-4 rounded-xl font-medium text-xs text-white bg-[#9F1239] hover:bg-[#881337] active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-xs">
+            <i class="fa-solid fa-arrow-up-from-bracket text-xs"></i>
+            <span>Upload document</span>
           </button>
         </div>
       </form>
@@ -841,12 +667,12 @@
     <div class="p-6">
       <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center">
-            <i class="fa-solid fa-pen-to-square text-base"></i>
+          <div class="w-9 h-9 rounded-lg bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center">
+            <i class="fa-solid fa-pen-to-square text-sm"></i>
           </div>
           <div>
-            <h2 class="font-bold text-base text-[#202124]">Edit Document</h2>
-            <p class="text-xs text-[#5F6368]">Rename title or update description notes</p>
+            <h2 class="font-semibold text-base text-[#1C1917]">Edit document</h2>
+            <p class="text-xs text-[#78716C]">Rename title or update description notes</p>
           </div>
         </div>
         <button type="button" onclick="closeEditModal()" class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm">
@@ -857,23 +683,23 @@
       <form id="editForm" method="POST" action="" class="mt-5 space-y-4">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         <div>
-          <label for="edit_title" class="block text-xs font-semibold text-[#5F6368] mb-1.5 uppercase tracking-wider font-mono">
-            Document Title <span class="text-[#F0445E]">*</span>
+          <label for="edit_title" class="block text-xs font-medium text-stone-700 mb-1.5">
+            Document title <span class="text-[#9F1239]">*</span>
           </label>
           <input type="text" name="document_title" id="edit_title" required class="wm-input w-full px-3.5 py-2.5 rounded-xl text-sm text-[#202124]">
         </div>
         <div>
-          <label for="edit_desc" class="block text-xs font-semibold text-[#5F6368] mb-1.5 uppercase tracking-wider font-mono">
-            Description / Notes (Optional)
+          <label for="edit_desc" class="block text-xs font-medium text-stone-700 mb-1.5">
+            Description / notes (optional)
           </label>
-          <textarea name="description" id="edit_desc" rows="3" placeholder="Add optional tags, context, or notes..." class="wm-input w-full px-3.5 py-2 rounded-xl text-xs text-[#202124]"></textarea>
+          <textarea name="description" id="edit_desc" rows="3" placeholder="Add optional context or notes..." class="wm-input w-full px-3.5 py-2 rounded-xl text-xs text-[#202124]"></textarea>
         </div>
         <div class="pt-2 flex items-center gap-2">
-          <button type="button" onclick="closeEditModal()" class="w-1/2 py-2 px-4 rounded-xl text-xs font-semibold text-[#5F6368] hover:bg-[#FAFAF9] border border-[#E9EAEC] font-mono">
+          <button type="button" onclick="closeEditModal()" class="w-1/2 py-2 px-4 rounded-xl text-xs font-medium text-stone-600 hover:bg-[#FAFAF9] border border-[#E9EAEC]">
             Cancel
           </button>
-          <button type="submit" class="w-1/2 py-2 px-4 rounded-xl font-bold text-xs text-white bg-[#F0445E] hover:bg-[#D92D50] shadow-xs font-mono">
-            Save Changes
+          <button type="submit" class="w-1/2 py-2 px-4 rounded-xl font-medium text-xs text-white bg-[#9F1239] hover:bg-[#881337] shadow-xs">
+            Save changes
           </button>
         </div>
       </form>
@@ -885,12 +711,12 @@
     <div class="p-6">
       <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center">
-            <i class="fa-solid fa-share-nodes text-base"></i>
+          <div class="w-9 h-9 rounded-lg bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center">
+            <i class="fa-solid fa-share-nodes text-sm"></i>
           </div>
           <div>
-            <h2 class="font-bold text-base text-[#202124]">Share Document</h2>
-            <p class="text-xs text-[#5F6368]">Generate public view & download link</p>
+            <h2 class="font-semibold text-base text-[#1C1917]">Share document</h2>
+            <p class="text-xs text-[#78716C]">Create a public view &amp; download link</p>
           </div>
         </div>
         <button type="button" onclick="closeShareModal()" class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm">
@@ -900,18 +726,18 @@
 
       <div class="mt-5 space-y-4">
         <div>
-          <p id="shareDocTitle" class="text-xs font-bold text-[#202124] truncate"></p>
-          <p class="text-[11px] text-[#5F6368] font-mono mt-0.5">Anyone with this link can view or download this document.</p>
+          <p id="shareDocTitle" class="text-xs font-semibold text-[#1C1917] truncate"></p>
+          <p class="text-[11px] text-[#78716C] mt-0.5">Anyone with this link can view or download this document.</p>
         </div>
         <div class="flex items-center gap-2">
-          <input type="text" id="shareUrlInput" readonly class="wm-input w-full px-3 py-2 rounded-xl text-xs font-mono text-[#F0445E] select-all bg-[#FAFAF9]">
-          <button type="button" id="copyShareBtn" onclick="copyShareLinkAction(this)" class="px-3.5 py-2 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-bold font-mono shrink-0 shadow-xs">
+          <input type="text" id="shareUrlInput" readonly class="wm-input w-full px-3 py-2 rounded-xl text-xs font-mono text-[#1C1917] select-all bg-[#FAFAF9]">
+          <button type="button" id="copyShareBtn" onclick="copyShareLinkAction(this)" class="px-3.5 py-2 rounded-xl bg-[#9F1239] hover:bg-[#881337] text-white text-xs font-medium shrink-0 shadow-xs">
             Copy
           </button>
         </div>
-        <div class="p-3 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[11px] text-[#F0445E] flex items-center gap-2">
-          <i class="fa-solid fa-shield-halved text-xs"></i>
-          <span>Public access token is cryptographically random and unique.</span>
+        <div class="p-3 rounded-xl bg-stone-50 border border-stone-200 text-[11px] text-stone-600 flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-xs text-stone-500"></i>
+          <span>Link includes a cryptographically random, unique token.</span>
         </div>
       </div>
     </div>
@@ -922,12 +748,12 @@
     <div class="p-6">
       <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
         <div class="flex items-center gap-3">
-          <div id="infoIcon" class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-lg">
+          <div id="infoIcon" class="w-9 h-9 rounded-lg bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center text-sm">
             <i class="fa-solid fa-circle-info"></i>
           </div>
           <div class="overflow-hidden">
-            <h2 id="infoTitle" class="font-bold text-base text-[#202124] truncate">Document Details</h2>
-            <p id="infoSubtitle" class="text-xs text-[#5F6368] font-mono truncate"></p>
+            <h2 id="infoTitle" class="font-semibold text-base text-[#1C1917] truncate">Document details</h2>
+            <p id="infoSubtitle" class="text-xs text-[#78716C] font-mono truncate"></p>
           </div>
         </div>
         <button type="button" onclick="closeInfoModal()" class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm">
@@ -937,41 +763,41 @@
 
       <div class="mt-5 space-y-3 font-mono text-xs">
         <div class="grid grid-cols-3 gap-2 py-2 border-b border-[#E9EAEC]">
-          <span class="text-[#5F6368]">File Name:</span>
-          <span id="infoFileName" class="col-span-2 text-[#202124] truncate"></span>
+          <span class="text-[#78716C]">File name:</span>
+          <span id="infoFileName" class="col-span-2 text-[#1C1917] truncate font-sans"></span>
         </div>
         <div class="grid grid-cols-3 gap-2 py-2 border-b border-[#E9EAEC]">
-          <span class="text-[#5F6368]">Author / Scholar:</span>
-          <span id="infoStudent" class="col-span-2 text-[#202124]"></span>
+          <span class="text-[#78716C]">Author:</span>
+          <span id="infoStudent" class="col-span-2 text-[#1C1917] font-sans"></span>
         </div>
         <div class="grid grid-cols-3 gap-2 py-2 border-b border-[#E9EAEC]">
-          <span class="text-[#5F6368]">File Size:</span>
-          <span id="infoSize" class="col-span-2 text-[#F0445E] font-semibold"></span>
+          <span class="text-[#78716C]">Size:</span>
+          <span id="infoSize" class="col-span-2 text-[#9F1239] font-semibold"></span>
         </div>
         <div class="grid grid-cols-3 gap-2 py-2 border-b border-[#E9EAEC]">
-          <span class="text-[#5F6368]">MIME Type:</span>
-          <span id="infoMime" class="col-span-2 text-[#5F6368] truncate"></span>
+          <span class="text-[#78716C]">MIME type:</span>
+          <span id="infoMime" class="col-span-2 text-[#78716C] truncate"></span>
         </div>
         <div class="grid grid-cols-3 gap-2 py-2 border-b border-[#E9EAEC]">
-          <span class="text-[#5F6368]">Archived Date:</span>
-          <span id="infoDate" class="col-span-2 text-[#5F6368]"></span>
+          <span class="text-[#78716C]">Archived date:</span>
+          <span id="infoDate" class="col-span-2 text-[#78716C]"></span>
         </div>
         <div class="grid grid-cols-3 gap-2 py-2 border-b border-[#E9EAEC]">
-          <span class="text-[#5F6368]">Storage ID:</span>
+          <span class="text-[#78716C]">Storage ID:</span>
           <span id="infoHash" class="col-span-2 text-[#268B65] truncate font-semibold"></span>
         </div>
         <div id="infoDescContainer" class="hidden pt-1">
-          <span class="text-[#5F6368] block mb-1">Notes:</span>
-          <p id="infoDesc" class="p-2.5 rounded-lg bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] text-[11px]"></p>
+          <span class="text-[#78716C] block mb-1">Notes:</span>
+          <p id="infoDesc" class="p-2.5 rounded-lg bg-[#FAFAF9] border border-[#E9EAEC] text-[#1C1917] text-[11px] font-sans"></p>
         </div>
       </div>
 
       <div class="mt-6 flex items-center justify-end gap-2">
-        <a id="infoDownloadBtn" href="#" download class="px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] text-[#202124] text-xs font-semibold font-mono flex items-center gap-1.5 border border-[#E9EAEC] shadow-xs">
-          <i class="fa-solid fa-download text-[11px] text-[#5F6368]"></i>
+        <a id="infoDownloadBtn" href="#" download class="px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] text-[#1C1917] text-xs font-medium flex items-center gap-1.5 border border-[#E9EAEC] shadow-xs">
+          <i class="fa-solid fa-download text-[11px] text-[#78716C]"></i>
           <span>Download</span>
         </a>
-        <button type="button" onclick="closeInfoModal()" class="px-4 py-2 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-bold font-mono shadow-xs">
+        <button type="button" onclick="closeInfoModal()" class="px-4 py-2 rounded-xl bg-stone-900 hover:bg-black text-white text-xs font-medium shadow-xs">
           Close
         </button>
       </div>
@@ -983,18 +809,18 @@
     <div class="p-6">
       <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-lg shadow-xs">
+          <div class="w-9 h-9 rounded-lg bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center text-sm shadow-xs">
             <i class="fa-solid fa-clock-rotate-left"></i>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="font-bold text-base text-[#202124]">Activity &amp; Security Log</h2>
+              <h2 class="font-semibold text-base text-[#1C1917]">Activity &amp; security log</h2>
             </div>
-            <p class="text-xs text-[#5F6368]">Recent file operations, authentication events, and security logs</p>
+            <p class="text-xs text-[#78716C]">Recent file operations, authentication events, and audit logs</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button type="button" onclick="loadAuditLogs()" class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#FAFAF9] text-[#5F6368] hover:text-[#202124] text-xs font-mono flex items-center gap-1 border border-[#E9EAEC] shadow-xs" title="Refresh logs">
+          <button type="button" onclick="loadAuditLogs()" class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#FAFAF9] text-[#78716C] hover:text-[#1C1917] text-xs font-mono flex items-center gap-1 border border-[#E9EAEC] shadow-xs" title="Refresh logs">
             <i class="fa-solid fa-arrows-rotate text-[11px]" id="auditSyncIcon"></i>
             <span class="hidden sm:inline">Sync</span>
           </button>
@@ -1005,22 +831,22 @@
       </div>
 
       <!-- Audit Event Category Filter Pills -->
-      <div class="flex items-center gap-1.5 mt-3 pb-1 border-b border-[#E9EAEC] text-[11px] font-mono">
-        <button type="button" onclick="filterAuditLogs('ALL', this)" class="audit-filter-pill px-2.5 py-1 rounded-lg bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] font-bold">
-          All Events
+      <div class="flex items-center gap-1.5 mt-3 pb-1 border-b border-[#E9EAEC] text-[11px]">
+        <button type="button" onclick="filterAuditLogs('ALL', this)" class="audit-filter-pill px-2.5 py-1 rounded-lg bg-[#FDF2F4] text-[#9F1239] border border-[#F8D0D6] font-medium">
+          All events
         </button>
-        <button type="button" onclick="filterAuditLogs('SEC', this)" class="audit-filter-pill px-2.5 py-1 rounded-lg bg-[#FAFAF9] text-[#5F6368] border border-[#E9EAEC] hover:text-[#202124]">
-          <i class="fa-solid fa-shield-halved text-[#F0445E] mr-1"></i> Security Alerts
+        <button type="button" onclick="filterAuditLogs('SEC', this)" class="audit-filter-pill px-2.5 py-1 rounded-lg bg-[#FAFAF9] text-[#78716C] border border-[#E9EAEC] hover:text-[#1C1917]">
+          <i class="fa-solid fa-shield-halved text-stone-500 mr-1"></i> Security events
         </button>
-        <button type="button" onclick="filterAuditLogs('DOC', this)" class="audit-filter-pill px-2.5 py-1 rounded-lg bg-[#FAFAF9] text-[#5F6368] border border-[#E9EAEC] hover:text-[#202124]">
-          <i class="fa-solid fa-file text-[#268B65] mr-1"></i> Document Operations
+        <button type="button" onclick="filterAuditLogs('DOC', this)" class="audit-filter-pill px-2.5 py-1 rounded-lg bg-[#FAFAF9] text-[#78716C] border border-[#E9EAEC] hover:text-[#1C1917]">
+          <i class="fa-solid fa-file-lines text-stone-500 mr-1"></i> Document actions
         </button>
       </div>
 
       <!-- Audit Log Content Stream -->
       <div class="mt-3">
-        <div id="auditLogSpinner" class="hidden flex items-center justify-center py-8 text-[#5F6368] text-xs font-mono gap-2">
-          <i class="fa-solid fa-circle-notch animate-spin text-base text-[#F0445E]"></i>
+        <div id="auditLogSpinner" class="hidden flex items-center justify-center py-8 text-[#78716C] text-xs font-mono gap-2">
+          <i class="fa-solid fa-circle-notch animate-spin text-base text-[#9F1239]"></i>
             <span>Loading recent activity...</span>
         </div>
         <div id="auditLogList" class="space-y-2 max-h-[55vh] overflow-y-auto pr-1">
@@ -1028,9 +854,9 @@
         </div>
       </div>
 
-      <div class="mt-5 pt-3 border-t border-[#E9EAEC] flex items-center justify-between text-[11px] text-[#5F6368] font-mono">
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-[#268B65]"></i> Azure SECaaS Audit Policy Active</span>
-        <button type="button" onclick="closeAuditModal()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] text-xs font-mono shadow-xs">
+      <div class="mt-5 pt-3 border-t border-[#E9EAEC] flex items-center justify-between text-[11px] text-[#78716C] font-mono">
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-[#268B65]"></i> Audit logging active</span>
+        <button type="button" onclick="closeAuditModal()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#1C1917] text-xs shadow-xs">
           Dismiss
         </button>
       </div>
@@ -1042,12 +868,12 @@
     <div class="p-6">
       <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-lg">
+          <div class="w-9 h-9 rounded-lg bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center text-sm">
             <i class="fa-solid fa-user-gear"></i>
           </div>
           <div>
-            <h2 class="font-bold text-base text-[#202124]">Account Settings</h2>
-            <p class="text-xs text-[#5F6368]">Manage profile, data backup, and security settings</p>
+            <h2 class="font-semibold text-base text-[#1C1917]">Account settings</h2>
+            <p class="text-xs text-[#78716C]">Profile, export, and account controls</p>
           </div>
         </div>
         <button type="button" onclick="closeAccountModal()" class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm" aria-label="Close dialog">
@@ -1059,25 +885,25 @@
         <!-- Identity Summary Card -->
         <div class="p-4 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center font-bold font-mono text-sm uppercase">
+            <div class="w-9 h-9 rounded-lg bg-stone-100 text-stone-800 border border-stone-200 flex items-center justify-center font-semibold font-mono text-xs uppercase">
               {{ current_user.username[0] if current_user.is_authenticated else 'U' }}
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <span class="font-bold text-sm text-[#202124]">{{ current_user.username if current_user.is_authenticated else '' }}</span>
-                <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] font-mono font-semibold">
+                <span class="font-semibold text-sm text-[#1C1917]">{{ current_user.username if current_user.is_authenticated else '' }}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200 font-mono font-medium">
                   {{ current_user.role|capitalize if current_user.is_authenticated else 'Student' }}
                 </span>
               </div>
-              <p class="text-xs text-[#5F6368] font-mono">{{ current_user.email if current_user.is_authenticated else '' }}</p>
+              <p class="text-xs text-[#78716C] font-mono">{{ current_user.email if current_user.is_authenticated else '' }}</p>
             </div>
           </div>
           <div>
             <form method="POST" action="{{ url_for('send_email_verification') }}" class="inline">
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              <button type="submit" class="w-full sm:w-auto px-3 py-1.5 rounded-xl bg-white hover:bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] text-[11px] font-mono font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-xs">
-                <i class="fa-solid fa-envelope-circle-check"></i>
-                <span>Verify Email</span>
+              <button type="submit" class="w-full sm:w-auto px-3 py-1.5 rounded-xl bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 text-[11px] font-medium transition-colors flex items-center justify-center gap-1.5 shadow-xs">
+                <i class="fa-solid fa-envelope-circle-check text-stone-500"></i>
+                <span>Verify email</span>
               </button>
             </form>
           </div>
@@ -1086,30 +912,30 @@
         <!-- Real-Time Cloud Security Posture Card -->
         <div class="p-3.5 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] space-y-2.5 font-mono text-xs">
           <div class="flex items-center justify-between">
-            <span class="font-bold text-[#202124] flex items-center gap-1.5">
+            <span class="font-semibold text-[#1C1917] flex items-center gap-1.5 font-sans">
               <i class="fa-solid fa-shield-halved text-[#268B65]"></i>
-              <span>Active Security Posture</span>
+              <span>Security settings</span>
             </span>
-            <span class="px-2 py-0.5 rounded-full bg-[#EAF6EF] text-[#268B65] border border-[#BEE7D5] text-[10px] font-bold">
-              Access scoped &bull; Reviewable
+            <span class="px-2 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200 text-[10px] font-medium">
+              Active
             </span>
           </div>
           <div class="grid grid-cols-2 gap-2 text-[11px]">
             <div class="p-2 rounded-lg bg-white border border-[#E9EAEC] flex items-center justify-between">
-              <span class="text-[#5F6368]">Transport:</span>
-              <span class="font-semibold text-[#202124]">HTTPS / session headers</span>
+              <span class="text-[#78716C]">Transport:</span>
+              <span class="font-medium text-[#1C1917]">HTTPS / secure cookies</span>
             </div>
             <div class="p-2 rounded-lg bg-white border border-[#E9EAEC] flex items-center justify-between">
-              <span class="text-[#5F6368]">Encryption:</span>
-            <span class="font-semibold text-[#268B65]">Provider-managed encryption</span>
+              <span class="text-[#78716C]">Storage:</span>
+              <span class="font-medium text-[#1C1917]">Provider encryption</span>
             </div>
             <div class="p-2 rounded-lg bg-white border border-[#E9EAEC] flex items-center justify-between">
-              <span class="text-[#5F6368]">Isolation:</span>
-              <span class="font-semibold text-[#202124]">Row-Level (RLS)</span>
+              <span class="text-[#78716C]">Isolation:</span>
+              <span class="font-medium text-[#1C1917]">User-scoped</span>
             </div>
             <div class="p-2 rounded-lg bg-white border border-[#E9EAEC] flex items-center justify-between">
-              <span class="text-[#5F6368]">Lockout:</span>
-              <span class="font-semibold text-[#F0445E]">5 Fails / 5m Ban</span>
+              <span class="text-[#78716C]">Lockout:</span>
+              <span class="font-medium text-[#1C1917]">Rate-limited</span>
             </div>
           </div>
         </div>
@@ -1118,42 +944,38 @@
         <div class="p-4 rounded-xl bg-white border border-[#E9EAEC] space-y-2">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <i class="fa-solid fa-database text-[#268B65] text-sm"></i>
-              <h3 class="text-xs font-bold text-[#202124]">Data Backup &amp; Export</h3>
+              <i class="fa-solid fa-database text-stone-600 text-sm"></i>
+              <h3 class="text-xs font-semibold text-[#1C1917]">Data backup &amp; export</h3>
             </div>
           </div>
-          <p class="text-[11px] text-[#5F6368] leading-relaxed">
+          <p class="text-[11px] text-[#78716C] leading-relaxed">
             Download a portable JSON archive of your account profile, document manifest, and activity logs.
           </p>
           <div class="pt-1 flex items-center gap-2 flex-wrap">
-            <a href="{{ url_for('export_account_data') }}" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-xs font-mono text-[#202124] font-semibold flex items-center gap-1.5 shadow-xs transition-colors">
-              <i class="fa-solid fa-file-arrow-down text-[#268B65]"></i>
-              <span>Download JSON Backup</span>
+            <a href="{{ url_for('export_account_data') }}" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-xs text-[#1C1917] font-medium flex items-center gap-1.5 shadow-xs transition-colors">
+              <i class="fa-solid fa-file-arrow-down text-stone-500"></i>
+              <span>Download JSON backup</span>
             </a>
-            <button type="button" onclick="closeAccountModal(); openAnalyticsModal();" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-xs font-mono text-[#202124] font-semibold flex items-center gap-1.5 shadow-xs transition-colors">
-              <i class="fa-solid fa-chart-pie text-[#F0445E]"></i>
-              <span>View Analytics</span>
-            </button>
           </div>
         </div>
 
         <!-- Danger Zone: Permanent Account Deletion -->
-        <div class="p-4 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] space-y-2.5">
+        <div class="p-4 rounded-xl bg-rose-50/70 border border-rose-200 space-y-2.5">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <i class="fa-solid fa-triangle-exclamation text-[#F0445E] text-sm"></i>
-              <h3 class="text-xs font-bold text-[#D92D50]">Delete Account</h3>
+              <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm"></i>
+              <h3 class="text-xs font-semibold text-rose-800">Delete account</h3>
             </div>
           </div>
-          <p class="text-[11px] text-[#777B83] leading-relaxed">
-            Permanently purges your account, credentials, all file descriptors, and all underlying blobs stored in Microsoft Azure.
+          <p class="text-[11px] text-stone-600 leading-relaxed">
+            Permanently purges your account, credentials, and all uploaded documents. This action cannot be reversed.
           </p>
-          <form method="POST" action="{{ url_for('delete_account') }}" onsubmit="return confirm('WARNING: Are you absolutely certain you want to permanently delete your CloudVault account and purge all files from Azure Blob Storage? This action cannot be reversed.')" class="space-y-2">
+          <form method="POST" action="{{ url_for('delete_account') }}" onsubmit="return confirm('WARNING: Are you absolutely certain you want to permanently delete your CloudVault account and purge all files? This action cannot be reversed.')" class="space-y-2">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <div class="flex items-center gap-2 flex-col sm:flex-row">
-              <input type="password" name="password" placeholder="Confirm password to purge" class="wm-input text-xs px-3 py-2 rounded-xl w-full bg-white" required>
-              <button type="submit" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-bold font-mono transition-colors shrink-0 shadow-xs">
-                Purge Account
+              <input type="password" name="password" placeholder="Confirm password to delete" class="wm-input text-xs px-3 py-2 rounded-xl w-full bg-white" required>
+              <button type="submit" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-medium transition-colors shrink-0 shadow-xs">
+                Delete account
               </button>
             </div>
           </form>
@@ -1161,199 +983,41 @@
 
       </div>
 
-      <div class="mt-5 pt-3 border-t border-[#E9EAEC] flex items-center justify-between text-[11px] text-[#5F6368] font-mono">
+      <div class="mt-5 pt-3 border-t border-[#E9EAEC] flex items-center justify-between text-[11px] text-[#78716C]">
         <a href="{{ url_for('privacy') }}" class="hover:underline flex items-center gap-1">
-          <i class="fa-solid fa-shield text-[#268B65]"></i> Privacy Policy
+          <i class="fa-solid fa-shield text-stone-500"></i> Privacy Policy
         </a>
-        <button type="button" onclick="closeAccountModal()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] text-xs font-mono shadow-xs">
+        <button type="button" onclick="closeAccountModal()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#1C1917] text-xs shadow-xs font-medium">
           Close
         </button>
       </div>
-    </div>
-  </dialog>
-
-  <!-- Vault Analytics & Telemetry Modal (<dialog>) -->
-  <dialog id="analyticsModal" class="rounded-2xl bg-white text-[#202124] border border-[#E9EAEC] p-0 shadow-2xl w-full max-w-lg overflow-hidden">
-    <div class="p-6">
-      <div class="flex items-center justify-between pb-4 border-b border-[#E9EAEC]">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-lg">
-            <i class="fa-solid fa-chart-simple"></i>
-          </div>
-          <div>
-            <h2 class="font-bold text-base text-[#202124]">Storage Telemetry &amp; Insights</h2>
-            <p class="text-xs text-[#5F6368] font-mono">Real-time object distribution and cloud health</p>
-          </div>
-        </div>
-        <button type="button" onclick="closeAnalyticsModal()" class="w-7 h-7 rounded-lg text-[#5F6368] hover:text-[#202124] hover:bg-[#E9EAEC] flex items-center justify-center text-sm" aria-label="Close dialog">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div class="mt-5 space-y-4 font-mono text-xs">
-        <!-- Storage Gauge -->
-        <div class="p-4 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-[#5F6368]">Capacity Consumed:</span>
-            <span class="font-bold text-[#F0445E]" id="analyticsPercent">Calculating...</span>
-          </div>
-          <div class="w-full bg-[#E9EAEC] h-2 rounded-full overflow-hidden">
-            <div id="analyticsProgressBar" class="h-full bg-[#F0445E] rounded-full transition-all duration-500" style="width: 0%"></div>
-          </div>
-          <div class="flex items-center justify-between text-[11px] text-[#777B83]">
-            <span id="analyticsUsed">0 B Used</span>
-            <span>5.0 GB Tier</span>
-          </div>
-        </div>
-
-        <!-- Metrics Grid -->
-        <div class="grid grid-cols-2 gap-2.5">
-          <div class="p-3 rounded-xl bg-white border border-[#E9EAEC] space-y-1">
-            <span class="text-[10px] text-[#777B83] uppercase tracking-wider block">Active Documents</span>
-            <span class="text-base font-bold text-[#202124]" id="analyticsDocCount">&mdash;</span>
-          </div>
-          <div class="p-3 rounded-xl bg-white border border-[#E9EAEC] space-y-1">
-            <span class="text-[10px] text-[#777B83] uppercase tracking-wider block">Storage protection</span>
-            <span class="text-xs font-bold text-[#268B65]">Storage protection</span>
-          </div>
-        </div>
-
-        <!-- Cloud Engine Details -->
-        <div class="p-3 rounded-xl bg-[#EAF6EF] border border-[#BEE7D5] text-[11px] text-[#268B65] space-y-1">
-          <div class="flex items-center gap-1.5 font-bold">
-            <i class="fa-solid fa-cloud"></i>
-            <span>Microsoft Azure Central India Tier</span>
-          </div>
-          <p class="text-[10px] text-[#1F7052]">Documents are scoped to the signed-in account and sent over the configured transport.</p>
-        </div>
-      </div>
-
-      <div class="mt-5 pt-3 border-t border-[#E9EAEC] flex items-center justify-end">
-        <button type="button" onclick="closeAnalyticsModal()" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] text-xs font-mono shadow-xs">
-          Close
-        </button>
-      </div>
-    </div>
-  </dialog>
-
-  <!-- Interactive Onboarding & Feature Walkthrough Modal (<dialog>) -->
-  <dialog id="onboardingModal" class="rounded-2xl bg-white text-[#202124] border border-[#E9EAEC] p-0 shadow-2xl w-full max-w-lg overflow-hidden">
-    <div class="p-6">
-      
-      <!-- Slide Container -->
-      <div id="onboardingSlide1" class="onboarding-slide space-y-4 text-center">
-        <div class="w-16 h-16 rounded-2xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-2xl mx-auto shadow-sm">
-          <i class="fa-solid fa-vault"></i>
-        </div>
-        <div class="space-y-1.5">
-          <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFF0F2] text-[#F0445E] text-[10px] font-mono font-bold uppercase tracking-wider">
-            Step 1 of 4 &bull; Welcome
-          </div>
-          <h2 class="text-xl font-extrabold text-[#202124] tracking-tight">Welcome to CloudVault</h2>
-          <p class="text-xs text-[#5F6368] font-mono max-w-sm mx-auto leading-relaxed">
-            Your academic document registry, backed by the storage service configured for this deployment.
-          </p>
-        </div>
-      </div>
-
-      <div id="onboardingSlide2" class="onboarding-slide space-y-4 text-center hidden">
-        <div class="w-16 h-16 rounded-2xl bg-[#EAF6EF] border border-[#BEE7D5] text-[#268B65] flex items-center justify-center text-2xl mx-auto shadow-sm">
-          <i class="fa-solid fa-cloud-arrow-up"></i>
-        </div>
-        <div class="space-y-1.5">
-          <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#EAF6EF] text-[#268B65] text-[10px] font-mono font-bold uppercase tracking-wider">
-            Step 2 of 4 &bull; Effortless Uploads
-          </div>
-          <h2 class="text-xl font-extrabold text-[#202124] tracking-tight">Drag, Drop &amp; Batch Upload</h2>
-          <p class="text-xs text-[#5F6368] font-mono max-w-sm mx-auto leading-relaxed">
-            Drag files anywhere on screen or press shortcut <kbd class="px-1.5 py-0.5 rounded bg-[#FAFAF9] border border-[#E9EAEC] font-mono text-[10px]">N</kbd> anytime to open the upload console.
-          </p>
-        </div>
-      </div>
-
-      <div id="onboardingSlide3" class="onboarding-slide space-y-4 text-center hidden">
-        <div class="w-16 h-16 rounded-2xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-2xl mx-auto shadow-sm">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </div>
-        <div class="space-y-1.5">
-          <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFF0F2] text-[#F0445E] text-[10px] font-mono font-bold uppercase tracking-wider">
-            Step 3 of 4 &bull; Instant Discovery
-          </div>
-          <h2 class="text-xl font-extrabold text-[#202124] tracking-tight">Rapid Search &amp; Smart Filters</h2>
-          <p class="text-xs text-[#5F6368] font-mono max-w-sm mx-auto leading-relaxed">
-            Press <kbd class="px-1.5 py-0.5 rounded bg-[#FAFAF9] border border-[#E9EAEC] font-mono text-[10px]">Ctrl+K</kbd> to search instantly by document name, scholar, or category.
-          </p>
-        </div>
-      </div>
-
-      <div id="onboardingSlide4" class="onboarding-slide space-y-4 text-center hidden">
-        <div class="w-16 h-16 rounded-2xl bg-[#FAFAF9] border border-[#E9EAEC] text-[#202124] flex items-center justify-center text-2xl mx-auto shadow-sm">
-          <i class="fa-solid fa-moon"></i>
-        </div>
-        <div class="space-y-1.5">
-          <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FAFAF9] text-[#202124] border border-[#E9EAEC] text-[10px] font-mono font-bold uppercase tracking-wider">
-            Step 4 of 4 &bull; Watermelon UI &amp; Offline
-          </div>
-          <h2 class="text-xl font-extrabold text-[#202124] tracking-tight">Offline Vault &amp; Dark Mode</h2>
-          <p class="text-xs text-[#5F6368] font-mono max-w-sm mx-auto leading-relaxed">
-            CloudVault functions even offline with automatic queue synchronization, plus a rich Watermelon UI dark mode.
-          </p>
-        </div>
-      </div>
-
-      <!-- Carousel Stepper Controls -->
-      <div class="mt-6 pt-4 border-t border-[#E9EAEC] flex items-center justify-between">
-        <div class="flex items-center gap-1.5" id="onboardingDots">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#F0445E]"></span>
-          <span class="w-2 h-2 rounded-full bg-[#E9EAEC]"></span>
-          <span class="w-2 h-2 rounded-full bg-[#E9EAEC]"></span>
-          <span class="w-2 h-2 rounded-full bg-[#E9EAEC]"></span>
-        </div>
-        <div class="flex items-center gap-2">
-          <button type="button" id="onboardingPrevBtn" onclick="prevOnboardingSlide()" class="hidden px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] text-xs font-mono text-[#5F6368] transition-colors">
-            Back
-          </button>
-          <button type="button" id="onboardingNextBtn" onclick="nextOnboardingSlide()" class="px-4 py-1.5 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-mono font-bold shadow-xs transition-colors">
-            Next &rarr;
-          </button>
-          <button type="button" id="onboardingFinishBtn" onclick="finishOnboarding()" class="hidden px-4 py-1.5 rounded-xl bg-[#268B65] hover:bg-[#1f7052] text-white text-xs font-mono font-bold shadow-xs transition-colors">
-            Got it, Let's Start!
-          </button>
-        </div>
-      </div>
-
     </div>
   </dialog>
 
   <!-- Desktop Full-Screen Drag & Drop Overlay -->
-  <div id="globalDropzone" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/95 backdrop-blur-md border-4 border-dashed border-[#F0445E] m-4 rounded-3xl pointer-events-none opacity-0 transition-all duration-300 transform scale-98 shadow-2xl">
-    <div class="text-center p-8 max-w-md space-y-4 pointer-events-none">
-        <div class="w-20 h-20 rounded-2xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center mx-auto text-3xl shadow-lg">
+  <div id="globalDropzone" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/95 dark:bg-[#16171C]/95 backdrop-blur-sm border-2 border-dashed border-[#9F1239] m-4 rounded-2xl pointer-events-none opacity-0 transition-all duration-200 shadow-xl">
+    <div class="text-center p-6 max-w-sm space-y-2 pointer-events-none">
+      <div class="w-12 h-12 rounded-xl bg-[#FDF2F4] text-[#9F1239] border border-[#F8D0D6] flex items-center justify-center mx-auto text-xl shadow-xs">
         <i class="fa-solid fa-cloud-arrow-up"></i>
       </div>
       <div>
-        <h3 class="text-xl font-extrabold text-[#202124] tracking-tight">Drop Files to Upload Instantly</h3>
-        <p class="text-xs text-[#5F6368] font-mono mt-1.5">Add several documents to the registry at once</p>
-      </div>
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EAF6EF] border border-[#BEE7D5] text-[11px] text-[#268B65] font-mono">
-        <i class="fa-solid fa-bolt text-amber-500"></i>
-        <span>Multi-file batch supported</span>
+        <h3 class="text-base font-bold text-[#1C1917] dark:text-[#F4F4F5]">Drop files to upload</h3>
+        <p class="text-xs text-[#57534E] dark:text-[#A1A1AA] mt-0.5">Documents will be added to your vault</p>
       </div>
     </div>
   </div>
 
   <!-- Live Upload Floating Progress Notification -->
-  <div id="uploadProgressToast" class="fixed bottom-6 right-6 z-50 hidden p-4 rounded-2xl bg-white border border-[#E9EAEC] shadow-2xl max-w-sm w-full animate-fade-in">
+  <div id="uploadProgressToast" class="fixed bottom-6 right-6 z-50 hidden p-4 rounded-xl bg-white border border-[#E9EAEC] shadow-xl max-w-sm w-full animate-fade-in">
     <div class="flex items-start gap-3">
-      <div class="w-9 h-9 rounded-xl bg-[#FFF0F2] text-[#F0445E] flex items-center justify-center shrink-0 border border-[#FECDD3]">
-          <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+      <div class="w-8 h-8 rounded-lg bg-[#FFF0F2] text-[#F0445E] flex items-center justify-center shrink-0 border border-[#FECDD3]">
+        <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
       </div>
       <div class="overflow-hidden flex-1">
         <div class="flex items-center justify-between">
-          <p id="uploadProgressLabel" class="text-xs font-bold text-[#202124] truncate">Uploading Files...</p>
-          <span id="uploadProgressPercent" class="text-[10px] font-mono text-[#F0445E] font-bold">In Progress</span>
+          <p id="uploadProgressLabel" class="text-xs font-semibold text-[#202124] truncate">Uploading files...</p>
+          <span id="uploadProgressPercent" class="text-[10px] font-mono text-[#F0445E] font-medium">In progress</span>
         </div>
-        <p id="uploadProgressDetails" class="text-[10px] text-[#5F6368] font-mono truncate mt-0.5">Encrypting and dispatching blobs</p>
         <div class="w-full bg-[#FAFAF9] h-1.5 rounded-full mt-2 overflow-hidden border border-[#E9EAEC]">
           <div id="uploadProgressBar" class="h-full bg-[#F0445E] rounded-full transition-all duration-300" style="width: 15%"></div>
         </div>
@@ -1396,8 +1060,6 @@
     const infoModal = document.getElementById('infoModal');
     const auditModal = document.getElementById('auditModal');
     const accountModal = document.getElementById('accountModal');
-    const analyticsModal = document.getElementById('analyticsModal');
-    const onboardingModal = document.getElementById('onboardingModal');
 
     setupDialogLightDismiss(previewModal);
     setupDialogLightDismiss(uploadModal);
@@ -1406,8 +1068,6 @@
     setupDialogLightDismiss(infoModal);
     setupDialogLightDismiss(auditModal);
     setupDialogLightDismiss(accountModal);
-    setupDialogLightDismiss(analyticsModal);
-    setupDialogLightDismiss(onboardingModal);
 
     function openAccountModal() {
       if (accountModal) accountModal.showModal();
@@ -1416,99 +1076,10 @@
       if (accountModal) accountModal.close();
     }
 
-    function openAnalyticsModal() {
-      if (analyticsModal) {
-        analyticsModal.showModal();
-        loadVaultAnalytics();
-      }
-    }
-    function closeAnalyticsModal() {
-      if (analyticsModal) analyticsModal.close();
-    }
-
-    function loadVaultAnalytics() {
-      fetch('/api/analytics', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(res => res.json())
-        .then(data => {
-          const percentEl = document.getElementById('analyticsPercent');
-          const barEl = document.getElementById('analyticsProgressBar');
-          const usedEl = document.getElementById('analyticsUsed');
-          const docCountEl = document.getElementById('analyticsDocCount');
-
-          if (percentEl) percentEl.textContent = `${data.storage_percentage}%`;
-          if (barEl) barEl.style.width = `${Math.min(data.storage_percentage, 100)}%`;
-          if (usedEl) usedEl.textContent = `${data.formatted_used} Used`;
-          if (docCountEl) docCountEl.textContent = `${data.total_active_docs} Files`;
-        })
-        .catch(() => {});
-    }
-
-    // Onboarding Walkthrough Carousel (4 steps)
-    let currentOnboardingStep = 1;
-    const totalOnboardingSteps = 4;
-
-    function openOnboardingModal() {
-      currentOnboardingStep = 1;
-      updateOnboardingSlide();
-      if (onboardingModal) onboardingModal.showModal();
-    }
-
-    function closeOnboardingModal() {
-      if (onboardingModal) onboardingModal.close();
-    }
-
-    function updateOnboardingSlide() {
-      for (let i = 1; i <= totalOnboardingSteps; i++) {
-        const slide = document.getElementById(`onboardingSlide${i}`);
-        if (slide) {
-          if (i === currentOnboardingStep) {
-            slide.classList.remove('hidden');
-          } else {
-            slide.classList.add('hidden');
-          }
-        }
-      }
-      const dots = document.getElementById('onboardingDots');
-      if (dots) {
-        const spans = dots.querySelectorAll('span');
-        spans.forEach((s, idx) => {
-          if (idx + 1 === currentOnboardingStep) {
-            s.className = 'w-2.5 h-2.5 rounded-full bg-[#F0445E] transition-all';
-          } else {
-            s.className = 'w-2 h-2 rounded-full bg-[#E9EAEC] transition-all';
-          }
-        });
-      }
-      const prevBtn = document.getElementById('onboardingPrevBtn');
-      const nextBtn = document.getElementById('onboardingNextBtn');
-      const finishBtn = document.getElementById('onboardingFinishBtn');
-
-      if (prevBtn) prevBtn.classList.toggle('hidden', currentOnboardingStep === 1);
-      if (nextBtn) nextBtn.classList.toggle('hidden', currentOnboardingStep === totalOnboardingSteps);
-      if (finishBtn) finishBtn.classList.toggle('hidden', currentOnboardingStep !== totalOnboardingSteps);
-    }
-
-    function nextOnboardingSlide() {
-      if (currentOnboardingStep < totalOnboardingSteps) {
-        currentOnboardingStep++;
-        updateOnboardingSlide();
-      }
-    }
-
-    function prevOnboardingSlide() {
-      if (currentOnboardingStep > 1) {
-        currentOnboardingStep--;
-        updateOnboardingSlide();
-      }
-    }
-
-    function finishOnboarding() {
-      localStorage.setItem('cloudvault_onboarded', 'true');
-      closeOnboardingModal();
-      if (typeof showToast === 'function') {
-        showToast('CloudVault is ready. Press Ctrl+K to search.', 'success');
-      }
-    }
+    function openAnalyticsModal() {}
+    function closeAnalyticsModal() {}
+    function openOnboardingModal() {}
+    function closeOnboardingModal() {}
 
     // Universal Form Submission Loading Feedback
     document.addEventListener('submit', (e) => {
@@ -1524,16 +1095,6 @@
           submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
           submitBtn.innerHTML = orig;
         }, 6000);
-      }
-    });
-
-    // Auto-launch onboarding on first visit
-    document.addEventListener('DOMContentLoaded', () => {
-      if (!localStorage.getItem('cloudvault_onboarded')) {
-        setTimeout(() => {
-          const hasOpenDialog = document.querySelector('dialog[open]');
-          if (!hasOpenDialog) openOnboardingModal();
-        }, 1500);
       }
     });
 

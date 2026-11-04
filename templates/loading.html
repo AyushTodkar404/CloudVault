@@ -7,7 +7,7 @@
   <!-- Fast fallback redirect for weak connections or disabled JavaScript -->
   <meta http-equiv="refresh" content="2;url={{ next_url }}">
   <title>Signing in &ndash; CloudVault</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍉</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%239F1239'/%3E%3Cpath d='M9 13.5V9.5C9 7.57 10.57 6 12.5 6H19.5C21.43 6 23 7.57 23 9.5V13.5M7 13.5H25C25.83 13.5 26.5 14.17 26.5 15V24C26.5 24.83 25.83 25.5 25 25.5H7C6.17 25.5 5.5 24.83 5.5 24V15C5.5 14.17 6.17 13.5 7 13.5ZM16 18V21M17.5 18C17.5 18.83 16.83 19.5 16 19.5C15.17 19.5 14.5 18.83 14.5 18C14.5 17.17 15.17 16.5 16 16.5C16.83 16.5 17.5 17.17 17.5 18Z' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 
   <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,30 +25,30 @@
   </style>
 </head>
 
-<body class="min-h-full flex items-center justify-center p-4 bg-[#FAFAF9] text-[#202124] selection:bg-[#F0445E] selection:text-white">
+<body class="min-h-full flex items-center justify-center p-4 bg-[#FAFAF9] text-[#1C1917] selection:bg-[#9F1239] selection:text-white">
 
-  <!-- Clean, Human-Designed Loading Card -->
-  <div class="w-full max-w-sm bg-white border border-[#E9EAEC] rounded-2xl p-6 sm:p-8 shadow-lg text-center space-y-5">
+  <!-- Loading Card -->
+  <div class="w-full max-w-sm bg-white border border-[#E9EAEC] rounded-2xl p-6 sm:p-8 shadow-xs text-center space-y-5">
     
-    <!-- Watermelon Brand Mark -->
-    <div class="w-12 h-12 mx-auto rounded-2xl bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center text-2xl shadow-xs">
-      🍉
+    <!-- Vault Brand Mark -->
+    <div class="w-10 h-10 mx-auto rounded-xl bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center text-base shadow-xs">
+      <i class="fa-solid fa-lock text-sm"></i>
     </div>
 
     <!-- Friendly Status Heading -->
     <div class="space-y-1">
-      <h1 class="text-base font-semibold text-[#202124]">Signing you in...</h1>
-      <p class="text-xs text-[#777B83]" id="loadingSubtext">Preparing your CloudVault workspace</p>
+      <h1 class="text-base font-semibold text-[#1C1917]">Signing you in...</h1>
+      <p class="text-xs text-[#78716C]" id="loadingSubtext">Preparing your vault workspace</p>
     </div>
 
-    <!-- Fast Linear Progress Bar -->
+    <!-- Linear Progress Bar -->
     <div class="w-full bg-[#E9EAEC] h-1.5 rounded-full overflow-hidden">
-      <div id="fastProgressBar" class="h-full bg-[#F0445E] rounded-full transition-all duration-300 ease-out" style="width: 15%"></div>
+      <div id="fastProgressBar" class="h-full bg-[#9F1239] rounded-full transition-all duration-300 ease-out" style="width: 15%"></div>
     </div>
 
-    <!-- User Pill (Clean and subtle) -->
+    <!-- User Pill -->
     {% if email or name %}
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAFAF9] border border-[#E9EAEC] text-xs text-[#5F6368] max-w-full">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAFAF9] border border-[#E9EAEC] text-xs text-[#78716C] max-w-full">
       <span class="w-1.5 h-1.5 rounded-full bg-[#268B65]"></span>
       <span class="truncate font-medium">{{ name if name else email }}</span>
     </div>
@@ -57,23 +57,21 @@
   </div>
 
   <script>
-    // Fast, responsive loading transition (1.2 seconds total)
+    // Loading transition
     const targetUrl = "{{ next_url or '/' }}";
     const bar = document.getElementById('fastProgressBar');
     const subtext = document.getElementById('loadingSubtext');
 
-    // Progress increments
     setTimeout(() => {
       if (bar) bar.style.width = '60%';
-      if (subtext) subtext.textContent = 'Connecting storage...';
+      if (subtext) subtext.textContent = 'Verifying storage connection...';
     }, 400);
 
     setTimeout(() => {
       if (bar) bar.style.width = '95%';
-      if (subtext) subtext.textContent = 'Opening your files...';
+      if (subtext) subtext.textContent = 'Opening your records...';
     }, 850);
 
-    // Direct, seamless navigation
     setTimeout(() => {
       window.location.replace(targetUrl);
     }, 1250);

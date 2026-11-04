@@ -47,26 +47,26 @@
   </div>
 
   <!-- Organized Section Navigator Tabs -->
-  <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-mono">
+  <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
     <button type="button" onclick="switchAboutTab('team')" id="tabBtn-team"
-      class="about-nav-btn px-4 py-2 rounded-xl bg-[#F0445E] text-white font-semibold shadow-xs whitespace-nowrap transition-all">
-      <i class="fa-solid fa-users mr-1.5"></i> Project Team
+      class="about-nav-btn px-4 py-2 rounded-xl bg-[#FDF2F4] text-[#9F1239] border border-[#F8D0D6] font-medium shadow-xs whitespace-nowrap transition-all">
+      Project Team
     </button>
     <button type="button" onclick="switchAboutTab('tech')" id="tabBtn-tech"
-      class="about-nav-btn px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] text-[#5F6368] font-semibold border border-[#E9EAEC] whitespace-nowrap transition-all">
-      <i class="fa-solid fa-layer-group text-sky-600 mr-1.5"></i> Technology Stack
+      class="about-nav-btn px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] text-stone-600 font-medium border border-stone-200 whitespace-nowrap transition-all">
+      Technology Stack
     </button>
     <button type="button" onclick="switchAboutTab('storage')" id="tabBtn-storage"
-      class="about-nav-btn px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] text-[#5F6368] font-semibold border border-[#E9EAEC] whitespace-nowrap transition-all">
-      <i class="fa-solid fa-shield-virus text-[#268B65] mr-1.5"></i> Storage & Scanner
+      class="about-nav-btn px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] text-stone-600 font-medium border border-stone-200 whitespace-nowrap transition-all">
+      Storage &amp; Integrity
     </button>
     <button type="button" onclick="switchAboutTab('models')" id="tabBtn-models"
-      class="about-nav-btn px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] text-[#5F6368] font-semibold border border-[#E9EAEC] whitespace-nowrap transition-all">
-      <i class="fa-solid fa-cubes-stacked text-indigo-600 mr-1.5"></i> 5 Cloud Models
+      class="about-nav-btn px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] text-stone-600 font-medium border border-stone-200 whitespace-nowrap transition-all">
+      Cloud Models
     </button>
     <button type="button" onclick="switchAboutTab('rubric')" id="tabBtn-rubric"
-      class="about-nav-btn px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] text-[#5F6368] font-semibold border border-[#E9EAEC] whitespace-nowrap transition-all">
-      <i class="fa-solid fa-clipboard-check text-amber-600 mr-1.5"></i> Evaluation Rubric
+      class="about-nav-btn px-4 py-2 rounded-xl bg-white hover:bg-[#FAFAF9] text-stone-600 font-medium border border-stone-200 whitespace-nowrap transition-all">
+      Evaluation Rubric
     </button>
   </div>
 
@@ -623,7 +623,7 @@
 
   <!-- Bottom CTA -->
   <div class="text-center pt-2">
-    <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white font-semibold text-xs font-mono shadow-xs transition-all active:scale-95">
+    <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#9F1239] hover:bg-[#881337] text-white font-medium text-xs shadow-xs transition-all active:scale-95">
       <i class="fa-solid fa-arrow-left"></i>
       <span>Return to Vault</span>
     </a>
@@ -640,8 +640,8 @@
     
     // Reset all buttons
     document.querySelectorAll('.about-nav-btn').forEach(btn => {
-      btn.classList.remove('bg-[#F0445E]', 'text-white', 'shadow-xs');
-      btn.classList.add('bg-white', 'text-[#5F6368]', 'border', 'border-[#E9EAEC]');
+      btn.classList.remove('bg-[#FDF2F4]', 'text-[#9F1239]', 'border-[#F8D0D6]', 'shadow-xs');
+      btn.classList.add('bg-white', 'text-stone-600', 'border', 'border-stone-200');
     });
 
     // Show target section
@@ -651,8 +651,8 @@
     // Highlight active button
     const targetBtn = document.getElementById(`tabBtn-${tabId}`);
     if (targetBtn) {
-      targetBtn.classList.remove('bg-white', 'text-[#5F6368]', 'border', 'border-[#E9EAEC]');
-      targetBtn.classList.add('bg-[#F0445E]', 'text-white', 'shadow-xs');
+      targetBtn.classList.remove('bg-white', 'text-stone-600', 'border', 'border-stone-200');
+      targetBtn.classList.add('bg-[#FDF2F4]', 'text-[#9F1239]', 'border', 'border-[#F8D0D6]', 'shadow-xs');
     }
   }
 </script>
