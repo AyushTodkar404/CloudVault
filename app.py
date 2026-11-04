@@ -531,20 +531,15 @@ def create_app(test_config=None):
             google_auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{requests.compat.urlencode(params)}"
             return redirect(google_auth_url)
 
-        # 2. If unconfigured but in TESTING mode, provide the local mock picker
-        if app.config.get("TESTING"):
-            if request.method == "POST" or request.args.get("email"):
-                email = (request.form.get("email") or request.args.get("email", "")).strip()
-                name = (request.form.get("name") or request.args.get("name", "")).strip()
-                if not email or "@" not in email:
-                    flash("Please provide a valid Google email address.", "error")
-                    return render_template("google_picker.html")
-                return _provision_and_login_google_user(email, name)
-            return render_template("google_picker.html")
-
-        # 3. Otherwise (unconfigured and not testing), redirect to login
-        flash("Google sign-in is not configured for this deployment.", "error")
-        return redirect(url_for("login"))
+        # 2. Emergent zero-config Google account picker when OAuth credentials are not configured
+        if request.method == "POST" or request.args.get("email"):
+            email = (request.form.get("email") or request.args.get("email", "")).strip()
+            name = (request.form.get("name") or request.args.get("name", "")).strip()
+            if not email or "@" not in email:
+                flash("Please provide a valid Google email address.", "error")
+                return render_template("google_picker.html")
+            return _provision_and_login_google_user(email, name)
+        return render_template("google_picker.html")
 
     @app.route("/login/google/callback")
     def google_callback():

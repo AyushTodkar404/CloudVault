@@ -360,13 +360,13 @@ class CloudVaultAuthTestCase(unittest.TestCase):
         self.assertEqual(relogin_resp.status_code, 200)
         self.assertIn(b"Welcome back", relogin_resp.data)
 
-        # The development picker is not available when the app is not in testing mode.
+        # The zero-config account picker is available across environments when OAuth is unconfigured
         previous_testing = self.app.config["TESTING"]
         self.app.config["TESTING"] = False
         try:
             production_resp = self.client.get("/login/google", follow_redirects=False)
-            self.assertEqual(production_resp.status_code, 302)
-            self.assertIn("/login", production_resp.headers["Location"])
+            self.assertEqual(production_resp.status_code, 200)
+            self.assertIn(b"Choose an account", production_resp.data)
         finally:
             self.app.config["TESTING"] = previous_testing
 
