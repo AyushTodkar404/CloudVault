@@ -441,24 +441,24 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
         <div class="flex items-center gap-2.5">
-          <div class="w-6 h-6 rounded-lg bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center text-xs shrink-0">
+          <div class="w-6 h-6 rounded-lg bg-stone-100 text-stone-700 border border-stone-200 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-300 flex items-center justify-center text-xs shrink-0">
             <i class="fa-solid fa-graduation-cap"></i>
           </div>
           <div>
-            <span class="font-bold text-[#202124]">CloudVault</span>
+            <span class="font-medium text-[#202124]">CloudVault</span>
             <span class="text-[#D3D5D9] mx-1.5">&bull;</span>
-            <span class="text-[11px]">Cloud Computing Laboratory Mini Project (2025–2026)</span>
+            <span class="text-[11px] text-[#5F6368]">Cloud Computing Laboratory Mini Project (2025–2026)</span>
           </div>
         </div>
 
         <!-- Clean Navigation Links -->
-        <div class="flex items-center gap-4 font-mono text-[11px] flex-wrap">
-          <a href="{{ url_for('index') }}" class="text-[#5F6368] hover:text-[#202124] transition-colors">Vault</a>
-          <a href="{{ url_for('about') }}" class="text-[#F0445E] hover:text-[#D92D50] font-semibold transition-colors">Project &amp; Team Details</a>
-          <a href="{{ url_for('privacy') }}" class="text-[#5F6368] hover:text-[#202124] transition-colors">Privacy Policy</a>
-          <a href="{{ url_for('terms') }}" class="text-[#5F6368] hover:text-[#202124] transition-colors">Terms</a>
+        <div class="flex items-center gap-4 text-xs text-[#5F6368] flex-wrap">
+          <a href="{{ url_for('index') }}" class="hover:text-[#202124] transition-colors">Vault</a>
+          <a href="{{ url_for('about') }}" class="hover:text-[#202124] transition-colors">Project &amp; Team Details</a>
+          <a href="{{ url_for('privacy') }}" class="hover:text-[#202124] transition-colors">Privacy Policy</a>
+          <a href="{{ url_for('terms') }}" class="hover:text-[#202124] transition-colors">Terms</a>
           {% if current_user.is_authenticated %}
-          <button type="button" onclick="openAuditModal()" class="text-[#5F6368] hover:text-[#202124] transition-colors cursor-pointer">Security Audit</button>
+          <button type="button" onclick="openAuditModal()" class="hover:text-[#202124] transition-colors cursor-pointer">Security Audit</button>
           {% endif %}
         </div>
       </div>

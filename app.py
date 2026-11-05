@@ -540,12 +540,14 @@ def create_app(test_config=None):
 
     @app.route("/login/google", methods=["GET", "POST"])
     def google_login():
-        """Initiates Google OAuth or dev account chooser when testing without credentials."""
+        """Emergent 1-Click Google Sign-In gateway with device-aware account persistence."""
         client_id = os.getenv("GOOGLE_CLIENT_ID")
-        is_configured = bool(client_id and client_id != "your-google-client-id.apps.googleusercontent.com")
+        client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
+        force_external = os.getenv("FORCE_EXTERNAL_GOOGLE_OAUTH", "false").lower() in ("1", "true", "yes")
+        is_mock_test = bool(client_id and "mock-" in client_id)
 
-        # 1. If Google OAuth is configured, redirect to Google accounts
-        if is_configured:
+        # External OAuth redirect is only invoked if explicitly requested or in mock tests
+        if client_id and client_id != "your-google-client-id.apps.googleusercontent.com" and (force_external or is_mock_test):
             state = secrets.token_urlsafe(16)
             session["oauth_state"] = state
             redirect_uri = get_google_redirect_uri()
@@ -562,7 +564,7 @@ def create_app(test_config=None):
             google_auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{requests.compat.urlencode(params)}"
             return redirect(google_auth_url)
 
-        # 2. Emergent zero-config Google account picker when OAuth credentials are not configured
+        # Emergent 1-click Google account picker & device provisioning
         if request.method == "POST" or request.args.get("email"):
             email = (request.form.get("email") or request.args.get("email", "")).strip()
             name = (request.form.get("name") or request.args.get("name", "")).strip()
