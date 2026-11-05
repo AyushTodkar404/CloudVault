@@ -470,54 +470,13 @@ def create_app(test_config=None):
             flash("Your email has been verified.", "success")
         return redirect(url_for("index"))
 
-    def _provision_and_login_google_user(email, name_seed=None):
-        """Finds or creates a user account from Google profile and establishes login session."""
-        email = email.lower().strip()
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            name_hint = name_seed or email.split("@")[0]
-            clean_username = "".join(c for c in name_hint.lower() if c.isalnum() or c in ("_", "-")) or "scholar"
-            candidate = clean_username
-            counter = 1
-            while User.query.filter_by(username=candidate).first():
-                candidate = f"{clean_username}{counter}"
-                counter += 1
-
-            user = User(
-                username=candidate,
-                email=email,
-                role="student",
-            )
-            user.set_password(secrets.token_urlsafe(32))
-            db.session.add(user)
-            db.session.commit()
-            log_activity(user.id, "SIGNUP", f"Google SSO account provisioned for {user.email}")
-            flash(f"Welcome to CloudVault, {user.username}. Signed in with Google.", "success")
-        else:
-            flash(f"Welcome back, {user.username}. Signed in with Google.", "success")
-
-        login_user(user)
-        log_activity(user.id, "LOGIN", "Signed in via Google OAuth Single Sign-On")
-        if not app.config.get("TESTING"):
-            return redirect(
-                url_for(
-                    "loading_page",
-                    next=url_for("index"),
-                    provider="google",
-                    email=user.email,
-                    name=user.username,
-                    duration=1.2,
-                )
-            )
-        return redirect(url_for("index"))
-
     @app.route("/loading")
     def loading_page():
         """Loading transition page for authentication and workspace initialization."""
         next_url = request.args.get("next", url_for("index"))
         if not next_url.startswith("/") or next_url.startswith("//") or "\\" in next_url or next_url.startswith("/\\"):
             next_url = url_for("index")
-        provider = request.args.get("provider", "google")
+        provider = request.args.get("provider", "vault")
         email = request.args.get("email", "")
         name = request.args.get("name", "")
         duration = request.args.get("duration", 1.2, type=float)
@@ -530,110 +489,6 @@ def create_app(test_config=None):
             name=name,
             duration=duration,
         )
-
-    def get_google_redirect_uri():
-        """Generates canonical OAuth redirect URI, ensuring HTTPS behind reverse proxies."""
-        uri = url_for("google_callback", _external=True)
-        if (request.headers.get("X-Forwarded-Proto") == "https" or request.is_secure) and uri.startswith("http://"):
-            uri = "https://" + uri[7:]
-        return uri
-
-    @app.route("/login/google", methods=["GET", "POST"])
-    def google_login():
-        """Emergent 1-Click Google Sign-In gateway with device-aware account persistence."""
-        client_id = os.getenv("GOOGLE_CLIENT_ID")
-        client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
-        force_external = os.getenv("FORCE_EXTERNAL_GOOGLE_OAUTH", "false").lower() in ("1", "true", "yes")
-        is_mock_test = bool(client_id and "mock-" in client_id)
-
-        # External OAuth redirect is only invoked if explicitly requested or in mock tests
-        if client_id and client_id != "your-google-client-id.apps.googleusercontent.com" and (force_external or is_mock_test):
-            state = secrets.token_urlsafe(16)
-            session["oauth_state"] = state
-            redirect_uri = get_google_redirect_uri()
-
-            params = {
-                "client_id": client_id,
-                "redirect_uri": redirect_uri,
-                "response_type": "code",
-                "scope": "openid email profile",
-                "state": state,
-                "access_type": "online",
-                "prompt": "select_account",
-            }
-            google_auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{requests.compat.urlencode(params)}"
-            return redirect(google_auth_url)
-
-        # Emergent 1-click Google account picker & device provisioning
-        if request.method == "POST" or request.args.get("email"):
-            email = (request.form.get("email") or request.args.get("email", "")).strip()
-            name = (request.form.get("name") or request.args.get("name", "")).strip()
-            if not email or "@" not in email:
-                flash("Please provide a valid Google email address.", "error")
-                return render_template("google_picker.html")
-            return _provision_and_login_google_user(email, name)
-        return render_template("google_picker.html")
-
-    @app.route("/login/google/callback")
-    def google_callback():
-        """Handles callback redirect from Google OAuth 2.0."""
-        state = request.args.get("state")
-        saved_state = session.pop("oauth_state", None)
-        if not state or state != saved_state:
-            flash("Authentication failed: State parameter mismatch or expired session.", "error")
-            return redirect(url_for("login"))
-
-        code = request.args.get("code")
-        if not code:
-            flash("Google authentication cancelled or failed to provide authorization code.", "error")
-            return redirect(url_for("login"))
-
-        client_id = os.getenv("GOOGLE_CLIENT_ID")
-        client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
-        redirect_uri = get_google_redirect_uri()
-
-        try:
-            token_resp = requests.post(
-                "https://oauth2.googleapis.com/token",
-                data={
-                    "client_id": client_id,
-                    "client_secret": client_secret,
-                    "code": code,
-                    "grant_type": "authorization_code",
-                    "redirect_uri": redirect_uri,
-                },
-                headers={"Accept": "application/json"},
-                timeout=10,
-            )
-            token_data = token_resp.json()
-            access_token = token_data.get("access_token")
-            if not access_token:
-                app.logger.error(f"Google token error: {token_data}")
-                flash("Could not obtain access token from Google.", "error")
-                return redirect(url_for("login"))
-
-            # Fetch user profile from Google UserInfo endpoint
-            userinfo_resp = requests.get(
-                "https://www.googleapis.com/oauth2/v3/userinfo",
-                headers={"Authorization": f"Bearer {access_token}"},
-                timeout=10,
-            )
-            user_data = userinfo_resp.json()
-            if user_data.get("email_verified") is False:
-                flash("Google returned an unverified email address.", "error")
-                return redirect(url_for("login"))
-            email = user_data.get("email", "").lower().strip()
-            if not email:
-                flash("Unable to obtain email from Google profile.", "error")
-                return redirect(url_for("login"))
-
-            name_seed = user_data.get("given_name") or user_data.get("name")
-            return _provision_and_login_google_user(email, name_seed)
-
-        except Exception as e:
-            app.logger.error(f"Google OAuth callback error: {e}", exc_info=True)
-            flash(f"Google sign-in error: {str(e)}", "error")
-            return redirect(url_for("login"))
 
     @app.route("/logout", methods=["POST"])
     @login_required
@@ -1462,7 +1317,7 @@ def create_app(test_config=None):
             "connect-src 'self'",
             "frame-ancestors 'none'",
             "base-uri 'self'",
-            "form-action 'self' https://accounts.google.com",
+            "form-action 'self'",
         ]
         response.headers["Content-Security-Policy"] = "; ".join(csp_directives)
         return response

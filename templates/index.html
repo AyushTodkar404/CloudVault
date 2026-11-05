@@ -458,20 +458,20 @@
             <!-- Checkbox -->
             <td class="py-3 px-3">
               <input type="checkbox" value="{{ doc.id }}" onchange="handleSelectRow(this)"
-                class="doc-checkbox rounded border-[#E9EAEC] text-[#F0445E] focus:ring-0 cursor-pointer">
+                class="doc-checkbox rounded border-[#E9EAEC] text-[#9F1239] focus:ring-0 cursor-pointer">
             </td>
 
             <!-- Student Identity -->
             <td class="py-3 px-3">
               <div class="flex items-center gap-2">
-                <span class="text-[#D92D50] text-xs"><i class="fa-solid fa-trash-can"></i></span>
+                <span class="text-stone-400 text-xs"><i class="fa-solid fa-trash-can"></i></span>
                 <div
-                  class="w-8 h-8 rounded-xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center font-bold text-xs font-mono shrink-0">
+                  class="w-8 h-8 rounded-xl bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center font-medium text-xs shrink-0">
                   {{ doc.student_name[:2]|upper }}
                 </div>
                 <div class="overflow-hidden">
-                  <p class="font-bold text-[#5F6368] line-through truncate max-w-[130px]">{{ doc.student_name }}</p>
-                  <p class="text-[10px] text-[#F0445E] font-mono">In Trash</p>
+                  <p class="font-medium text-[#78716C] line-through truncate max-w-[130px]">{{ doc.student_name }}</p>
+                  <p class="text-[10px] text-stone-500 font-medium">In Trash</p>
                 </div>
               </div>
             </td>
@@ -513,7 +513,7 @@
                   onsubmit="return confirm('Permanently destroy this record? This cannot be recovered.')">
                   <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                   <button type="submit"
-                    class="p-1.5 rounded-lg text-[#777B83] hover:text-[#C02142] hover:bg-[#FFF0F2] text-xs transition-colors"
+                    class="p-1.5 rounded-lg text-stone-400 hover:text-red-700 hover:bg-stone-100 text-xs transition-colors"
                     title="Purge permanently">
                     <i class="fa-solid fa-ban text-[11px]"></i>
                   </button>
@@ -1080,7 +1080,7 @@
               <button 
                 type="button" 
                 onclick="window.OfflineVault.preview('${item.id}')"
-                class="px-2.5 py-1 rounded-lg bg-[#FFF0F2] hover:bg-[#FFE2E6] border border-[#FECDD3] text-[#F0445E] text-xs font-semibold font-mono transition-colors shadow-xs"
+                class="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 border border-stone-200 text-stone-700 text-xs font-medium transition-colors shadow-xs"
                 title="Preview offline file"
               >
                 Preview
@@ -1096,7 +1096,7 @@
               <button 
                 type="button" 
                 onclick="deleteOfflineItem('${item.id}')"
-                class="p-1.5 rounded-lg text-[#777B83] hover:text-[#F0445E] hover:bg-[#FFF0F2] text-xs transition-colors"
+                class="p-1.5 rounded-lg text-stone-400 hover:text-red-600 hover:bg-stone-100 text-xs transition-colors"
                 title="Delete from offline queue"
               >
                 <i class="fa-solid fa-trash-can text-[11px]"></i>
@@ -1148,7 +1148,7 @@
               <button 
                 type="button" 
                 onclick="window.OfflineVault.preview('${item.id}')"
-                class="px-2.5 py-1 rounded-lg bg-[#FFF0F2] hover:bg-[#FFE2E6] border border-[#FECDD3] text-[#F0445E] transition-colors text-[11px] font-semibold"
+                class="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 border border-stone-200 text-stone-700 transition-colors text-[11px] font-medium"
               >
                 Preview
               </button>
@@ -1163,7 +1163,7 @@
               <button 
                 type="button" 
                 onclick="deleteOfflineItem('${item.id}')"
-                class="p-1 rounded-lg text-[#777B83] hover:text-[#F0445E] hover:bg-[#FFF0F2] text-xs"
+                class="p-1 rounded-lg text-stone-400 hover:text-red-600 hover:bg-stone-100 text-xs"
                 title="Delete"
               >
                 <i class="fa-solid fa-trash-can"></i>

@@ -32,7 +32,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
-<body class="min-h-full flex flex-col bg-[#FAFAF9] text-[#202124] font-sans selection:bg-[#F0445E] selection:text-white">
+<body class="min-h-full flex flex-col bg-[#FAFAF9] text-[#202124] font-sans selection:bg-[#9F1239] selection:text-white">
 
   <!-- Header -->
   <header class="border-b border-[#E9EAEC] bg-white/95 backdrop-blur-md px-4 py-3.5 sticky top-0 z-30">
@@ -121,18 +121,18 @@
           </div>
         {% else %}
           <div class="text-center p-8 space-y-4 max-w-md bg-white rounded-2xl border border-[#E9EAEC] shadow-xs">
-            <div class="w-20 h-20 rounded-2xl bg-[#FFF0F2] border border-[#FECDD3] text-[#F0445E] flex items-center justify-center text-3xl shadow-xs mx-auto">
+            <div class="w-16 h-16 rounded-2xl bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center text-2xl shadow-xs mx-auto">
               <i class="fa-solid fa-file-arrow-down"></i>
             </div>
             <div>
-              <h3 class="text-base font-bold text-[#202124]">{{ doc.file_name }}</h3>
-              <p class="text-xs text-[#5F6368] font-mono mt-1">This document format can be downloaded and opened with its native application.</p>
+              <h3 class="text-base font-semibold text-[#1C1917]">{{ doc.file_name }}</h3>
+              <p class="text-xs text-[#78716C] mt-1">This document format can be downloaded and opened with its native application.</p>
             </div>
             <div>
               <a href="{{ url_for('download_shared_document', token=doc.share_token) }}" download="{{ doc.file_name }}"
-                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F0445E] hover:bg-[#D92D50] text-white text-xs font-bold shadow-xs font-mono">
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#9F1239] hover:bg-[#881337] text-white text-xs font-medium shadow-xs transition-colors">
                 <i class="fa-solid fa-download text-xs"></i>
-                <span>Download {{ doc.file_extension|upper }} File ({{ doc.formatted_size }})</span>
+                <span>Download file ({{ doc.formatted_size }})</span>
               </a>
             </div>
           </div>

@@ -139,24 +139,6 @@
 
     </form>
 
-    <!-- Social Auth Divider -->
-    <div class="my-5 flex items-center gap-3">
-      <div class="flex-1 h-[1px] bg-[#E9EAEC]"></div>
-      <span class="text-[11px] text-[#78716C]">or continue with</span>
-      <div class="flex-1 h-[1px] bg-[#E9EAEC]"></div>
-    </div>
-
-    <!-- Google Sign-In Button -->
-    <a href="{{ url_for('google_login') }}" class="w-full py-2.5 px-4 rounded-xl font-medium text-xs text-[#1C1917] bg-white hover:bg-[#FAFAF9] border border-[#E9EAEC] hover:border-[#D3D5D9] active:scale-[0.99] transition-all flex items-center justify-center gap-3 shadow-xs group">
-      <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.14z"/>
-        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
-        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
-        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-      </svg>
-      <span class="font-medium text-[#1C1917] transition-colors">Sign up with Google</span>
-    </a>
-
     <!-- Footer Switcher -->
     <div class="mt-6 pt-5 border-t border-[#E9EAEC] text-center text-xs text-[#78716C]">
       <span>Already have an account? </span>
@@ -191,9 +173,9 @@
       const val = pwInput.value;
       if (!val) {
         strengthBar.style.width = '5%';
-        strengthBar.className = 'h-full bg-[#F0445E] rounded-full transition-all duration-300';
+        strengthBar.className = 'h-full bg-stone-300 rounded-full transition-all duration-300';
         strengthText.textContent = 'Enter Password';
-        strengthText.className = 'font-bold text-[#777B83]';
+        strengthText.className = 'font-medium text-[#78716C]';
         return;
       }
 
@@ -206,17 +188,17 @@
 
       strengthBar.style.width = `${score}%`;
       if (score < 40) {
-        strengthBar.className = 'h-full bg-[#F0445E] rounded-full transition-all duration-300';
+        strengthBar.className = 'h-full bg-[#9F1239] rounded-full transition-all duration-300';
         strengthText.textContent = 'Weak';
-        strengthText.className = 'font-bold text-[#F0445E]';
+        strengthText.className = 'font-medium text-[#9F1239]';
       } else if (score < 70) {
         strengthBar.className = 'h-full bg-amber-500 rounded-full transition-all duration-300';
         strengthText.textContent = 'Moderate';
-        strengthText.className = 'font-bold text-amber-600';
+        strengthText.className = 'font-medium text-amber-700';
       } else {
-        strengthBar.className = 'h-full bg-[#268B65] rounded-full transition-all duration-300';
-        strengthText.textContent = 'Strong (High Security)';
-        strengthText.className = 'font-bold text-[#268B65]';
+        strengthBar.className = 'h-full bg-[#166534] rounded-full transition-all duration-300';
+        strengthText.textContent = 'Strong';
+        strengthText.className = 'font-medium text-[#166534]';
       }
     });
   }

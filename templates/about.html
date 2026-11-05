@@ -9,37 +9,37 @@
   <div class="bg-white rounded-2xl p-5 sm:p-7 border border-[#E9EAEC] shadow-xs relative overflow-hidden">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
       <div class="space-y-1.5">
-        <div class="flex items-center gap-2 flex-wrap text-[11px] font-mono">
-          <span class="px-2.5 py-0.5 rounded-full bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] font-semibold">
+        <div class="flex items-center gap-2 flex-wrap text-xs">
+          <span class="px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200 font-medium text-[11px]">
             Cloud Computing Laboratory
           </span>
           <span class="text-[#D3D5D9]">&bull;</span>
-          <span class="text-[#5F6368]">Department of Computer Engineering</span>
+          <span class="text-[#5F6368] text-[11px]">Department of Computer Engineering</span>
           <span class="text-[#D3D5D9]">&bull;</span>
-          <span class="text-[#5F6368]">2025–2026</span>
+          <span class="text-[#5F6368] text-[11px]">2025–2026</span>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-[#202124] tracking-tight">
+        <h1 class="text-2xl sm:text-3xl font-bold text-[#1C1917] tracking-tight">
           CloudVault Document Registry
         </h1>
-        <p class="text-xs sm:text-sm text-[#5F6368] max-w-2xl leading-relaxed">
+        <p class="text-xs sm:text-sm text-[#78716C] max-w-2xl leading-relaxed">
           A focused document registry for coursework and credentials, with local storage or Azure Blob Storage depending on deployment.
         </p>
       </div>
 
       <!-- Quick Metrics Strip -->
-      <div class="flex items-center gap-2.5 shrink-0 font-mono text-xs">
+      <div class="flex items-center gap-2.5 shrink-0 text-xs">
         <div class="p-2.5 sm:p-3 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] flex items-center gap-2.5">
           <span class="w-2.5 h-2.5 rounded-full {% if is_cloud_active %}bg-[#268B65]{% else %}bg-amber-500{% endif %}"></span>
           <div>
-            <span class="text-[9px] text-[#5F6368] block uppercase tracking-wider">Storage</span>
-            <span class="font-bold text-[#202124] text-xs">{% if is_cloud_active %}Azure Blob{% else %}Local storage{% endif %}</span>
+            <span class="text-[10px] text-stone-500 block">Storage</span>
+            <span class="font-semibold text-[#1C1917] text-xs">{% if is_cloud_active %}Azure Blob{% else %}Local storage{% endif %}</span>
           </div>
         </div>
         <div class="p-2.5 sm:p-3 rounded-xl bg-[#FAFAF9] border border-[#E9EAEC] flex items-center gap-2.5">
           <i class="fa-solid fa-hard-drive text-amber-500 text-xs"></i>
           <div>
-            <span class="text-[9px] text-[#5F6368] block uppercase tracking-wider">Storage Quota</span>
-            <span class="font-bold text-[#202124] text-xs">5.0 GB / Student</span>
+            <span class="text-[10px] text-stone-500 block">Quota</span>
+            <span class="font-semibold text-[#1C1917] text-xs">5.0 GB / Student</span>
           </div>
         </div>
       </div>
@@ -74,13 +74,13 @@
   <div id="section-team" class="about-section space-y-4">
     <div class="flex items-center justify-between border-b border-[#E9EAEC] pb-2.5">
       <div>
-        <h2 class="text-base font-bold text-[#202124] flex items-center gap-2">
-          <i class="fa-solid fa-users text-[#F0445E]"></i>
+        <h2 class="text-base font-semibold text-[#1C1917] flex items-center gap-2">
+          <i class="fa-solid fa-users text-stone-700"></i>
           <span>Undergraduate Engineering Team</span>
         </h2>
-        <p class="text-xs text-[#5F6368]">Department of Computer Engineering &bull; Roll Number Registry</p>
+        <p class="text-xs text-[#78716C]">Department of Computer Engineering &bull; Roll Number Registry</p>
       </div>
-      <span class="text-xs font-mono px-2.5 py-0.5 rounded-lg bg-[#FAFAF9] border border-[#E9EAEC] text-[#5F6368]">
+      <span class="text-xs px-2.5 py-0.5 rounded-lg bg-[#FAFAF9] border border-[#E9EAEC] text-[#78716C]">
         4 Members
       </span>
     </div>
@@ -89,19 +89,19 @@
       <!-- Member 1: Ayush Todkar -->
       <div class="bg-white hover:border-[#D3D5D9] rounded-xl p-4 border border-[#E9EAEC] shadow-xs transition-all relative group">
         <div class="flex items-start gap-3.5">
-          <div class="w-11 h-11 rounded-xl bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] flex items-center justify-center font-bold text-base shadow-xs font-mono shrink-0">
+          <div class="w-11 h-11 rounded-xl bg-stone-100 text-stone-800 border border-stone-200 flex items-center justify-center font-semibold text-base shadow-xs shrink-0">
             AT
           </div>
           <div class="space-y-1 flex-1 min-w-0">
             <div class="flex items-center justify-between gap-2">
-              <h3 class="text-sm font-bold text-[#202124] truncate">Ayush Todkar</h3>
-              <span class="px-2 py-0.5 rounded-full bg-[#FFF0F2] text-[#F0445E] border border-[#FECDD3] text-[10px] font-mono font-bold shrink-0">
+              <h3 class="text-sm font-semibold text-[#1C1917] truncate">Ayush Todkar</h3>
+              <span class="px-2 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200 text-[10px] font-medium shrink-0">
                 Roll No: 57
               </span>
             </div>
-            <p class="text-xs font-semibold text-[#F0445E] font-mono">Lead Cloud Architect & Full-Stack Developer</p>
-            <p class="text-xs text-[#5F6368] leading-relaxed">
-              PaaS deployment orchestration on Azure App Service, Gunicorn WSGI pipeline, Google SSO, and responsive UI architecture.
+            <p class="text-xs font-medium text-[#9F1239]">Lead Cloud Architect & Full-Stack Developer</p>
+            <p class="text-xs text-[#78716C] leading-relaxed">
+              PaaS deployment orchestration on Azure App Service, Gunicorn WSGI pipeline, Session Security & RBAC, and responsive UI architecture.
             </p>
             <div class="flex items-center gap-1.5 flex-wrap pt-1 text-[10px] font-mono text-[#5F6368]">
               <span class="px-2 py-0.5 rounded bg-[#FAFAF9] border border-[#E9EAEC]">Azure PaaS</span>
@@ -209,8 +209,8 @@
 
     <!-- Official Technology Logos Showcase Strip -->
     <div class="bg-white rounded-xl p-3.5 border border-[#E9EAEC] flex items-center justify-between gap-3 overflow-x-auto text-xs font-mono shadow-xs">
-      <div class="flex items-center gap-2 shrink-0 text-[#5F6368] text-[11px] pr-2 border-r border-[#E9EAEC]">
-        <i class="fa-solid fa-microchip text-[#F0445E]"></i>
+      <div class="flex items-center gap-2 shrink-0 text-[#78716C] text-[11px] pr-2 border-r border-[#E9EAEC]">
+        <i class="fa-solid fa-microchip text-stone-700"></i>
         <span>Ecosystem:</span>
       </div>
       <div class="flex items-center gap-3 sm:gap-5 flex-nowrap">
@@ -235,9 +235,9 @@
           <span class="text-amber-700 font-bold text-[11px]">Azure SQL</span>
         </div>
         <!-- Azure Blob Logo -->
-        <div class="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-[#FFF0F2] border border-[#FECDD3]" title="Azure Blob Storage">
-          <i class="fa-solid fa-cloud text-[#F0445E] text-xs"></i>
-          <span class="text-[#F0445E] font-bold text-[11px]">Blob Storage</span>
+        <div class="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-sky-50 border border-sky-200" title="Azure Blob Storage">
+          <i class="fa-solid fa-cloud text-sky-600 text-xs"></i>
+          <span class="text-sky-700 font-bold text-[11px]">Blob Storage</span>
         </div>
         <!-- Ubuntu Linux Logo -->
         <div class="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-orange-50 border border-orange-200" title="Canonical Ubuntu Linux">
@@ -258,12 +258,12 @@
       <div class="p-4 rounded-xl bg-white border border-[#E9EAEC] space-y-2.5 shadow-xs relative group overflow-hidden">
         <div class="flex items-center justify-between text-xs font-mono">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-code text-[#F0445E] text-xs"></i>
+            <div class="w-8 h-8 rounded-lg bg-stone-100 border border-stone-200 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-code text-stone-700 text-xs"></i>
             </div>
             <div>
-              <span class="font-bold text-[#202124] block leading-tight">Frontend Architecture</span>
-              <span class="text-[10px] text-[#F0445E] font-mono">Modern UI & Client</span>
+              <span class="font-semibold text-[#1C1917] block leading-tight">Frontend Architecture</span>
+              <span class="text-[10px] text-[#78716C]">Modern UI & Client</span>
             </div>
           </div>
           <div class="flex items-center gap-1 text-sm">
@@ -361,17 +361,17 @@
       <div class="p-4 rounded-xl bg-white border border-[#E9EAEC] space-y-2.5 shadow-xs relative group overflow-hidden">
         <div class="flex items-center justify-between text-xs font-mono">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-cloud text-[#F0445E] text-xs"></i>
+            <div class="w-8 h-8 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-cloud text-sky-600 text-xs"></i>
             </div>
             <div>
-              <span class="font-bold text-[#202124] block leading-tight">Cloud Storage (SaaS)</span>
-              <span class="text-[10px] text-[#F0445E] font-mono">Azure Blob Storage</span>
+              <span class="font-semibold text-[#1C1917] block leading-tight">Cloud Storage (SaaS)</span>
+              <span class="text-[10px] text-[#78716C]">Azure Blob Storage</span>
             </div>
           </div>
-          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#FFF0F2] text-[#F0445E] font-bold border border-[#FECDD3]">5.0 GB</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 font-medium border border-stone-200">5.0 GB</span>
         </div>
-        <p class="text-xs text-[#5F6368] leading-relaxed">
+        <p class="text-xs text-[#78716C] leading-relaxed">
           High-durability blob container (documents) in storage account cloudvault1 with inline streaming and 5.0 GB per-user quota allocation.
         </p>
         <div class="flex flex-wrap gap-1 text-[10px] font-mono text-[#5F6368]">
@@ -385,15 +385,15 @@
       <div class="p-4 rounded-xl bg-white border border-[#E9EAEC] space-y-2.5 shadow-xs relative group overflow-hidden">
         <div class="flex items-center justify-between text-xs font-mono">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-[#FFF0F2] border border-[#FECDD3] flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-shield-virus text-[#F0445E] text-xs"></i>
+            <div class="w-8 h-8 rounded-lg bg-stone-100 border border-stone-200 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-shield-virus text-stone-700 text-xs"></i>
             </div>
             <div>
-              <span class="font-bold text-[#202124] block leading-tight">Threat Scanner & SECaaS</span>
-              <span class="text-[10px] text-[#F0445E] font-mono">Active Defense</span>
+              <span class="font-semibold text-[#1C1917] block leading-tight">Threat Scanner & SECaaS</span>
+              <span class="text-[10px] text-[#78716C]">Active Defense</span>
             </div>
           </div>
-          <i class="fa-solid fa-user-shield text-[#F0445E] text-xs"></i>
+          <i class="fa-solid fa-user-shield text-stone-500 text-xs"></i>
         </div>
         <p class="text-xs text-[#5F6368] leading-relaxed">
           Deep byte header scanning, blocked executable formats, Scrypt password hashing, and an SQL activity log.
@@ -452,7 +452,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
       <!-- Feature 1: 5.0 GB Quota -->
       <div class="p-4 rounded-xl bg-white border border-[#E9EAEC] space-y-2 shadow-xs">
-        <div class="flex items-center gap-2 text-[#F0445E] font-mono text-xs font-semibold uppercase">
+        <div class="flex items-center gap-2 text-stone-800 text-xs font-medium">
           <i class="fa-solid fa-user-shield"></i>
           <span>5.0 GB Guaranteed Quota</span>
         </div>
@@ -506,9 +506,9 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
       <!-- 1. PaaS -->
       <div class="p-4 rounded-xl bg-white border border-[#E9EAEC] space-y-1.5 shadow-xs">
-        <div class="flex items-center justify-between text-xs font-mono">
-          <span class="font-bold text-[#F0445E] px-2 py-0.5 rounded bg-[#FFF0F2] border border-[#FECDD3]">PaaS</span>
-          <span class="text-[10px] text-[#5F6368]">Azure App Service</span>
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-medium text-stone-700 px-2 py-0.5 rounded bg-stone-100 border border-stone-200 text-[11px]">PaaS</span>
+          <span class="text-[10px] text-[#78716C]">Azure App Service</span>
         </div>
         <h4 class="font-bold text-xs text-[#202124]">Platform as a Service</h4>
         <p class="text-xs text-[#5F6368] leading-relaxed">
@@ -542,9 +542,9 @@
 
       <!-- 4. SECaaS -->
       <div class="p-4 rounded-xl bg-white border border-[#E9EAEC] space-y-1.5 shadow-xs">
-        <div class="flex items-center justify-between text-xs font-mono">
-          <span class="font-bold text-[#D92D50] px-2 py-0.5 rounded bg-[#FFF0F2] border border-[#FECDD3]">SECaaS</span>
-          <span class="text-[10px] text-[#5F6368]">Security Architecture</span>
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-medium text-stone-700 px-2 py-0.5 rounded bg-stone-100 border border-stone-200 text-[11px]">SECaaS</span>
+          <span class="text-[10px] text-[#78716C]">Security Architecture</span>
         </div>
         <h4 class="font-bold text-xs text-[#202124]">Security as a Service</h4>
         <p class="text-xs text-[#5F6368] leading-relaxed">
