@@ -21,15 +21,38 @@ MAGIC_SIGNATURES = {
     "png": [b"\x89PNG\r\n\x1a\n"],
     "jpg": [b"\xff\xd8\xff"],
     "jpeg": [b"\xff\xd8\xff"],
+    "jfif": [b"\xff\xd8\xff"],
     "gif": [b"GIF87a", b"GIF89a"],
     "webp": [b"RIFF"],  # followed by WEBP
     "bmp": [b"BM"],
+    "ico": [b"\x00\x00\x01\x00"],
+    "tif": [b"II*\x00", b"MM\x00*"],
+    "tiff": [b"II*\x00", b"MM\x00*"],
     "zip": [b"PK\x03\x04", b"PK\x05\x06", b"PK\x07\x08"],
     "docx": [b"PK\x03\x04"],
     "xlsx": [b"PK\x03\x04"],
     "pptx": [b"PK\x03\x04"],
+    "epub": [b"PK\x03\x04"],
+    "odt": [b"PK\x03\x04"],
+    "ods": [b"PK\x03\x04"],
+    "odp": [b"PK\x03\x04"],
+    "doc": [b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"],
+    "xls": [b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"],
+    "ppt": [b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"],
+    "rtf": [b"{\\rtf"],
     "gz": [b"\x1f\x8b"],
-    "tar": [b"ustar"],
+    "7z": [b"7z\xbc\xaf'\x1c"],
+    "rar": [b"Rar!\x1a\x07"],
+    "bz2": [b"BZh"],
+    "tar": [b"ustar"],  # checked at offset 257
+    "flac": [b"fLaC"],
+    "ogg": [b"OggS"],
+    "mp3": [b"ID3", b"\xff\xfb", b"\xff\xf3", b"\xff\xf2"],
+    "wav": [b"RIFF"],
+    "avi": [b"RIFF"],
+    "mp4": [b"ftyp"],
+    "m4a": [b"ftyp"],
+    "mov": [b"ftyp", b"moov"],
 }
 
 # Forbidden binary executable and shellcode headers (detected even when disguised under benign extensions)
@@ -114,8 +137,10 @@ class FileSecurityScanner:
         parts = filename.lower().split(".")
         if len(parts) > 2:
             dangerous_exts = {
-                "exe", "bat", "cmd", "sh", "ps1", "vbs", "msi", "dll", "com", "scr",
-                "pif", "reg", "wsf", "hta", "cpl", "jar", "php", "asp", "aspx", "jsp"
+                "exe", "bat", "cmd", "sh", "ps1", "ps2", "vbs", "vbe", "msi", "msp",
+                "dll", "com", "scr", "pif", "reg", "wsf", "wsh", "hta", "cpl", "jar",
+                "html", "htm", "xhtml", "php", "phtml", "asp", "aspx", "jsp", "jspx",
+                "cgi", "pl", "pyc", "jse", "scf", "lnk", "inf", "apk", "deb", "rpm", "bin", "iso"
             }
             for part in parts[1:-1]:
                 if part in dangerous_exts:
@@ -153,6 +178,22 @@ class FileSecurityScanner:
                 if len(file_bytes) < 12 or file_bytes[8:12] != b"WEBP":
                     matched = False
 
+            # Special check for WAV (RIFF....WAVE)
+            if ext == "wav" and matched:
+                if len(file_bytes) < 12 or file_bytes[8:12] != b"WAVE":
+                    matched = False
+
+            # Special check for AVI (RIFF....AVI )
+            if ext == "avi" and matched:
+                if len(file_bytes) < 12 or file_bytes[8:12] != b"AVI ":
+                    matched = False
+
+            # Special check for MP4, M4A, MOV (offset 4 has ftyp or moov)
+            if ext in ("mp4", "m4a", "mov"):
+                matched = len(file_bytes) >= 8 and (
+                    file_bytes[4:8] in (b"ftyp", b"moov", b"mdat", b"free", b"wide")
+                )
+
             # Special check for TAR (ustar at offset 257)
             if ext == "tar":
                 matched = (len(file_bytes) > 262 and file_bytes[257:262] == b"ustar")
@@ -164,7 +205,7 @@ class FileSecurityScanner:
                 )
 
         # 3. Deep Archive & Office Document Structural Health Check (with Zip Bomb Defense)
-        if ext in ("zip", "docx", "xlsx", "pptx"):
+        if ext in ("zip", "docx", "xlsx", "pptx", "epub", "odt", "ods", "odp"):
             try:
                 with zipfile.ZipFile(io.BytesIO(file_bytes), "r") as zf:
                     corrupted_entry = zf.testzip()
@@ -187,7 +228,7 @@ class FileSecurityScanner:
 
         # 4. Embedded Malicious Webshell & Shellcode Payload Scanning
         # For non-code documents (e.g., pdf, jpg, png, docx, xlsx, txt), scan for executable injection
-        code_exts = {"py", "sh", "js", "ts", "php", "html", "css", "sql", "c", "cpp", "java"}
+        code_exts = {"py", "sh", "js", "ts", "php", "html", "css", "sql", "c", "cpp", "java", "cs"}
         if ext not in code_exts:
             sample_buffer = file_bytes[:65536] + file_bytes[-16384:] if len(file_bytes) > 81920 else file_bytes
             for payload in PROHIBITED_PAYLOAD_STRINGS:

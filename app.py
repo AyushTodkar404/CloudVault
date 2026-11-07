@@ -49,13 +49,13 @@ logging.basicConfig(
 # Whitelist of genuine document, media, spreadsheet, archive, and code extensions
 ALLOWED_EXTENSIONS = {
     # Documents & Text
-    "pdf", "doc", "docx", "txt", "rtf", "odt", "tex",
+    "pdf", "doc", "docx", "txt", "rtf", "odt", "tex", "log", "epub",
     # Spreadsheets
     "xls", "xlsx", "csv", "tsv", "ods",
     # Presentations
     "ppt", "pptx", "odp",
     # Images
-    "png", "jpg", "jpeg", "webp", "svg", "gif", "bmp", "tiff", "ico",
+    "png", "jpg", "jpeg", "jfif", "webp", "svg", "gif", "bmp", "tiff", "tif", "ico",
     # Audio & Video
     "mp4", "webm", "mov", "mkv", "avi", "mp3", "wav", "ogg", "m4a", "flac", "aac",
     # Compressed Archives
@@ -66,8 +66,10 @@ ALLOWED_EXTENSIONS = {
 
 # Explicit blacklist of dangerous executables and script formats
 BLOCKED_EXTENSIONS = {
-    "exe", "bat", "cmd", "sh", "ps1", "vbs", "msi", "dll", "com", "scr", "pif", "reg",
-    "wsf", "hta", "cpl", "jar", "html", "htm", "xhtml", "php", "phtml", "asp", "aspx", "jsp", "cgi"
+    "exe", "bat", "cmd", "sh", "ps1", "ps2", "vbs", "vbe", "msi", "msp", "dll", "com", "scr", "pif", "reg",
+    "wsf", "wsh", "hta", "cpl", "jar", "html", "htm", "xhtml", "php", "phtml", "asp", "aspx", "jsp", "jspx",
+    "cgi", "pl", "pyc", "jse", "scf", "lnk", "inf", "ins", "isp", "gadget", "action", "apk", "deb", "rpm",
+    "bin", "iso", "img", "dmg"
 }
 
 
