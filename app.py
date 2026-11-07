@@ -1138,6 +1138,32 @@ def create_app(test_config=None):
             }
         ), 200
 
+    @app.route("/manifest.webmanifest", methods=["GET"])
+    def manifest():
+        """Serves PWA manifest for Android, Windows, and iOS standalone installation."""
+        return send_from_directory(
+            os.path.join(app.root_path, "static"),
+            "manifest.webmanifest",
+            mimetype="application/manifest+json",
+        )
+
+    @app.route("/sw.js", methods=["GET"])
+    def service_worker():
+        """Serves Service Worker script configured for offline caching and low-bandwidth rural networks."""
+        response = send_from_directory(
+            os.path.join(app.root_path, "static"),
+            "sw.js",
+            mimetype="application/javascript",
+        )
+        response.headers["Service-Worker-Allowed"] = "/"
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        return response
+
+    @app.route("/offline", methods=["GET"])
+    def offline():
+        """Lightweight offline fallback shell when network drops entirely."""
+        return render_template("offline.html")
+
     @app.route("/account/backup", methods=["GET"])
     @login_required
     def export_account_data():

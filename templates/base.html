@@ -3,10 +3,26 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>{% block title %}CloudVault &mdash; Document & Credential Registry{% endblock %}</title>
-  <meta name="description" content="A private document and credential registry for academic teams.">
+  <meta name="description" content="A private document and credential registry for academic teams with offline resilience and multi-device support.">
+  
+  <!-- Mobile & PWA Platform Meta Tags for Android, Windows, and iOS -->
+  <meta name="theme-color" content="#9F1239" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0E0F12" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="CloudVault">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-TileColor" content="#9F1239">
+  <meta name="msapplication-navbutton-color" content="#9F1239">
+
+  <!-- Icons & Web App Manifest -->
+  <link rel="manifest" href="{{ url_for('manifest') }}">
+  <link rel="apple-touch-icon" sizes="192x192" href="/static/icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png">
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239F1239' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='18' height='18' x='3' y='3' rx='2'/><circle cx='12' cy='12' r='3'/><path d='m14.5 9.5 2-2'/><path d='m9.5 14.5-2 2'/></svg>">
 
@@ -37,8 +53,8 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
           },
           colors: {
             vault: {
@@ -98,13 +114,54 @@
     html, body {
       max-width: 100%;
       overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+      scroll-behavior: smooth;
     }
 
     body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
       background-color: var(--cv-canvas);
       color: var(--cv-ink);
       font-feature-settings: "cv02", "cv03", "cv04", "cv11";
       transition: background-color 0.16s ease, color 0.16s ease;
+    }
+
+    /* iOS auto-zoom defense on mobile touch devices */
+    @media screen and (max-width: 768px) {
+      input[type="text"], input[type="password"], input[type="email"], select, textarea {
+        font-size: 16px !important;
+      }
+    }
+
+    /* Touch target ergonomics for Android and iOS touchscreens */
+    @media (pointer: coarse) {
+      button, a.tab-btn, .doc-checkbox, input[type="checkbox"] {
+        min-height: 40px;
+        touch-action: manipulation;
+      }
+    }
+
+    /* Safe dialog boundaries on mobile devices */
+    dialog {
+      max-width: calc(100vw - 20px) !important;
+      margin: auto;
+    }
+    @media (max-width: 640px) {
+      dialog {
+        max-height: 90dvh !important;
+      }
+    }
+
+    /* Low-Bandwidth & Data Saver Mode: Accelerates rural 2G/3G connections and saves battery */
+    body.low-bandwidth-mode * {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
     }
 
     /* Core Surface & Input Tokens */
@@ -312,6 +369,14 @@
             title="Active storage tier">
             <span class="inline-flex rounded-full h-1.5 w-1.5 bg-[#166534] dark:bg-[#4ADE80]"></span>
             <span id="clusterStatusText">Storage connected</span>
+          </div>
+
+          <!-- Network & Low-Bandwidth Indicator -->
+          <div id="networkQualityPill"
+            class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#F4F4F2] dark:bg-[#1D1E24] text-[11px] font-mono text-[#57534E] dark:text-[#A1A1AA] transition-colors"
+            title="Network connection quality">
+            <span id="networkDot" class="inline-flex rounded-full h-1.5 w-1.5 bg-[#166534] dark:bg-[#4ADE80]"></span>
+            <span id="networkText" class="hidden sm:inline">Online</span>
           </div>
 
           <!-- Theme Toggle (Light / Dark) -->
@@ -2030,32 +2095,84 @@
       });
     }
 
-    // Cloud Connectivity Sentinel
-    function checkNetworkConnectivity() {
-      const ping = document.getElementById('clusterStatusPing');
-      const dot = document.getElementById('clusterStatusDot');
-      const text = document.getElementById('clusterStatusText');
+    // Multi-Device & Dynamic Platform Sensing (Android, Windows, iOS)
+    (function detectDevicePlatform() {
+      const ua = navigator.userAgent || '';
+      const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const isAndroid = /Android/.test(ua);
+      const isWindows = /Windows/.test(ua);
+      const root = document.documentElement;
+
+      if (isIOS) root.classList.add('platform-ios');
+      if (isAndroid) root.classList.add('platform-android');
+      if (isWindows) root.classList.add('platform-windows');
+    })();
+
+    // Network Connectivity & Rural / Low-Bandwidth Quality Sentinel
+    function updateNetworkQuality() {
+      const dot = document.getElementById('networkDot');
+      const text = document.getElementById('networkText');
+      const pill = document.getElementById('networkQualityPill');
+      const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+
       if (!navigator.onLine) {
-        if (ping) ping.classList.add('hidden');
-        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-amber-500';
-        if (text) text.innerHTML = '<span class="text-amber-700 font-semibold">Offline Mode (Sync Queued)</span>';
-        showToast('Internet connection lost. Working in offline cached mode.', 'warning');
+        if (dot) dot.className = 'inline-flex rounded-full h-1.5 w-1.5 bg-rose-600 animate-pulse';
+        if (text) text.textContent = 'Offline (Vault Ready)';
+        if (pill) pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-50 dark:bg-rose-950/40 text-[11px] font-mono text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900';
+        document.body.classList.add('low-bandwidth-mode');
+        return;
+      }
+
+      const isWeak = conn && (conn.effectiveType === '2g' || conn.effectiveType === 'slow-2g' || conn.saveData || (conn.rtt && conn.rtt > 750));
+
+      if (isWeak) {
+        if (dot) dot.className = 'inline-flex rounded-full h-1.5 w-1.5 bg-amber-500';
+        if (text) text.textContent = conn.saveData ? 'Data Saver Active' : 'Low Bandwidth (2G)';
+        if (pill) pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 dark:bg-amber-950/40 text-[11px] font-mono text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900';
+        document.body.classList.add('low-bandwidth-mode');
       } else {
-        if (ping) ping.classList.remove('hidden');
-        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-[#268B65]';
-        if (text) text.innerHTML = '<span class="text-[#268B65] font-semibold">Storage connected</span>';
+        if (dot) dot.className = 'inline-flex rounded-full h-1.5 w-1.5 bg-[#166534] dark:bg-[#4ADE80]';
+        const typeLabel = conn && conn.effectiveType ? conn.effectiveType.toUpperCase() : 'Online';
+        if (text) text.textContent = typeLabel;
+        if (pill) pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#F4F4F2] dark:bg-[#1D1E24] text-[11px] font-mono text-[#57534E] dark:text-[#A1A1AA]';
+        document.body.classList.remove('low-bandwidth-mode');
       }
     }
-    window.addEventListener('offline', checkNetworkConnectivity);
-    window.addEventListener('online', () => {
-      checkNetworkConnectivity();
-      showToast('Reconnected to internet! Checking offline queue...', 'success');
-      OfflineVault.syncAll();
+
+    window.addEventListener('offline', () => {
+      updateNetworkQuality();
+      showToast('Internet connection lost. Offline Vault is active for local caching.', 'warning');
     });
+
+    window.addEventListener('online', () => {
+      updateNetworkQuality();
+      showToast('Connection restored! Syncing offline documents with Azure...', 'success');
+      if (window.OfflineVault && typeof window.OfflineVault.syncAll === 'function') {
+        OfflineVault.syncAll();
+      }
+    });
+
+    if (navigator.connection) {
+      navigator.connection.addEventListener('change', updateNetworkQuality);
+    }
+
+    // PWA Service Worker Registration for Instant Offline Shell Caching
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then((reg) => {
+            console.debug('CloudVault PWA Service Worker active:', reg.scope);
+          })
+          .catch((err) => {
+            console.debug('Service Worker registration skipped:', err);
+          });
+      });
+    }
 
     // Auto-sync on page load if online and offline items exist
     document.addEventListener('DOMContentLoaded', () => {
-      if (navigator.onLine) {
+      updateNetworkQuality();
+      if (navigator.onLine && window.OfflineVault) {
         setTimeout(() => OfflineVault.syncAll(), 1500);
       }
     });

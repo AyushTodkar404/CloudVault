@@ -951,6 +951,40 @@ class CloudVaultRealProductionFeaturesTestCase(unittest.TestCase):
         self.assertIn(b'href="#main-content"', resp.data)
         self.assertIn(b'id="main-content"', resp.data)
 
+    def test_pwa_manifest_and_service_worker_for_cross_device_offline_support(self):
+        """Verify PWA manifest, service worker, offline fallback, and mobile viewport for Android, iOS, Windows."""
+        # 1. PWA Web Manifest
+        manifest_resp = self.client.get("/manifest.webmanifest")
+        self.assertEqual(manifest_resp.status_code, 200)
+        self.assertIn("application/manifest+json", manifest_resp.headers.get("Content-Type", ""))
+        manifest_data = manifest_resp.get_json()
+        self.assertEqual(manifest_data["name"], "CloudVault - Document & Credential Registry")
+        self.assertEqual(manifest_data["theme_color"], "#9F1239")
+        self.assertEqual(manifest_data["display"], "standalone")
+        self.assertTrue(len(manifest_data["icons"]) >= 2)
+
+        # 2. Service Worker for offline/rural low-bandwidth acceleration
+        sw_resp = self.client.get("/sw.js")
+        self.assertEqual(sw_resp.status_code, 200)
+        self.assertIn("application/javascript", sw_resp.headers.get("Content-Type", ""))
+        self.assertEqual(sw_resp.headers.get("Service-Worker-Allowed"), "/")
+        self.assertIn(b"CACHE_NAME", sw_resp.data)
+        self.assertIn(b"cloudvault-v1", sw_resp.data)
+
+        # 3. Offline Fallback Page
+        offline_resp = self.client.get("/offline")
+        self.assertEqual(offline_resp.status_code, 200)
+        self.assertIn(b"Low Connectivity / Offline Mode", offline_resp.data)
+        self.assertIn(b"Offline Vault Active", offline_resp.data)
+
+        # 4. Multi-device & mobile viewport compatibility in base template
+        login_resp = self.client.get("/login")
+        self.assertEqual(login_resp.status_code, 200)
+        self.assertIn(b"viewport-fit=cover", login_resp.data)
+        self.assertIn(b"apple-mobile-web-app-capable", login_resp.data)
+        self.assertIn(b"mobile-web-app-capable", login_resp.data)
+        self.assertIn(b"manifest.webmanifest", login_resp.data)
+
     def test_recycle_bin_and_storage_container_transfer_lifecycle(self):
         """Test moving document to recycle bin, restoring, and permanent deletion with storage sync."""
         self.client.post(

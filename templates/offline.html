@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Offline &mdash; CloudVault{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-12 px-4 sm:px-6 text-center space-y-6 animate-fade-in">
+  <div class="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 flex items-center justify-center text-2xl mx-auto shadow-xs">
+    <i class="fa-solid fa-wifi-slash"></i>
+  </div>
+
+  <div class="space-y-2">
+    <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-[#1C1917] dark:text-[#F4F4F5]">
+      Low Connectivity / Offline Mode
+    </h1>
+    <p class="text-xs sm:text-sm text-[#57534E] dark:text-[#A1A1AA] max-w-md mx-auto leading-relaxed">
+      CloudVault detected that your connection is weak or currently offline. The application shell and local database remain fully available.
+    </p>
+  </div>
+
+  <div class="bg-white dark:bg-[#18191E] border border-[#E5E7EB] dark:border-[#272832] rounded-2xl p-5 text-left space-y-3.5 shadow-xs">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-[#EAF6EF] dark:bg-emerald-950/40 text-[#268B65] dark:text-emerald-400 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-bolt text-xs"></i>
+      </div>
+      <div>
+        <h4 class="text-xs font-semibold text-[#1C1917] dark:text-[#F4F4F5]">Offline Vault Active</h4>
+        <p class="text-[11px] text-[#78716C] dark:text-[#A1A1AA]">Documents you stage will be securely queued in local IndexedDB storage.</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3 pt-2 border-t border-[#E5E7EB] dark:border-[#272832]">
+      <div class="w-8 h-8 rounded-lg bg-[#FDF2F4] dark:bg-[#9F1239]/20 text-[#9F1239] dark:text-[#FB7185] flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-rotate text-xs"></i>
+      </div>
+      <div>
+        <h4 class="text-xs font-semibold text-[#1C1917] dark:text-[#F4F4F5]">Automatic Cloud Sync</h4>
+        <p class="text-[11px] text-[#78716C] dark:text-[#A1A1AA]">As soon as a 2G, 3G, or 4G signal is detected, queued files upload to Azure automatically.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+    <button type="button" onclick="window.location.reload()"
+      class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#9F1239] hover:bg-[#881337] text-white text-xs font-semibold transition-colors shadow-xs flex items-center justify-center gap-2">
+      <i class="fa-solid fa-rotate-right text-xs"></i>
+      <span>Retry Connection</span>
+    </button>
+    <a href="{{ url_for('index') }}"
+      class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white dark:bg-[#18191E] hover:bg-[#FAFAF9] dark:hover:bg-[#1F2026] border border-[#E5E7EB] dark:border-[#272832] text-[#1C1917] dark:text-[#F4F4F5] text-xs font-medium transition-colors shadow-xs flex items-center justify-center gap-2">
+      <i class="fa-solid fa-folder-tree text-xs"></i>
+      <span>Return to Vault Shell</span>
+    </a>
+  </div>
+</div>
+{% endblock %}
