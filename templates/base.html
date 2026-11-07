@@ -290,6 +290,11 @@
             <span>Project & Team</span>
           </a>
           {% if current_user.is_authenticated %}
+          <a href="{{ url_for('index', category='trash') }}"
+            class="px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 {% if request.endpoint == 'index' and request.args.get('category') == 'trash' %}bg-[#FDF2F4] text-[#9F1239] font-semibold dark:bg-[#9F1239]/20 dark:text-[#FB7185]{% else %}text-[#57534E] hover:text-[#1C1917] dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5] hover:bg-[#F4F4F2] dark:hover:bg-[#1D1E24]{% endif %}">
+            <i class="fa-solid fa-trash-can text-[11px]"></i>
+            <span>Recycle Bin</span>
+          </a>
           <button type="button" onclick="openAuditModal()"
             class="px-3 py-1.5 rounded-lg text-[#57534E] hover:text-[#1C1917] dark:text-[#A1A1AA] dark:hover:text-[#F4F4F5] hover:bg-[#F4F4F2] dark:hover:bg-[#1D1E24] transition-colors flex items-center gap-1.5">
             <i class="fa-solid fa-clock-rotate-left text-[11px]"></i>
@@ -359,15 +364,21 @@
 
     <!-- Mobile Responsive Navigation Drawer -->
     <div id="mobileDrawer" class="hidden md:hidden border-b border-[#E9EAEC] bg-white px-4 py-3.5 space-y-3 transition-all animate-fade-in shadow-lg">
-      <div class="grid grid-cols-2 gap-2 text-xs">
-        <a href="{{ url_for('index') }}" class="p-2.5 rounded-xl flex items-center gap-2 {% if request.endpoint == 'index' %}bg-stone-100 text-[#1C1917] font-medium border border-stone-200{% else %}text-[#5F6368] hover:bg-[#FAFAF9]{% endif %}">
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <a href="{{ url_for('index') }}" class="p-2.5 rounded-xl flex items-center gap-1.5 {% if request.endpoint == 'index' and request.args.get('category') != 'trash' %}bg-stone-100 text-[#1C1917] font-medium border border-stone-200{% else %}text-[#5F6368] hover:bg-[#FAFAF9]{% endif %}">
           <i class="fa-solid fa-folder-tree text-stone-700"></i>
           <span>Vault</span>
         </a>
-        <a href="{{ url_for('about') }}" class="p-2.5 rounded-xl flex items-center gap-2 {% if request.endpoint == 'about' %}bg-stone-100 text-[#1C1917] font-medium border border-stone-200{% else %}text-[#5F6368] hover:bg-[#FAFAF9]{% endif %}">
+        <a href="{{ url_for('about') }}" class="p-2.5 rounded-xl flex items-center gap-1.5 {% if request.endpoint == 'about' %}bg-stone-100 text-[#1C1917] font-medium border border-stone-200{% else %}text-[#5F6368] hover:bg-[#FAFAF9]{% endif %}">
           <i class="fa-solid fa-graduation-cap text-stone-700"></i>
-          <span>Project & Team</span>
+          <span>Project</span>
         </a>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('index', category='trash') }}" class="p-2.5 rounded-xl flex items-center gap-1.5 {% if request.endpoint == 'index' and request.args.get('category') == 'trash' %}bg-stone-100 text-[#1C1917] font-medium border border-stone-200{% else %}text-[#5F6368] hover:bg-[#FAFAF9]{% endif %}">
+          <i class="fa-solid fa-trash-can text-stone-700"></i>
+          <span>Bin</span>
+        </a>
+        {% endif %}
       </div>
 
       {% if current_user.is_authenticated %}

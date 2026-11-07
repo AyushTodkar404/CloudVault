@@ -128,8 +128,9 @@
           Images
         </button>
         <button type="button" onclick="filterCategory('trash')" id="tab-trash"
-          class="tab-btn px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-900 border border-transparent font-normal transition-all whitespace-nowrap">
-          Trash ({{ trash_count }})
+          class="tab-btn px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-900 border border-transparent font-normal transition-all whitespace-nowrap flex items-center gap-1.5">
+          <i class="fa-solid fa-trash-can text-[11px]"></i>
+          <span>Recycle Bin ({{ trash_count }})</span>
         </button>
       </div>
 
@@ -512,6 +513,7 @@
                 <form action="{{ url_for('delete_document', doc_id=doc.id) }}" method="POST" class="inline"
                   onsubmit="return confirm('Permanently destroy this record? This cannot be recovered.')">
                   <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="from" value="trash">
                   <button type="submit"
                     class="p-1.5 rounded-lg text-stone-400 hover:text-red-700 hover:bg-stone-100 text-xs transition-colors"
                     title="Purge permanently">
@@ -645,6 +647,7 @@
           <form action="{{ url_for('delete_document', doc_id=doc.id) }}" method="POST" class="inline"
             onsubmit="return confirm('Purge permanently?')">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="from" value="trash">
             <button type="submit" class="p-1 rounded-lg text-stone-400 hover:text-rose-700 text-xs"
               title="Delete permanently">
               <i class="fa-solid fa-ban"></i>
@@ -1190,6 +1193,11 @@
   window.deleteOfflineItem = deleteOfflineItem;
 
   document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialCategory = urlParams.get('category');
+    if (initialCategory) {
+      filterCategory(initialCategory);
+    }
     renderOfflineDocuments();
   });
 </script>

@@ -575,7 +575,11 @@ def create_app(test_config=None):
                 category_breakdown["other"] += (d.file_size or 0)
 
         # Filtering
-        filtered = list(active_documents)
+        if category_filter == "trash":
+            filtered = list(trash_documents)
+        else:
+            filtered = list(active_documents)
+
         if query:
             q_lower = query.lower()
             filtered = [
@@ -583,7 +587,7 @@ def create_app(test_config=None):
                 if q_lower in d.student_name.lower() or q_lower in d.document_title.lower() or q_lower in d.file_name.lower()
             ]
 
-        if category_filter and category_filter != "all":
+        if category_filter and category_filter not in ("all", "trash"):
             if category_filter == "starred":
                 filtered = [d for d in filtered if d.is_starred]
             elif category_filter == "documents":
@@ -806,7 +810,7 @@ def create_app(test_config=None):
     @app.route("/delete/<int:doc_id>", methods=["POST"])
     @login_required
     def delete_document(doc_id):
-        """Removes document record from database with authorization check."""
+        """Removes document record and permanently destroys its storage blob across Azure/local storage."""
         doc = db.session.get(Document, doc_id)
         if not doc:
             flash("Document not found.", "error")
@@ -818,15 +822,8 @@ def create_app(test_config=None):
             return redirect(url_for("index"))
 
         try:
-            # Delete from cloud storage if active
-            if storage_manager.is_cloud_active and storage_manager.blob_service_client:
-                try:
-                    blob_client = storage_manager.blob_service_client.get_blob_client(
-                        container=storage_manager.container_name, blob=doc.blob_name
-                    )
-                    blob_client.delete_blob()
-                except Exception as blob_err:
-                    app.logger.warning(f"Could not delete blob: {blob_err}")
+            # Permanently delete from Azure Blob Storage (both trash & active tiers) and local disk
+            storage_manager.delete_file(doc.blob_name)
 
             doc_title = doc.document_title
             db.session.delete(doc)
@@ -837,7 +834,7 @@ def create_app(test_config=None):
             db.session.rollback()
             flash(f"Error deleting document: {str(e)}", "error")
 
-        return redirect(url_for("index"))
+        return redirect(url_for("index", category="trash" if request.form.get("from") == "trash" else "all"))
 
     @app.route("/document/<int:doc_id>/star", methods=["POST"])
     @login_required
@@ -857,31 +854,39 @@ def create_app(test_config=None):
     @app.route("/document/<int:doc_id>/trash", methods=["POST"])
     @login_required
     def trash_document(doc_id):
-        """Moves a document to the Recycle Bin / Trash."""
+        """Moves a document to the Recycle Bin and transfers blob to the Azure trash container."""
         doc = db.session.get(Document, doc_id)
         if not doc or (doc.user_id and doc.user_id != current_user.id and current_user.role != "admin"):
             flash("Access denied.", "error")
             return redirect(url_for("index"))
+
+        new_url = storage_manager.move_to_trash(doc.blob_name)
+        if new_url:
+            doc.blob_url = new_url
         doc.is_deleted = True
         doc.deleted_at = datetime.now(timezone.utc)
         db.session.commit()
-        log_activity(current_user.id, "TRASH", f"Moved '{doc.document_title}' to Trash")
-        flash(f"Moved '{doc.document_title}' to Trash.", "success")
+        log_activity(current_user.id, "TRASH", f"Moved '{doc.document_title}' to Recycle Bin")
+        flash(f"Moved '{doc.document_title}' to Recycle Bin.", "success")
         return redirect(url_for("index"))
 
     @app.route("/document/<int:doc_id>/restore", methods=["POST"])
     @login_required
     def restore_document(doc_id):
-        """Restores a document from Trash back to the active repository."""
+        """Restores a document from Recycle Bin back to active Azure container and repository."""
         doc = db.session.get(Document, doc_id)
         if not doc or (doc.user_id and doc.user_id != current_user.id and current_user.role != "admin"):
             flash("Access denied.", "error")
             return redirect(url_for("index"))
+
+        new_url = storage_manager.restore_from_trash(doc.blob_name)
+        if new_url:
+            doc.blob_url = new_url
         doc.is_deleted = False
         doc.deleted_at = None
         db.session.commit()
-        log_activity(current_user.id, "RESTORE", f"Restored '{doc.document_title}' from Trash")
-        flash(f"Restored '{doc.document_title}' from Trash.", "success")
+        log_activity(current_user.id, "RESTORE", f"Restored '{doc.document_title}' from Recycle Bin")
+        flash(f"Restored '{doc.document_title}' to repository.", "success")
         return redirect(url_for("index"))
 
     @app.route("/document/<int:doc_id>/edit", methods=["POST"])
@@ -1031,13 +1036,19 @@ def create_app(test_config=None):
 
         if action == "trash":
             for d in authorized_docs:
+                new_url = storage_manager.move_to_trash(d.blob_name)
+                if new_url:
+                    d.blob_url = new_url
                 d.is_deleted = True
                 d.deleted_at = datetime.now(timezone.utc)
             db.session.commit()
             log_activity(current_user.id, "BATCH_TRASH", f"Moved {len(authorized_docs)} item(s) to Trash")
-            flash(f"Moved {len(authorized_docs)} item(s) to Trash.", "success")
+            flash(f"Moved {len(authorized_docs)} item(s) to Recycle Bin.", "success")
         elif action == "restore":
             for d in authorized_docs:
+                new_url = storage_manager.restore_from_trash(d.blob_name)
+                if new_url:
+                    d.blob_url = new_url
                 d.is_deleted = False
                 d.deleted_at = None
             db.session.commit()
@@ -1045,13 +1056,7 @@ def create_app(test_config=None):
             flash(f"Restored {len(authorized_docs)} item(s) to repository.", "success")
         elif action == "delete_permanent":
             for d in authorized_docs:
-                if storage_manager.is_cloud_active and storage_manager.blob_service_client:
-                    try:
-                        storage_manager.blob_service_client.get_blob_client(
-                            container=storage_manager.container_name, blob=d.blob_name
-                        ).delete_blob()
-                    except Exception as blob_err:
-                        app.logger.warning(f"Could not delete account blob '{d.blob_name}': {blob_err}")
+                storage_manager.delete_file(d.blob_name)
                 db.session.delete(d)
             db.session.commit()
             log_activity(current_user.id, "BATCH_DELETE", f"Permanently deleted {len(authorized_docs)} item(s)")
@@ -1084,16 +1089,18 @@ def create_app(test_config=None):
         return jsonify([a.to_dict() for a in activities])
 
     @app.route("/uploads/<path:filename>")
+    @app.route("/uploads/trash/<path:filename>")
     @login_required
     def local_uploads(filename):
         """Serves files stored locally in sandbox mode with tenant isolation."""
         safe_name = secure_filename(filename)
-        doc = Document.query.filter_by(blob_name=safe_name, is_deleted=False).first()
+        doc = Document.query.filter_by(blob_name=safe_name).first()
         if not doc:
             abort(404)
         if doc.user_id and doc.user_id != current_user.id and current_user.role != "admin":
             abort(403)
-        return send_from_directory(storage_manager.local_upload_dir, safe_name)
+        folder = storage_manager.local_trash_dir if doc.is_deleted else storage_manager.local_upload_dir
+        return send_from_directory(folder, safe_name)
 
     @app.route("/about", methods=["GET"])
     def about():
@@ -1184,13 +1191,7 @@ def create_app(test_config=None):
         # Purge blobs from storage
         docs = Document.query.filter_by(user_id=user_id).all()
         for d in docs:
-            if storage_manager.is_cloud_active and storage_manager.blob_service_client:
-                try:
-                    storage_manager.blob_service_client.get_blob_client(
-                        container=storage_manager.container_name, blob=d.blob_name
-                    ).delete_blob()
-                except Exception as blob_err:
-                    app.logger.warning(f"Could not delete account blob '{d.blob_name}': {blob_err}")
+            storage_manager.delete_file(d.blob_name)
             db.session.delete(d)
 
         # Delete user activities

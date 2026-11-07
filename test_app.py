@@ -951,6 +951,137 @@ class CloudVaultRealProductionFeaturesTestCase(unittest.TestCase):
         self.assertIn(b'href="#main-content"', resp.data)
         self.assertIn(b'id="main-content"', resp.data)
 
+    def test_recycle_bin_and_storage_container_transfer_lifecycle(self):
+        """Test moving document to recycle bin, restoring, and permanent deletion with storage sync."""
+        self.client.post(
+            "/signup",
+            data={
+                "username": "bin_user",
+                "email": "bin_user@vault.edu",
+                "password": "password123",
+                "confirm_password": "password123",
+            },
+            follow_redirects=True,
+        )
+
+        # 1. Upload a document
+        upload_resp = self.client.post(
+            "/upload",
+            data={
+                "student_name": "Bin Tester",
+                "document_title": "Semester Report",
+                "file": (io.BytesIO(b"%PDF-1.4 Semester Report Data"), "semester_report.pdf"),
+            },
+            follow_redirects=True,
+        )
+        self.assertEqual(upload_resp.status_code, 200)
+
+        with self.app.app_context():
+            doc = Document.query.filter_by(document_title="Semester Report").first()
+            self.assertIsNotNone(doc)
+            doc_id = doc.id
+            blob_name = doc.blob_name
+
+        # Verify initial storage state in local mode
+        from storage import storage_manager
+        active_local_file = os.path.join(storage_manager.local_upload_dir, blob_name)
+        trash_local_file = os.path.join(storage_manager.local_trash_dir, blob_name)
+        self.assertTrue(os.path.exists(active_local_file))
+        self.assertFalse(os.path.exists(trash_local_file))
+
+        # 2. Move document to Recycle Bin
+        trash_resp = self.client.post(f"/document/{doc_id}/trash", follow_redirects=True)
+        self.assertEqual(trash_resp.status_code, 200)
+        self.assertIn(b"Recycle Bin", trash_resp.data)
+
+        with self.app.app_context():
+            trashed = db.session.get(Document, doc_id)
+            self.assertTrue(trashed.is_deleted)
+            self.assertIsNotNone(trashed.deleted_at)
+
+        # File moved from active directory to trash directory
+        self.assertFalse(os.path.exists(active_local_file))
+        self.assertTrue(os.path.exists(trash_local_file))
+
+        # Check Recycle Bin view via category parameter
+        bin_view = self.client.get("/?category=trash")
+        self.assertEqual(bin_view.status_code, 200)
+        self.assertIn(b"Recycle Bin", bin_view.data)
+
+        # 3. Restore document from Recycle Bin
+        restore_resp = self.client.post(f"/document/{doc_id}/restore", follow_redirects=True)
+        self.assertEqual(restore_resp.status_code, 200)
+        self.assertIn(b"Restored", restore_resp.data)
+
+        with self.app.app_context():
+            restored = db.session.get(Document, doc_id)
+            self.assertFalse(restored.is_deleted)
+            self.assertIsNone(restored.deleted_at)
+
+        # File moved back from trash directory to active directory
+        self.assertTrue(os.path.exists(active_local_file))
+        self.assertFalse(os.path.exists(trash_local_file))
+
+        # 4. Move back to trash and permanently delete
+        self.client.post(f"/document/{doc_id}/trash", follow_redirects=True)
+        self.assertTrue(os.path.exists(trash_local_file))
+
+        del_resp = self.client.post(f"/delete/{doc_id}", data={"from": "trash"}, follow_redirects=True)
+        self.assertEqual(del_resp.status_code, 200)
+
+        with self.app.app_context():
+            self.assertIsNone(db.session.get(Document, doc_id))
+
+        # Permanently purged from all storage tiers
+        self.assertFalse(os.path.exists(active_local_file))
+        self.assertFalse(os.path.exists(trash_local_file))
+
+    def test_azure_storage_manager_trash_and_restore_methods(self):
+        """Test CloudStorageManager move_to_trash, restore_from_trash, and delete_file with mock Azure client."""
+        from storage import CloudStorageManager
+        from unittest.mock import MagicMock
+
+        sm = CloudStorageManager()
+        sm.is_cloud_active = True
+        mock_client = MagicMock()
+        sm.blob_service_client = mock_client
+
+        doc_blob = MagicMock()
+        trash_blob = MagicMock()
+        doc_blob.url = "https://azure/documents/blob.pdf"
+        trash_blob.url = "https://azure/trash/blob.pdf"
+        doc_blob.exists.return_value = True
+        trash_blob.exists.return_value = True
+        doc_blob.download_blob.return_value.readall.return_value = b"test payload"
+        trash_blob.download_blob.return_value.readall.return_value = b"test payload"
+
+        src_props = MagicMock()
+        src_props.content_settings.content_type = "application/pdf"
+        src_props.content_settings.content_disposition = 'inline; filename="test.pdf"'
+        doc_blob.get_blob_properties.return_value = src_props
+        trash_blob.get_blob_properties.return_value = src_props
+
+        def get_blob_side_effect(container, blob):
+            return doc_blob if container == sm.container_name else trash_blob
+
+        mock_client.get_blob_client.side_effect = get_blob_side_effect
+
+        # 1. move_to_trash: copies from documents to trash, deletes from documents
+        result_url = sm.move_to_trash("blob.pdf")
+        self.assertEqual(result_url, "https://azure/trash/blob.pdf")
+        trash_blob.upload_blob.assert_called()
+        doc_blob.delete_blob.assert_called()
+
+        # 2. restore_from_trash: copies from trash to documents, deletes from trash
+        restore_url = sm.restore_from_trash("blob.pdf")
+        self.assertEqual(restore_url, "https://azure/documents/blob.pdf")
+        doc_blob.upload_blob.assert_called()
+        trash_blob.delete_blob.assert_called()
+
+        # 3. delete_file: permanently purges from both containers
+        purged = sm.delete_file("blob.pdf")
+        self.assertTrue(purged)
+
 
 if __name__ == "__main__":
     unittest.main()
