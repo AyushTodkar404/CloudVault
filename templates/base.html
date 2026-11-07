@@ -112,8 +112,10 @@
     }
 
     html, body {
-      max-width: 100%;
-      overflow-x: hidden;
+      max-width: 100vw;
+      overflow-x: hidden !important;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
       -webkit-text-size-adjust: 100%;
       -webkit-tap-highlight-color: transparent;
       scroll-behavior: smooth;
@@ -201,10 +203,17 @@
       to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
-    /* Subtle Native Scrollbars */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--cv-border-strong); border-radius: 9999px; }
+    /* Eliminate horizontal scrolling and hide scrollbar lines across all browsers */
+    html, body, * {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    ::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
 
     /* Map Palette Classes to Quiet Neutral & Accent System */
     .bg-\[\#FAFAF9\] { background-color: var(--cv-canvas) !important; }
