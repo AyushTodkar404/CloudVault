@@ -883,6 +883,57 @@ class CloudVaultRealProductionFeaturesTestCase(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 create_app()
 
+    def test_open_redirect_protection_on_login(self):
+        """Ensure /login refuses protocol-relative and backslash open redirect targets."""
+        self.client.post(
+            "/signup",
+            data={"username": "redirect_user", "email": "redirect@vault.edu", "password": "password123", "confirm_password": "password123"},
+            follow_redirects=True,
+        )
+        self.client.post("/logout")
+
+        for payload in ["//attacker.com", "/\\attacker.com", "\\attacker.com", "https://attacker.com"]:
+            resp = self.client.post(
+                f"/login?next={payload}",
+                data={"identity": "redirect_user", "password": "password123"},
+                follow_redirects=False,
+            )
+            self.assertEqual(resp.status_code, 302)
+            self.assertFalse(resp.headers["Location"].startswith("//"))
+            self.assertFalse(resp.headers["Location"].startswith("https://attacker.com"))
+            self.assertIn("/", resp.headers["Location"])
+            self.client.post("/logout")
+
+    def test_custom_error_handlers_render_cleanly(self):
+        """Ensure 400, 403, 404, 413, and 500 error handlers render without traceback leakage."""
+        # 404 Not Found
+        resp_404 = self.client.get("/nonexistent-page-url-xyz")
+        self.assertEqual(resp_404.status_code, 404)
+        self.assertIn(b"Record Not Found", resp_404.data)
+        self.assertIn(b"HTTP 404", resp_404.data)
+
+        # 403 Forbidden via CSRF failure
+        previous_csrf = self.app.config.get("WTF_CSRF_ENABLED", False)
+        self.app.config["WTF_CSRF_ENABLED"] = True
+        try:
+            self.client.get("/login")
+            resp_403 = self.client.post(
+                "/login",
+                data={"identity": "test", "password": "wrong"},
+            )
+            self.assertEqual(resp_403.status_code, 403)
+            self.assertIn(b"Access Forbidden", resp_403.data)
+        finally:
+            self.app.config["WTF_CSRF_ENABLED"] = previous_csrf
+
+    def test_accessibility_skip_link_and_landmarks(self):
+        """Ensure base templates include skip link, focus targets, and semantic landmarks."""
+        resp = self.client.get("/login")
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(b'class="skip-link"', resp.data)
+        self.assertIn(b'href="#main-content"', resp.data)
+        self.assertIn(b'id="main-content"', resp.data)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -217,10 +217,39 @@
         transition-duration: 0.01ms !important;
       }
     }
+
+    /* Accessible Skip Navigation Link (WCAG 2.4.1) */
+    .skip-link {
+      position: absolute;
+      top: -120px;
+      left: 1rem;
+      z-index: 10000;
+      padding: 0.65rem 1.15rem;
+      background: var(--cv-surface);
+      color: var(--cv-accent);
+      border: 2px solid var(--cv-accent);
+      border-radius: 0.5rem;
+      font-family: var(--font-mono, ui-monospace, monospace);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+      transition: top 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .skip-link:focus, .skip-link:focus-visible {
+      top: 1rem;
+      outline: 2px solid var(--cv-accent);
+      outline-offset: 2px;
+    }
+    :focus-visible {
+      outline: 2px solid var(--cv-accent);
+      outline-offset: 2px;
+    }
   </style>
 </head>
 
 <body class="h-full bg-[#FAFAF9] font-sans text-[#202124] flex flex-col min-h-screen">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- Top Navigation Bar -->
   <header class="sticky top-0 z-40 bg-white/95 dark:bg-[#16171C]/95 backdrop-blur-md border-b border-[#E5E7EB] dark:border-[#272832]">
@@ -432,7 +461,7 @@
   </div>
 
   <!-- Main Viewport -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <main id="main-content" tabindex="-1" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 outline-none">
     {% block content %}{% endblock %}
   </main>
 

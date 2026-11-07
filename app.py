@@ -242,6 +242,21 @@ def create_app(test_config=None):
             return False
         return ext in ALLOWED_EXTENSIONS
 
+    def is_safe_redirect_url(target):
+        """Validates that a redirect target is strictly relative to prevent open redirect vulnerabilities."""
+        if not target or not isinstance(target, str):
+            return False
+        from urllib.parse import urlsplit
+        parts = urlsplit(target)
+        return (
+            not parts.scheme
+            and not parts.netloc
+            and target.startswith("/")
+            and not target.startswith("//")
+            and not target.startswith("/\\")
+            and "\\" not in target
+        )
+
     # --------------------------------------------------------------------------
     # Authentication Routes
     # --------------------------------------------------------------------------
@@ -359,7 +374,7 @@ def create_app(test_config=None):
             flash(f"Welcome back, {user.username}.", "success")
 
             next_page = request.args.get("next")
-            if next_page and next_page.startswith("/"):
+            if next_page and is_safe_redirect_url(next_page):
                 return redirect(next_page)
             return redirect(url_for("index"))
 
@@ -474,7 +489,7 @@ def create_app(test_config=None):
     def loading_page():
         """Loading transition page for authentication and workspace initialization."""
         next_url = request.args.get("next", url_for("index"))
-        if not next_url.startswith("/") or next_url.startswith("//") or "\\" in next_url or next_url.startswith("/\\"):
+        if not is_safe_redirect_url(next_url):
             next_url = url_for("index")
         provider = request.args.get("provider", "vault")
         email = request.args.get("email", "")
@@ -1322,9 +1337,70 @@ def create_app(test_config=None):
         response.headers["Content-Security-Policy"] = "; ".join(csp_directives)
         return response
 
+    @app.errorhandler(400)
+    def bad_request(e):
+        return (
+            render_template(
+                "404.html",
+                error_code=400,
+                error_title="Bad Request",
+                error_desc="The request could not be processed due to invalid or malformed data.",
+            ),
+            400,
+        )
+
+    @app.errorhandler(403)
+    def forbidden(e):
+        return (
+            render_template(
+                "404.html",
+                error_code=403,
+                error_title="Access Forbidden",
+                error_desc="You do not have authorization clearance for this resource or action.",
+            ),
+            403,
+        )
+
     @app.errorhandler(404)
     def not_found(e):
-        return render_template("404.html"), 404
+        return (
+            render_template(
+                "404.html",
+                error_code=404,
+                error_title="Record Not Found",
+                error_desc="The requested document, share link, or page could not be located in this vault instance.",
+            ),
+            404,
+        )
+
+    @app.errorhandler(413)
+    @app.errorhandler(RequestEntityTooLarge)
+    def entity_too_large(e):
+        max_mb = app.config.get("MAX_CONTENT_LENGTH", 100 * 1024 * 1024) // (1024 * 1024)
+        return (
+            render_template(
+                "404.html",
+                error_code=413,
+                error_title="Payload Exceeds Limit",
+                error_desc=f"Uploaded file payload exceeds the maximum allowed size of {max_mb} MB.",
+            ),
+            413,
+        )
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        incident_ref = secrets.token_hex(4).upper()
+        app.logger.error(f"Internal server error [Ref {incident_ref}]: {e}", exc_info=True)
+        return (
+            render_template(
+                "404.html",
+                error_code=500,
+                error_title="Internal System Anomaly",
+                error_desc="An internal anomaly occurred while processing this request. Our operations sentinel has been notified.",
+                error_id=incident_ref,
+            ),
+            500,
+        )
 
     return app
 
