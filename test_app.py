@@ -603,6 +603,23 @@ class CloudVaultProfessionalFeaturesTestCase(unittest.TestCase):
         self.assertFalse(data["success"])
         self.assertIn("Prohibited script payload signature detected", data["error"])
 
+    def test_genuine_png_screenshot_with_compressed_bytes_is_accepted(self):
+        """Ensure genuine PNG image containing random byte sequences (like 0x3C 0x25 '<%') is not falsely blocked."""
+        self.register_and_login("screenshot_user", "screenshot@vault.edu")
+        # Valid PNG header + compressed body containing byte sequence 0x3C 0x25 (<%)
+        fake_png_with_asp_bytes = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR" + b"compressed_data<%" + b"\x00\x00\x00\x00IEND\xaeB`\x82"
+        resp = self.client.post(
+            "/upload",
+            data={
+                "file": (io.BytesIO(fake_png_with_asp_bytes), "Screenshot 2026-11-07 025654.png"),
+                "document_title": "Genuine Screenshot",
+            },
+            headers={"X-Requested-With": "XMLHttpRequest"},
+        )
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertTrue(data["success"])
+
 
     def test_offline_vault_and_sync_elements_rendered(self):
         """Ensure templates render offline vault UI elements and OfflineVault storage logic."""

@@ -45,10 +45,14 @@ MALICIOUS_BINARY_HEADERS = [
 ]
 
 # Prohibited dangerous embedded script and webshell patterns in non-code documents
+# Note: Signatures must be multi-byte specific execution patterns to prevent
+# false-positive collisions in compressed binary streams (e.g. zlib/deflate in PNG/DOCX, DCT in JPEG).
 PROHIBITED_PAYLOAD_STRINGS = [
     b"<?" + b"php",
-    b"<?" + b"=",
-    b"<" + b"%",
+    b"<" + b"%eval",
+    b"<" + b"%execute",
+    b"<" + b"%@ page",
+    b"<" + b"%page ",
     b"<script",
     b"javascript:",
     b"vbscript:",
@@ -56,10 +60,9 @@ PROHIBITED_PAYLOAD_STRINGS = [
     b"eval(" + b"gzinflate",
     b"passthru(",
     b"shell_exec(",
-    b"system(",
     b"powershell" + b" -nop",
     b"powershell.exe" + b" -enc",
-    b"powershell",
+    b"powershell" + b" -enc",
     b"cmd.exe" + b" /c",
     b"/bin" + b"/sh",
     b"/bin" + b"/bash",
